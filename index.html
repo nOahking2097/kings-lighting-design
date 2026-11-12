@@ -71,21 +71,26 @@ a { color: inherit; }
 /* ---------- Previs console ---------- */
 .console { --c-panel: #0D1016; --c-tile: #161A22; --c-edge: #262B36; --sel: #F0A24A; --go: #1E7A49; --go-edge: #2EA061; --err: #FF8A7A;
   border: 1px solid var(--stage-line); border-radius: 6px; overflow: hidden; background: var(--c-panel); font-size: 13px; }
-.c-top { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
-.viewport { position: relative; min-height: 460px; background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
+.c-top { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); }
+.viewport { position: relative; min-height: 620px; background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
 .viewport:active { cursor: grabbing; }
 .viewport.aim { cursor: crosshair; touch-action: none; }
 .viewport canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
-.vp-tools { position: absolute; left: 12px; top: 12px; display: flex; gap: 4px; z-index: 3; }
+.vp-tools { position: absolute; left: 12px; bottom: 34px; display: flex; gap: 4px; z-index: 3; }
 .vp-tools button { font: 500 12px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
 .vp-tools button[aria-pressed="true"] { border-color: var(--sel); color: var(--sel); }
 .vp-hint { position: absolute; left: 12px; right: 12px; bottom: 10px; font-family: var(--f-mono); font-size: 11px; color: var(--stage-muted); letter-spacing: .04em; pointer-events: none; z-index: 3; }
-.vp-cue { position: absolute; left: 12px; top: 46px; font-family: var(--f-mono); font-size: 12px; color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); padding: 4px 8px; border-radius: 3px; pointer-events: none; z-index: 3; }
+.vp-cue { position: absolute; right: 12px; bottom: 34px; font-family: var(--f-mono); font-size: 12px; color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); padding: 4px 8px; border-radius: 3px; pointer-events: none; z-index: 3; }
 .vp-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--stage-muted); }
-.fx-label { position: absolute; left: 0; top: 0; font: 500 11px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .82); border: 1px solid var(--stage-line); border-radius: 3px; padding: 2px 6px; cursor: ew-resize; user-select: none; z-index: 2; touch-action: none; white-space: nowrap; }
+.fx-label { position: absolute; left: 0; top: 0; font: 500 10px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .82); border: 1px solid var(--stage-line); border-radius: 3px; padding: 1px 4px; cursor: ew-resize; user-select: none; z-index: 2; touch-action: none; white-space: nowrap; }
 .fx-label.cyc { cursor: pointer; }
 .fx-label.sel { background: var(--sel); color: #17110A; border-color: var(--sel); }
-.sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: 460px; }
+.sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: 620px; }
+.patch { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--stage-line); }
+.patch-h { font: 500 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--sel); margin-right: 4px; }
+.patch label { font: 11px var(--f-mono); color: var(--stage-muted); }
+.console .patch select { font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 8px; max-width: 100%; color-scheme: dark; }
+.patch-count { margin-left: auto; font: 11px var(--f-mono); color: var(--stage-muted); }
 .ctable { width: 100%; border-collapse: collapse; font: 12px var(--f-mono); font-variant-numeric: tabular-nums; color: var(--stage-fg); }
 .ctable th { position: sticky; top: 0; background: var(--c-panel); color: var(--stage-muted); font-weight: 500; text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--stage-line); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; z-index: 1; }
 .ctable td { padding: 7px 8px; border-bottom: 1px solid #181C25; white-space: nowrap; }
@@ -129,7 +134,7 @@ a { color: inherit; }
 .cbtn.warn { color: var(--err); }
 .cbtn.go { background: var(--go); border-color: var(--go-edge); color: #FFFFFF; font-weight: 600; }
 .cbtn.go:hover { filter: brightness(1.12); }
-.cuelist { max-height: 206px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
+.cuelist { max-height: 260px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
 .cuelist tr.cur td { color: var(--sel); }
 .cuelist tr.cur td:first-child::before { content: "▶ "; }
 .cuelist tr.next td:first-child::before { content: "› "; color: var(--stage-muted); }
@@ -158,7 +163,7 @@ a { color: inherit; }
 @media (max-width: 860px) {
   .c-top { grid-template-columns: 1fr; }
   .sheet { border-left: 0; border-top: 1px solid var(--stage-line); max-height: 260px; }
-  .viewport { min-height: 340px; }
+  .viewport { min-height: 400px; }
 }
 @media (max-width: 600px) {
   .c-deck { grid-template-columns: 1fr; }
@@ -289,7 +294,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
-            <span class="vp-hint" id="vp-hint">Drag empty space to orbit · Drag a fixture tag to slide it along the truss</span>
+            <span class="vp-hint" id="vp-hint">Drag empty space to orbit · Drag a fixture tag to slide it along its truss</span>
           </div>
           <div class="sheet" aria-label="Fixture sheet">
             <table class="ctable">
@@ -297,6 +302,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <tbody id="sheet-body"></tbody>
             </table>
           </div>
+        </div>
+        <div class="patch" role="group" aria-label="Patch lights">
+          <span class="patch-h">Patch</span>
+          <label for="p-type">Light type</label><select id="p-type"></select>
+          <label for="p-pos">Position</label><select id="p-pos"></select>
+          <label for="p-qty">Qty</label><select id="p-qty"><option>1</option><option selected>2</option><option>4</option><option>6</option></select>
+          <button type="button" class="cbtn" id="p-add">Add lights</button>
+          <button type="button" class="cbtn" id="p-change">Change selected to this type</button>
+          <button type="button" class="cbtn warn" id="p-del">Remove selected</button>
+          <span class="patch-count" id="p-count"></span>
         </div>
         <div class="cmdline">
           <label for="cmd">CMD</label>
@@ -340,7 +355,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -512,24 +527,48 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
 
   // ================= Rig =================
-  const TRUSS = { foh: { y: 7, z: 9.5, min: -5.5, max: 5.5 }, elec: { y: 6.6, z: -1.2, min: -6, max: 6 } };
+  const TRUSS = {
+    foh: { name: 'FOH truss', y: 7, z: 9.5, min: -5.8, max: 5.8, base: 100 },
+    e1: { name: '1st electric', y: 6.6, z: 1.8, min: -6, max: 6, base: 200 },
+    e2: { name: '2nd electric', y: 6.6, z: -1.2, min: -6, max: 6, base: 300 },
+    floor: { name: 'Upstage floor', y: 0, z: -4.45, min: -6.5, max: 6.5, base: 400, floor: true }
+  };
+  const TYPES = {
+    spot: { label: 'Moving spot', short: 'Spot', plural: 'Spots', group: 'Moving lights', zoom: [8, 40], def: 20, pen: 0.25, power: 3.2, r: 0.13, len: 0.38, haze: 0.06, moving: true },
+    wash: { label: 'Moving wash', short: 'Wash', plural: 'Washes', group: 'Moving lights', zoom: [12, 60], def: 32, pen: 0.75, power: 2.6, r: 0.17, len: 0.38, haze: 0.05, moving: true },
+    beam: { label: 'Moving beam', short: 'Beam', plural: 'Beams', group: 'Moving lights', zoom: [2, 8], def: 4, pen: 0.1, power: 4.5, r: 0.1, len: 0.32, haze: 0.16, moving: true },
+    profile: { label: 'Profile (ellipsoidal)', short: 'Profile', plural: 'Profiles', group: 'Conventional', zoom: [15, 50], def: 26, pen: 0.12, power: 3.0, r: 0.11, len: 0.62, haze: 0.06 },
+    fresnel: { label: 'Fresnel', short: 'Fresnel', plural: 'Fresnels', group: 'Conventional', zoom: [15, 60], def: 40, pen: 0.9, power: 2.4, r: 0.17, len: 0.34, haze: 0.04 },
+    par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 2.2, r: 0.14, len: 0.28, haze: 0.05 }
+  };
   const MOVER = ['dim', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
-  const FIX = [];
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push({ id: 101 + i, type: 'Spot', truss: 'foh', x0: x, attrs: MOVER, n: i }));
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push({ id: 201 + i, type: 'Wash', truss: 'elec', x0: x, attrs: MOVER, n: i }));
-  FIX.push({ id: 301, type: 'Cyc', attrs: ['dim', 'r', 'g', 'b'], n: 0 });
-  const byId = Object.fromEntries(FIX.map(f => [f.id, f]));
-  const ALL = FIX.map(f => f.id);
+  const MAX_PER_TRUSS = 14, MAX_TOTAL = 60;
+  const mk = (id, type, truss, x) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0 });
+  let FIX = [], byId = {};
+  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(101 + i, 'spot', 'foh', x)));
+  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(201 + i, 'wash', 'e1', x)));
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(301 + i, 'beam', 'e2', x)));
+  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(401 + i, 'par', 'floor', x)));
+  FIX.push(mk(501, 'cyc', null, 0));
+  function reindex() {
+    FIX.sort((a, b) => a.id - b.id);
+    byId = Object.fromEntries(FIX.map(f => [f.id, f]));
+    const c = {};
+    FIX.forEach(f => { if (f.type === 'cyc') { f.n = 0; return; } c[f.truss] = c[f.truss] || 0; f.n = c[f.truss]++; });
+  }
+  reindex();
+  const typeName = f => f.type === 'cyc' ? 'Cyc' : TYPES[f.type].short;
+  const isMoving = f => f.type !== 'cyc' && TYPES[f.type].moving;
 
   const ATTR = {
     dim: { label: 'Dim', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     pan: { label: 'Pan', min: -270, max: 270, step: 1, fmt: v => Math.round(v) + '°' },
     tilt: { label: 'Tilt', min: -135, max: 135, step: 1, fmt: v => Math.round(v) + '°' },
-    zoom: { label: 'Zoom', min: 6, max: 50, step: 0.5, fmt: v => Math.round(v) + '°' },
+    zoom: { label: 'Zoom', min: 2, max: 60, step: 0.5, fmt: v => (v < 10 ? v.toFixed(1) : Math.round(v)) + '°' },
     r: { label: 'Red', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     g: { label: 'Green', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     b: { label: 'Blue', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
-    x: { label: 'Truss X', min: -6, max: 6, step: 0.05, fmt: v => v.toFixed(2) + ' m' }
+    x: { label: 'Truss X', min: -6.5, max: 6.5, step: 0.05, fmt: v => v.toFixed(2) + ' m' }
   };
   const PAGES = [['Dimmer', ['dim']], ['Position', ['pan', 'tilt']], ['Beam', ['zoom']], ['Color', ['r', 'g', 'b']], ['Move', ['x']]];
 
@@ -537,9 +576,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { name: 'N/C', sub: 'Open white', hex: '#ffffff' },
     { name: 'L204', sub: 'Full CTO', hex: '#ffb46b' },
     { name: 'L201', sub: 'Full CTB', hex: '#a9c8ff' },
+    { name: 'L101', sub: 'Yellow', hex: '#ffe04a' },
     { name: 'L147', sub: 'Apricot', hex: '#ff9a5c' },
     { name: 'L106', sub: 'Primary Red', hex: '#e4142c' },
+    { name: 'L128', sub: 'Bright Pink', hex: '#ff3c9a' },
+    { name: 'L170', sub: 'Deep Lavender', hex: '#b48ce8' },
     { name: 'L139', sub: 'Primary Green', hex: '#14a845' },
+    { name: 'L115', sub: 'Peacock Blue', hex: '#00a8a8' },
     { name: 'R80', sub: 'Primary Blue', hex: '#2b5cff' },
     { name: 'L181', sub: 'Congo Blue', hex: '#3a14b0' }
   ];
@@ -549,72 +592,96 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   const ACTORS = [[-2.3, 1.5, 0.9], [0.1, 1.5, -0.6], [2.4, 1.5, 0.6]];
   function aimAt(f, fx, P) {
-    const T = TRUSS[f.truss];
-    const vx = P[0] - fx, vy = P[1] - (T.y - 0.43), vz = P[2] - T.z;
+    const T = TRUSS[f.truss], s = T.floor ? -1 : 1;
+    let vx = P[0] - fx, vy = P[1] - (T.y - s * 0.43), vz = P[2] - T.z;
+    if (T.floor) { vx = -vx; vy = -vy; }
     const h = Math.hypot(vx, vz);
     return { tilt: deg(Math.atan2(h, -vy)), pan: deg(Math.atan2(-vx, -vz)) };
   }
+  const fanPt = (f, x) => TRUSS[f.truss].floor ? [x * 1.1, 4.5, -4.8] : [x * 1.1, 0, f.truss === 'foh' ? 1.5 : TRUSS[f.truss].z + 0.8];
   const POS = [
-    { name: 'DSR', sub: 'Down right', aim: f => [-3.5, 0.6, 2.2] },
-    { name: 'DSC', sub: 'Down centre', aim: f => [0, 0.6, 2.2] },
-    { name: 'DSL', sub: 'Down left', aim: f => [3.5, 0.6, 2.2] },
-    { name: 'CS', sub: 'Centre', aim: f => [0, 0.6, 0] },
-    { name: 'USC', sub: 'Upstage', aim: f => [0, 0.6, -2.8] },
+    { name: 'DSR', sub: 'Down right', aim: () => [-3.5, 0.6, 2.2] },
+    { name: 'DSC', sub: 'Down centre', aim: () => [0, 0.6, 2.2] },
+    { name: 'DSL', sub: 'Down left', aim: () => [3.5, 0.6, 2.2] },
+    { name: 'CS', sub: 'Centre', aim: () => [0, 0.6, 0] },
+    { name: 'USC', sub: 'Upstage', aim: () => [0, 0.6, -2.8] },
     { name: 'Actors', sub: 'Specials', aim: f => ACTORS[f.n % 3] },
-    { name: 'Fan', sub: 'Straight out', aim: (f, x) => [x * 1.2, 0, f.truss === 'foh' ? 1.5 : 1.8] },
+    { name: 'Fan', sub: 'Straight out', aim: (f, x) => fanPt(f, x) },
     { name: 'Home', sub: 'Pan/tilt 0', home: true }
   ];
-  const GROUPS = [
-    { name: 'All', ids: ALL },
-    { name: 'FOH spots', ids: [101, 102, 103, 104] },
-    { name: 'Washes', ids: [201, 202, 203, 204] },
-    { name: 'Cyc', ids: [301] },
-    { name: 'Odd', ids: [101, 103, 201, 203] },
-    { name: 'Even', ids: [102, 104, 202, 204] },
-    { name: 'Spots SR', ids: [101, 102] },
-    { name: 'Spots SL', ids: [103, 104] }
-  ];
+  function buildGroups() {
+    const g = [{ name: 'All', ids: FIX.map(f => f.id) }];
+    Object.entries(TRUSS).forEach(([k, T]) => g.push({ name: T.name, ids: FIX.filter(f => f.truss === k).map(f => f.id) }));
+    Object.entries(TYPES).forEach(([k, t]) => g.push({ name: t.plural, ids: FIX.filter(f => f.type === k).map(f => f.id) }));
+    g.push({ name: 'Cyc', ids: FIX.filter(f => f.type === 'cyc').map(f => f.id) });
+    const mv = FIX.filter(f => f.type !== 'cyc');
+    g.push({ name: 'Odd', ids: mv.filter(f => f.n % 2 === 0).map(f => f.id) }, { name: 'Even', ids: mv.filter(f => f.n % 2 === 1).map(f => f.id) });
+    return g.filter(x => x.ids.length);
+  }
+  let GROUPS = buildGroups();
 
   // ================= Show data =================
   function defaults(f) {
     const d = { dim: 0, r: 100, g: 100, b: 100 };
-    if (f.type !== 'Cyc') Object.assign(d, { pan: 0, tilt: 0, zoom: f.type === 'Spot' ? 20 : 32, x: f.x0 });
+    if (f.type !== 'cyc') Object.assign(d, { pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
     return d;
   }
-  function look(build) {
+  const role = f => f.type === 'cyc' ? 'cyc' : TRUSS[f.truss].floor ? 'floor' : f.type;
+  function resolveAt(f, at) {
+    if (typeof at === 'function') at = at(f);
+    if (at === 'actors') return ACTORS[f.n % 3];
+    if (at === 'fan') return fanPt(f, f.x0);
+    if (at === 'cs') return [0, 0.6, 0];
+    if (at === 'cyc') return [f.x0 * 1.1, 4.5, -4.8];
+    return at;
+  }
+  function look(spec) {
     const s = {};
-    FIX.forEach(f => { const d = defaults(f); Object.assign(d, build(f) || {}); s[f.id] = d; });
+    FIX.forEach(f => {
+      const d = defaults(f);
+      let p = spec[role(f)];
+      if (typeof p === 'function') p = p(f);
+      if (p) {
+        if (p.dim != null) d.dim = p.dim;
+        if (p.zoom != null && f.type !== 'cyc') d.zoom = clamp(p.zoom, ...TYPES[f.type].zoom);
+        if (p.gel) Object.assign(d, gel(p.gel));
+        if (p.k) Object.assign(d, kcol(p.k));
+        if (p.at && f.type !== 'cyc') Object.assign(d, aimAt(f, f.x0, resolveAt(f, p.at)));
+      }
+      s[f.id] = d;
+    });
     return s;
   }
-  const aimP = (f, P) => aimAt(f, f.x0, P);
-  const q1 = look(f => f.type === 'Spot' ? Object.assign({ dim: 0 }, aimP(f, ACTORS[f.n % 3]))
-    : f.type === 'Wash' ? Object.assign({ dim: 30 }, gel('R80'), aimP(f, [f.x0 * 1.2, 0, 1.8]))
-    : Object.assign({ dim: 40 }, gel('R80')));
-  const q2 = look(f => f.type === 'Spot' ? Object.assign({ dim: 65, zoom: 22 }, kcol(3600), aimP(f, ACTORS[f.n % 3]))
-    : f.type === 'Wash' ? Object.assign({ dim: 40 }, gel('L201'), aimP(f, [f.x0 * 1.2, 0, 1.8]))
-    : Object.assign({ dim: 75 }, gel('L147')));
-  const q3 = look(f => f.type === 'Spot' ? Object.assign({ dim: 35, zoom: 14 }, kcol(6500), aimP(f, ACTORS[f.n % 3]))
-    : f.type === 'Wash' ? Object.assign({ dim: 90, zoom: 10 }, gel('L201'), aimP(f, ACTORS[f.n % 3]))
-    : Object.assign({ dim: 90 }, gel('L181')));
-  const q4 = look(f => f.type === 'Spot' ? Object.assign({ dim: f.id === 104 ? 0 : 70, zoom: 18 }, kcol(2200), aimP(f, ACTORS[f.n % 3]))
-    : f.type === 'Wash' ? Object.assign({ dim: 45, zoom: 36 }, gel('L147'), aimP(f, [0, 0.6, 0]))
-    : Object.assign({ dim: 25 }, gel('L106')));
-  const q5 = clone(q4); Object.values(q5).forEach(v => { v.dim = 0; });
-  let cues = [
-    { num: 1, name: 'Preset', fade: 0, state: q1 },
-    { num: 2, name: 'Dawn', fade: 5, state: q2 },
-    { num: 3, name: 'Storm', fade: 2, state: q3 },
-    { num: 4, name: 'Fireside', fade: 4, state: q4 },
-    { num: 5, name: 'Blackout', fade: 1.5, state: q5 }
+  const alt = (a, b) => f => f.n % 2 ? b : a;
+  const LOOKS = [
+    ['Preset', 0, { spot: { at: 'actors' }, wash: { dim: 30, gel: 'R80', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'R80', at: 'cyc' }, cyc: { dim: 40, gel: 'R80' } }],
+    ['Dawn', 5, { spot: { dim: 55, k: 3600, zoom: 22, at: 'actors' }, wash: { dim: 35, gel: 'L201', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 60, gel: 'L147', at: 'cyc' }, cyc: { dim: 70, gel: 'L147' } }],
+    ['Morning', 4, { spot: { dim: 75, k: 4300, zoom: 24, at: 'actors' }, wash: { dim: 50, gel: 'L201', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L201', at: 'cyc' }, cyc: { dim: 80, gel: 'L201' } }],
+    ['Midday', 3, { spot: { dim: 90, k: 5600, zoom: 28, at: 'actors' }, wash: { dim: 85, gel: 'N/C', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'N/C', at: 'cyc' }, cyc: { dim: 95, gel: 'L201' } }],
+    ['Sunset', 6, { spot: { dim: 60, k: 2700, zoom: 22, at: 'actors' }, wash: { dim: 50, gel: 'L147', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 80, gel: 'L106', at: 'cyc' }, cyc: { dim: 70, gel: 'L147' } }],
+    ['Dusk', 5, { spot: { dim: 35, k: 3200, zoom: 22, at: 'actors' }, wash: { dim: 40, gel: 'L170', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 70, gel: 'L181', at: 'cyc' }, cyc: { dim: 60, gel: 'L170' } }],
+    ['Moonlight', 4, { spot: { dim: 30, k: 6500, zoom: 16, at: 'actors' }, wash: { dim: 30, gel: 'L201', zoom: 20, at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L181', at: 'cyc' }, cyc: { dim: 45, gel: 'L181' } }],
+    ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 2.5, 0, 2.5] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' } }],
+    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 2.5, 0, 2.5] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' } }],
+    ['After the storm', 3, { spot: { dim: 40, k: 4300, zoom: 22, at: 'actors' }, wash: { dim: 30, gel: 'L115', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'L115', at: 'cyc' }, cyc: { dim: 50, gel: 'L115' } }],
+    ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
+    ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: ACTORS[1] }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
+    ['Dream', 5, { spot: { dim: 40, gel: 'L170', zoom: 30, at: 'actors' }, wash: { dim: 50, gel: 'L128', at: 'fan' }, beam: { dim: 60, gel: 'L170', at: 'actors' }, floor: { dim: 60, gel: 'L170', at: 'cyc' }, cyc: { dim: 55, gel: 'L128' } }],
+    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 3, 3, 9] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
+    ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 2.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
   ];
+  let cues = LOOKS.map(([name, fadeT, spec], i) => ({ num: i + 1, name, fade: fadeT, state: look(spec) }));
+  const bo = clone(cues[cues.length - 1].state); Object.values(bo).forEach(v => { v.dim = 0; });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo });
+
   let curIdx = 0;
-  let pb = clone(q1);
+  let pb = clone(cues[0].state);
   let programmer = {};
   let selection = [];
   let fade = null;
   let fx = false;
   let encPage = 0;
-  const masters = { gm: 100, seq: 100, foh: 100, wash: 100, cyc: 100, haze: 35 };
+  const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35 };
   let dirty = true, uiDirty = true;
   const changed = () => { dirty = true; uiDirty = true; };
 
@@ -622,7 +689,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const inProg = (id, a) => !!(programmer[id] && a in programmer[id]);
   function outDim(f) {
     const d = inProg(f.id, 'dim') ? programmer[f.id].dim : pb[f.id].dim * masters.seq / 100;
-    const gm = f.type === 'Spot' ? masters.foh : f.type === 'Wash' ? masters.wash : masters.cyc;
+    const gm = f.truss === 'foh' ? masters.foh : (f.truss === 'e1' || f.truss === 'e2') ? masters.over : masters.floor;
     return d * gm / 100 * masters.gm / 100;
   }
 
@@ -645,14 +712,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     changed();
   }
   function setAttr(ids, a, v) {
-    let n = 0;
     ids.forEach(id => {
-      const f = byId[id]; if (!f.attrs.includes(a)) return;
+      const f = byId[id]; if (!f || !f.attrs.includes(a)) return;
       let lo = ATTR[a].min, hi = ATTR[a].max;
       if (a === 'x') { lo = TRUSS[f.truss].min; hi = TRUSS[f.truss].max; }
-      (programmer[id] = programmer[id] || {})[a] = clamp(v, lo, hi); n++;
+      if (a === 'zoom') { [lo, hi] = TYPES[f.type].zoom; }
+      (programmer[id] = programmer[id] || {})[a] = clamp(v, lo, hi);
     });
-    changed(); return n;
+    changed();
   }
   function nudge(a, dv) {
     if (!selection.length) { fb('Select fixtures first', true); return; }
@@ -664,21 +731,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     setAttr(selection, 'r', c.r); setAttr(selection, 'g', c.g); setAttr(selection, 'b', c.b);
     fb('Color ' + label + ' on ' + fmtIds(selection));
   }
+  function aimIds(ids, pointFor) {
+    ids.forEach(id => { const f = byId[id]; const a = aimAt(f, val(id, 'x'), pointFor(f, val(id, 'x'))); setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt); });
+  }
   function applyPos(p) {
     if (!needSel()) return;
-    const movers = selection.filter(id => byId[id].type !== 'Cyc');
+    const movers = selection.filter(id => byId[id].type !== 'cyc');
     if (!movers.length) { fb('The cyc light has no position', true); return; }
-    movers.forEach(id => {
-      const f = byId[id];
-      const a = p.home ? { pan: 0, tilt: 0 } : aimAt(f, val(id, 'x'), p.aim(f, val(id, 'x')));
-      setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt);
-    });
+    if (p.home) movers.forEach(id => { setAttr([id], 'pan', 0); setAttr([id], 'tilt', 0); });
+    else aimIds(movers, p.aim);
     fb('Position ' + p.name + ' on ' + fmtIds(movers));
   }
   function locate() {
     if (!needSel()) return;
     setAttr(selection, 'dim', 100); setAttr(selection, 'r', 100); setAttr(selection, 'g', 100); setAttr(selection, 'b', 100);
-    selection.forEach(id => { const f = byId[id]; if (f.type === 'Cyc') return; const a = aimAt(f, val(id, 'x'), [0, 0.6, 0]); setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt); setAttr([id], 'zoom', defaults(f).zoom); });
+    const movers = selection.filter(id => byId[id].type !== 'cyc');
+    aimIds(movers, f => TRUSS[f.truss].floor ? [0, 4.5, -4.8] : [0, 0.6, 0]);
+    movers.forEach(id => setAttr([id], 'zoom', TYPES[byId[id].type].def));
     fb('Located ' + fmtIds(selection));
   }
   function clearKey() {
@@ -686,6 +755,70 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     else if (Object.keys(programmer).length) { programmer = {}; fb('Programmer cleared'); }
     else fb('Nothing to clear');
     changed();
+  }
+
+  // ================= Patch: add, change and remove lights =================
+  function freeX(truss) {
+    const T = TRUSS[truss];
+    const xs = FIX.filter(f => f.truss === truss).map(f => val(f.id, 'x'));
+    let best = 0, bs = -Infinity;
+    for (let x = T.min; x <= T.max + 1e-6; x += 0.25) {
+      const sc = xs.length ? Math.min(...xs.map(v => Math.abs(v - x))) : -Math.abs(x);
+      if (sc > bs + 1e-9) { bs = sc; best = x; }
+    }
+    return Math.round(best * 100) / 100;
+  }
+  function addLights(type, truss, qty) {
+    const T = TRUSS[truss], added = [];
+    for (let k = 0; k < qty; k++) {
+      if (FIX.length >= MAX_TOTAL) { fb('The rig is full (' + MAX_TOTAL + ' lights). Remove some first', true); break; }
+      if (FIX.filter(f => f.truss === truss).length >= MAX_PER_TRUSS) { fb(T.name + ' is full (' + MAX_PER_TRUSS + ' lights)', true); break; }
+      let id = T.base + 1; while (byId[id]) id++;
+      const f = mk(id, type, truss, freeX(truss));
+      FIX.push(f); reindex();
+      const d = defaults(f);
+      pb[id] = clone(d); if (fade) { fade.from[id] = clone(d); fade.to[id] = clone(d); }
+      cues.forEach(c => { c.state[id] = clone(d); });
+      if (scene3d) scene3d.addFixture(f);
+      added.push(id);
+    }
+    if (!added.length) return;
+    selection = [...added];
+    setAttr(added, 'dim', 60);
+    aimIds(added, f => TRUSS[f.truss].floor ? [f.x0 * 1.1, 4.5, -4.8] : [0, 0.6, 0]);
+    rebuildPatch();
+    fb('Added ' + added.length + ' × ' + TYPES[type].label + ' on the ' + T.name + ': ' + fmtIds(added) + '. Store to keep them in a cue');
+  }
+  function changeType(type) {
+    if (!needSel()) return;
+    const ids = selection.filter(id => byId[id].type !== 'cyc');
+    if (!ids.length) { fb('The cyc light cannot change type', true); return; }
+    ids.forEach(id => {
+      const f = byId[id]; f.type = type;
+      const [lo, hi] = TYPES[type].zoom;
+      cues.forEach(c => { c.state[id].zoom = clamp(c.state[id].zoom, lo, hi); });
+      pb[id].zoom = clamp(pb[id].zoom, lo, hi);
+      if (inProg(id, 'zoom')) programmer[id].zoom = clamp(programmer[id].zoom, lo, hi);
+      if (scene3d) { scene3d.removeFixture(id); scene3d.addFixture(f); }
+    });
+    rebuildPatch();
+    fb(fmtIds(ids) + ' changed to ' + TYPES[type].label);
+  }
+  function removeLights() {
+    if (!needSel()) return;
+    const ids = selection.filter(id => byId[id].type !== 'cyc');
+    if (!ids.length) { fb('The cyc light cannot be removed', true); return; }
+    ids.forEach(id => {
+      FIX = FIX.filter(f => f.id !== id);
+      delete pb[id]; delete programmer[id];
+      cues.forEach(c => { delete c.state[id]; });
+      if (fade) { delete fade.from[id]; delete fade.to[id]; }
+      if (scene3d) scene3d.removeFixture(id);
+    });
+    reindex();
+    selection = selection.filter(id => byId[id]);
+    rebuildPatch();
+    fb('Removed ' + fmtIds(ids));
   }
 
   // ================= Playback =================
@@ -758,8 +891,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       if (typeof k !== 'number') { fb('Cannot use "' + k + '" here', true); return; }
       let ids;
       if (mode === 'group') { const g = GROUPS[k - 1]; if (!g) { fb('There is no group ' + k, true); return; } ids = g.ids; }
-      else if (thru && last != null) { const lo = Math.min(last, k), hi = Math.max(last, k); ids = ALL.filter(id => id >= lo && id <= hi); thru = false; }
-      else { if (!byId[k]) { fb('There is no fixture ' + k + '. Fixtures are 101–104, 201–204 and 301', true); return; } ids = [k]; }
+      else if (thru && last != null) { const lo = Math.min(last, k), hi = Math.max(last, k); ids = FIX.map(f => f.id).filter(id => id >= lo && id <= hi); thru = false; }
+      else { if (!byId[k]) { fb('There is no fixture ' + k + '. The rig has ' + fmtIds(FIX.map(f => f.id)), true); return; } ids = [k]; }
       sel = sel || [];
       if (op === '-') sel = sel.filter(id => !ids.includes(id)); else ids.forEach(id => { if (!sel.includes(id)) sel.push(id); });
       op = '+'; if (mode === 'fixture') last = k;
@@ -806,11 +939,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (extra) b.insertBefore(extra, b.lastChild);
     return b;
   }
-  const groupTiles = GROUPS.map((g, i) => {
-    const b = tile((i + 1) + ' ' + g.name, g.ids.length + ' fixture' + (g.ids.length > 1 ? 's' : ''));
-    b.addEventListener('click', e => { select(g.ids, e.shiftKey ? 'add' : 'replace'); fb('Group ' + (i + 1) + ' ' + g.name + ': ' + fmtIds(selection)); });
-    $('pool-groups').appendChild(b); return b;
-  });
+  let groupTiles = [];
+  function buildGroupPool() {
+    GROUPS = buildGroups();
+    $('pool-groups').innerHTML = '';
+    groupTiles = GROUPS.map((g, i) => {
+      const b = tile((i + 1) + ' ' + g.name, g.ids.length + ' light' + (g.ids.length > 1 ? 's' : ''));
+      b.addEventListener('click', e => { select(g.ids, e.shiftKey ? 'add' : 'replace'); fb('Group ' + (i + 1) + ' ' + g.name + ': ' + fmtIds(selection)); });
+      $('pool-groups').appendChild(b); return b;
+    });
+  }
   POS.forEach(p => { const b = tile(p.name, p.sub); b.addEventListener('click', () => applyPos(p)); $('pool-pos').appendChild(b); });
   GELS.forEach(gl => {
     const bar = document.createElement('span'); bar.className = 'bar'; bar.style.background = gl.hex;
@@ -818,6 +956,21 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     b.addEventListener('click', () => applyColor(hexRGB(gl.hex), gl.name));
     $('pool-color').appendChild(b);
   });
+
+  // Patch bar
+  const pType = $('p-type'), pPos = $('p-pos');
+  const og = {};
+  Object.entries(TYPES).forEach(([k, t]) => {
+    if (!og[t.group]) { og[t.group] = document.createElement('optgroup'); og[t.group].label = t.group; pType.appendChild(og[t.group]); }
+    const o = document.createElement('option'); o.value = k; o.textContent = t.label + ' · ' + t.zoom[0] + '–' + t.zoom[1] + '°';
+    og[t.group].appendChild(o);
+  });
+  pType.value = 'beam';
+  Object.entries(TRUSS).forEach(([k, T]) => { const o = document.createElement('option'); o.value = k; o.textContent = T.name; pPos.appendChild(o); });
+  pPos.value = 'e2';
+  $('p-add').addEventListener('click', () => addLights(pType.value, pPos.value, +$('p-qty').value));
+  $('p-change').addEventListener('click', () => changeType(pType.value));
+  $('p-del').addEventListener('click', removeLights);
 
   // Encoders
   const encEls = [];
@@ -848,7 +1001,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
 
   // Faders
-  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['wash', 'Wash'], ['cyc', 'Cyc'], ['haze', 'Haze']].forEach(([k, label]) => {
+  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['over', 'Elecs'], ['floor', 'Floor'], ['haze', 'Haze']].forEach(([k, label]) => {
     const w = document.createElement('div'); w.className = 'fader';
     w.innerHTML = '<span class="v"></span><input type="range" min="0" max="100" step="1"><label></label>';
     const inp = w.querySelector('input'), v = w.querySelector('.v'), l = w.querySelector('label');
@@ -862,21 +1015,32 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   $('b-store').addEventListener('click', () => store(null));
   $('b-clear').addEventListener('click', clearKey);
   $('b-locate').addEventListener('click', locate);
-  $('b-fx').addEventListener('click', () => { fx = !fx; $('b-fx').setAttribute('aria-pressed', fx); fb(fx ? 'Ballyhoo running on the FOH spots' : 'Ballyhoo stopped'); changed(); });
+  $('b-fx').addEventListener('click', () => { fx = !fx; $('b-fx').setAttribute('aria-pressed', fx); fb(fx ? 'Ballyhoo running on all moving lights' : 'Ballyhoo stopped'); changed(); });
 
   // Fixture sheet
-  const sheetRows = {};
-  FIX.forEach(f => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = '<td></td><td></td><td data-a="dim"></td><td data-a="pan"></td><td data-a="tilt"></td><td data-a="zoom"></td><td data-a="col"></td><td data-a="x"></td>';
-    tr.cells[0].textContent = f.id; tr.cells[1].textContent = f.type;
-    tr.addEventListener('click', e => { select([f.id], e.shiftKey || e.ctrlKey || e.metaKey ? 'toggle' : 'replace'); fb('Selected ' + (selection.length ? fmtIds(selection) : 'nothing')); });
-    $('sheet-body').appendChild(tr); sheetRows[f.id] = tr;
-  });
+  let sheetRows = {};
+  function buildSheet() {
+    const body = $('sheet-body'); body.innerHTML = ''; sheetRows = {};
+    FIX.forEach(f => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td></td><td></td><td data-a="dim"></td><td data-a="pan"></td><td data-a="tilt"></td><td data-a="zoom"></td><td data-a="col"></td><td data-a="x"></td>';
+      tr.cells[0].textContent = f.id; tr.cells[1].textContent = typeName(f);
+      tr.addEventListener('click', e => { select([f.id], e.shiftKey || e.ctrlKey || e.metaKey ? 'toggle' : 'replace'); fb('Selected ' + (selection.length ? fmtIds(selection) : 'nothing')); });
+      body.appendChild(tr); sheetRows[f.id] = tr;
+    });
+  }
+  function rebuildPatch() {
+    buildSheet(); buildGroupPool();
+    const n = FIX.length;
+    $('p-count').textContent = n + ' lights patched · ' + Object.keys(TYPES).map(k => [k, FIX.filter(f => f.type === k).length]).filter(x => x[1]).map(([k, c]) => c + ' ' + (c > 1 ? TYPES[k].plural : TYPES[k].short)).join(', ');
+    changed();
+  }
 
   function renderUI() {
     FIX.forEach(f => {
-      const tr = sheetRows[f.id]; tr.classList.toggle('sel', selection.includes(f.id));
+      const tr = sheetRows[f.id]; if (!tr) return;
+      tr.classList.toggle('sel', selection.includes(f.id));
+      tr.cells[1].textContent = typeName(f);
       [...tr.cells].slice(2).forEach(td => {
         const a = td.dataset.a;
         if (a === 'col') {
@@ -887,7 +1051,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         }
         if (!f.attrs.includes(a)) { td.textContent = '—'; td.className = 'na'; return; }
         const v = val(f.id, a);
-        td.textContent = a === 'dim' ? (v >= 99.5 ? 'FL' : Math.round(v)) : a === 'x' ? v.toFixed(1) : Math.round(v);
+        td.textContent = a === 'dim' ? (v >= 99.5 ? 'FL' : Math.round(v)) : a === 'x' ? v.toFixed(1) : a === 'zoom' && v < 10 ? v.toFixed(1) : Math.round(v);
         td.className = inProg(f.id, a) ? 'prog' : '';
       });
     });
@@ -898,17 +1062,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       if (!a) { el.dataset.attr = ''; el.classList.add('off'); el.querySelector('.lbl').textContent = '—'; el.querySelector('.val').textContent = ''; el.style.setProperty('--rot', '0deg'); el.removeAttribute('aria-label'); el.tabIndex = -1; return; }
       const A = ATTR[a]; el.dataset.attr = a; el.classList.remove('off'); el.tabIndex = 0;
       el.querySelector('.lbl').textContent = A.label;
-      const id = selection.find(s => byId[s].attrs.includes(a));
+      const id = selection.find(s => byId[s] && byId[s].attrs.includes(a));
       const v = id != null ? val(id, a) : null;
       el.querySelector('.val').textContent = v == null ? '—' : A.fmt(v);
-      const lo = a === 'x' ? -6 : A.min, hi = a === 'x' ? 6 : A.max;
-      el.style.setProperty('--rot', (v == null ? 0 : ((v - lo) / (hi - lo)) * 270 - 135) + 'deg');
+      el.style.setProperty('--rot', (v == null ? 0 : ((v - A.min) / (A.max - A.min)) * 270 - 135) + 'deg');
       el.setAttribute('aria-label', A.label); el.setAttribute('aria-valuemin', A.min); el.setAttribute('aria-valuemax', A.max);
       if (v != null) el.setAttribute('aria-valuenow', Math.round(v * 100) / 100); else el.removeAttribute('aria-valuenow');
     });
     $('sel-info').textContent = selection.length ? fmtIds(selection) : 'No selection';
     const key = [...selection].sort().join();
-    groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && key === [...GROUPS[i].ids].sort().join()));
+    groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && GROUPS[i] && key === [...GROUPS[i].ids].sort().join()));
     const body = $('cue-body'); body.innerHTML = '';
     cues.forEach((c, i) => {
       const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
@@ -917,7 +1080,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       tr.addEventListener('click', () => gotoIdx(i));
       body.appendChild(tr);
     });
-    $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : '');
+    $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
     const c = cues[curIdx];
     $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (Object.keys(programmer).length ? ' + programmer' : '');
   }
@@ -1000,6 +1163,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
     const pipeMat = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: 0.6, roughness: 0.4 });
     Object.values(TRUSS).forEach(T => {
+      if (T.floor) return;
       const len = T.max - T.min + 1.2;
       [-0.1, 0.1].forEach(dz => {
         const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 8), pipeMat);
@@ -1007,61 +1171,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     });
 
-    const obj = {};
-    FIX.forEach(f => {
-      if (f.type === 'Cyc') return;
-      const T = TRUSS[f.truss];
-      const root = new THREE.Group(); root.position.set(f.x0, T.y, T.z); scene.add(root);
-      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1b1d22, roughness: 0.5, emissive: 0x000000 });
-      const base = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.1, 0.3), baseMat); base.position.y = -0.08; root.add(base);
-      const pan = new THREE.Group(); pan.position.y = -0.13; root.add(pan);
-      const armMat = new THREE.MeshStandardMaterial({ color: 0x24272d, roughness: 0.5 });
-      const yokeTop = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.04, 0.12), armMat); pan.add(yokeTop);
-      [-1, 1].forEach(s => { const arm = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.34, 0.12), armMat); arm.position.set(s * 0.21, -0.17, 0); pan.add(arm); });
-      const tilt = new THREE.Group(); tilt.position.y = -0.3; pan.add(tilt);
-      const r = f.type === 'Spot' ? 0.13 : 0.17;
-      const head = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r, 0.38, 20), new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 }));
-      tilt.add(head);
-      const lens = new THREE.Mesh(new THREE.CircleGeometry(r * 0.8, 24), new THREE.MeshBasicMaterial({ color: 0x111111 }));
-      lens.rotation.x = Math.PI / 2; lens.position.y = -0.192; tilt.add(lens);
-      const spot = new THREE.SpotLight(0xffffff, 0, 34, 0.3, f.type === 'Spot' ? 0.25 : 0.75, 1.1);
-      spot.position.y = -0.2; tilt.add(spot);
-      const tgt = new THREE.Object3D(); tgt.position.y = -10; tilt.add(tgt); spot.target = tgt;
-      if (f.type === 'Spot') { spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0006; spot.shadow.camera.near = 0.5; }
-      const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
-      const cone = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
-      cone.position.y = -0.2; tilt.add(cone);
-      obj[f.id] = { root, pan, tilt, spot, cone, lens, baseMat, len: 14 };
-    });
+    // A fixed pool of real lights is shared by the brightest fixtures, so the rig can grow without overloading the graphics card.
+    const POOL = 14, pool = [];
+    for (let i = 0; i < POOL; i++) {
+      const s = new THREE.SpotLight(0xffffff, 0, 34, 0.3, 0.3, 1.1);
+      if (i < 4) { s.castShadow = true; s.shadow.mapSize.set(1024, 1024); s.shadow.bias = -0.0006; s.shadow.camera.near = 0.5; }
+      scene.add(s, s.target); pool.push(s);
+    }
 
-    // Fixture tags
-    const labels = {};
-    FIX.forEach(f => {
-      const el = document.createElement('div'); el.className = 'fx-label' + (f.type === 'Cyc' ? ' cyc' : '');
-      el.textContent = f.id; el.title = f.type + ' ' + f.id + (f.type === 'Cyc' ? '' : ' · drag to move along the truss');
-      $('labels').appendChild(el); labels[f.id] = el;
-      let drag = null;
-      el.addEventListener('pointerdown', e => {
-        e.stopPropagation(); e.preventDefault();
-        const add = e.shiftKey || e.ctrlKey || e.metaKey;
-        if (add) { select([f.id], 'toggle'); return; }
-        if (!selection.includes(f.id)) select([f.id], 'replace');
-        drag = { sx: e.clientX, moved: false }; el.setPointerCapture(e.pointerId);
-      });
-      el.addEventListener('pointermove', e => {
-        if (!drag || f.type === 'Cyc') return;
-        if (Math.abs(e.clientX - drag.sx) > 3) drag.moved = true;
-        if (!drag.moved) return;
-        const P = hit(e, new THREE.Plane(new THREE.Vector3(0, 0, 1), -TRUSS[f.truss].z));
-        if (P) { setAttr([f.id], 'x', P.x); fb(f.id + ' moved to X ' + val(f.id, 'x').toFixed(2) + ' m'); }
-      });
-      el.addEventListener('pointerup', () => {
-        if (drag && !drag.moved) { select([f.id], 'replace'); fb('Selected ' + f.id); }
-        drag = null;
-      });
-      el.addEventListener('pointercancel', () => { drag = null; });
-    });
-
+    const obj = {}, labels = {};
     const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
     function hit(e, plane) {
       const r = vp.getBoundingClientRect();
@@ -1070,18 +1188,72 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const out = new THREE.Vector3();
       return ray.ray.intersectPlane(plane, out) ? out : null;
     }
+    function makeLabel(f) {
+      const el = document.createElement('div'); el.className = 'fx-label' + (f.type === 'cyc' ? ' cyc' : '');
+      el.textContent = f.id; el.title = typeName(f) + ' ' + f.id + (f.type === 'cyc' ? '' : ' · drag to move along the ' + TRUSS[f.truss].name);
+      $('labels').appendChild(el); labels[f.id] = el;
+      let drag = null;
+      el.addEventListener('pointerdown', e => {
+        e.stopPropagation(); e.preventDefault();
+        if (e.shiftKey || e.ctrlKey || e.metaKey) { select([f.id], 'toggle'); return; }
+        if (!selection.includes(f.id)) select([f.id], 'replace');
+        drag = { sx: e.clientX, moved: false }; el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', e => {
+        if (!drag || f.type === 'cyc') return;
+        if (Math.abs(e.clientX - drag.sx) > 3) drag.moved = true;
+        if (!drag.moved) return;
+        const P = hit(e, new THREE.Plane(new THREE.Vector3(0, 0, 1), -TRUSS[f.truss].z));
+        if (P) { setAttr([f.id], 'x', P.x); fb(f.id + ' moved to X ' + val(f.id, 'x').toFixed(2) + ' m'); }
+      });
+      el.addEventListener('pointerup', () => { if (drag && !drag.moved) { select([f.id], 'replace'); fb('Selected ' + f.id); } drag = null; });
+      el.addEventListener('pointercancel', () => { drag = null; });
+    }
+    function addFixture(f) {
+      makeLabel(f);
+      if (f.type === 'cyc') return;
+      const T = TRUSS[f.truss], ty = TYPES[f.type];
+      const root = new THREE.Group(); root.position.set(f.x0, T.y, T.z); if (T.floor) root.rotation.z = Math.PI; scene.add(root);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1b1d22, roughness: 0.5, emissive: 0x000000 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.1, 0.3), baseMat); base.position.y = -0.08; root.add(base);
+      const pan = new THREE.Group(); pan.position.y = -0.13; root.add(pan);
+      const armMat = new THREE.MeshStandardMaterial({ color: 0x24272d, roughness: 0.5 });
+      pan.add(new THREE.Mesh(new THREE.BoxGeometry(ty.r * 2 + 0.16, 0.04, 0.1), armMat));
+      [-1, 1].forEach(s => { const arm = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.34, 0.1), armMat); arm.position.set(s * (ty.r + 0.06), -0.17, 0); pan.add(arm); });
+      const tilt = new THREE.Group(); tilt.position.y = -0.3; pan.add(tilt);
+      const top = f.type === 'beam' ? ty.r * 1.3 : f.type === 'profile' ? ty.r * 1.15 : f.type === 'par' ? ty.r : ty.r * 0.9;
+      const head = new THREE.Mesh(new THREE.CylinderGeometry(top, ty.r, ty.len, 20), new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 }));
+      tilt.add(head);
+      const lens = new THREE.Mesh(new THREE.CircleGeometry(ty.r * 0.82, 24), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      lens.rotation.x = Math.PI / 2; lens.position.y = -ty.len / 2 - 0.002; tilt.add(lens);
+      const emit = new THREE.Object3D(); emit.position.y = -ty.len / 2; tilt.add(emit);
+      const aim = new THREE.Object3D(); aim.position.y = -10; tilt.add(aim);
+      const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
+      const cone = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+      cone.position.y = -ty.len / 2; tilt.add(cone);
+      obj[f.id] = { root, pan, tilt, cone, lens, baseMat, emit, aim, len: 14 };
+      dirty = true;
+    }
+    function removeFixture(id) {
+      const o = obj[id];
+      if (o) { scene.remove(o.root); o.root.traverse(m => { if (m.geometry) m.geometry.dispose(); if (m.material) m.material.dispose(); }); delete obj[id]; }
+      if (labels[id]) { labels[id].remove(); delete labels[id]; }
+      dirty = true;
+    }
+    FIX.forEach(addFixture);
+
     const deckPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     function aimHere(e) {
-      const movers = selection.filter(id => byId[id].type !== 'Cyc');
-      if (!movers.length) { fb('Select moving lights, then click the stage to aim them', true); return; }
+      const movers = selection.filter(id => byId[id] && byId[id].type !== 'cyc');
+      if (!movers.length) { fb('Select lights, then click the stage to aim them', true); return; }
       const P = hit(e, deckPlane);
       if (!P || Math.abs(P.x) > 7 || P.z < -4.8 || P.z > 4) return;
-      movers.forEach(id => { const a = aimAt(byId[id], val(id, 'x'), [P.x, 0, P.z]); setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt); });
+      aimIds(movers, () => [P.x, 0, P.z]);
       fb('Aimed ' + fmtIds(movers) + ' at X ' + P.x.toFixed(1) + ' m, Z ' + P.z.toFixed(1) + ' m');
     }
 
-    let az = 0.15, el = 0.12, dist = 20;
-    const lookAt = new THREE.Vector3(0, 3.2, -0.3);
+    let az = 0.15, el = 0.1, dist = 18;
+    const lookAt = new THREE.Vector3(0, 3.9, -0.3);
     function placeCam() {
       camera.position.set(lookAt.x + dist * Math.sin(az) * Math.cos(el), lookAt.y + dist * Math.sin(el), lookAt.z + dist * Math.cos(az) * Math.cos(el));
       camera.lookAt(lookAt);
@@ -1106,39 +1278,50 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     function resize() {
       const w = vp.clientWidth, h = vp.clientHeight;
       renderer.setSize(w, h, false); camera.aspect = w / h;
-      dist = w / h < 1.1 ? 28 : 20;
+      dist = w / h < 1.1 ? 26 : 18;
       camera.updateProjectionMatrix(); dirty = true;
     }
     new ResizeObserver(resize).observe(vp);
 
-    const v3 = new THREE.Vector3();
+    const v3 = new THREE.Vector3(), up = new THREE.Vector3();
     function render(now) {
+      const lit = [];
       FIX.forEach(f => {
         const d = outDim(f) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
-        if (f.type === 'Cyc') { cycMat.emissive.setRGB(r, g, b); cycMat.emissiveIntensity = 0.03 + 0.95 * d; return; }
-        const o = obj[f.id];
+        if (f.type === 'cyc') { cycMat.emissive.setRGB(r, g, b); cycMat.emissiveIntensity = 0.03 + 0.95 * d; return; }
+        const o = obj[f.id]; if (!o) return;
+        const ty = TYPES[f.type];
         let pan = val(f.id, 'pan'), tilt = val(f.id, 'tilt');
-        if (fx && f.type === 'Spot') { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
+        if (fx && ty.moving) { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
         o.root.position.x = val(f.id, 'x');
         o.pan.rotation.y = rad(pan); o.tilt.rotation.x = rad(tilt);
         const zoom = val(f.id, 'zoom');
-        o.spot.angle = rad(zoom / 2); o.spot.color.setRGB(r, g, b);
-        o.spot.intensity = (f.type === 'Spot' ? 3.2 : 2.6) * d;
         const rr = Math.tan(rad(zoom / 2)) * o.len;
         o.cone.scale.set(rr, o.len, rr);
         o.cone.material.color.setRGB(r, g, b);
-        o.cone.material.opacity = masters.haze / 100 * d * (f.type === 'Spot' ? 0.06 : 0.07);
+        o.cone.material.opacity = masters.haze / 100 * d * ty.haze;
         o.cone.visible = o.cone.material.opacity > 0.002;
         o.lens.material.color.setRGB(0.07 + r * d, 0.07 + g * d, 0.07 + b * d);
         o.baseMat.emissive.setHex(selection.includes(f.id) ? 0x8a5410 : 0x000000);
+        if (d > 0.002) lit.push({ f, o, d, r, g, b, zoom, pri: d * ty.power * (TRUSS[f.truss].floor ? 0.3 : 1) });
+      });
+      scene.updateMatrixWorld();
+      lit.sort((a, b) => b.pri - a.pri);
+      pool.forEach((s, i) => {
+        const L = lit[i];
+        if (!L) { s.intensity = 0; return; }
+        L.o.emit.getWorldPosition(s.position);
+        L.o.aim.getWorldPosition(s.target.position);
+        const ty = TYPES[L.f.type];
+        s.angle = rad(L.zoom / 2); s.penumbra = ty.pen; s.color.setRGB(L.r, L.g, L.b); s.intensity = ty.power * L.d;
       });
       placeCam();
-      scene.updateMatrixWorld();
       renderer.render(scene, camera);
       const w = vp.clientWidth, h = vp.clientHeight;
       FIX.forEach(f => {
-        const lb = labels[f.id];
-        if (f.type === 'Cyc') v3.set(0, 7.4, -4.8); else obj[f.id].root.getWorldPosition(v3).add(new THREE.Vector3(0, 0.32, 0));
+        const lb = labels[f.id]; if (!lb) return;
+        if (f.type === 'cyc') v3.set(0, 7.4, -4.8);
+        else obj[f.id].root.getWorldPosition(v3).add(up.set(0, TRUSS[f.truss].floor ? 0.85 : 0.32, 0));
         v3.project(camera);
         const off = v3.z > 1;
         lb.hidden = off;
@@ -1147,7 +1330,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render };
+    return { render, addFixture, removeFixture };
   }
 
   try { scene3d = build3D(); }
@@ -1157,12 +1340,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     vp.appendChild(f);
     $('vp-hint').hidden = true;
   }
+  rebuildPatch();
 
   function setTool(aim) {
     aimMode = aim;
     $('tool-aim').setAttribute('aria-pressed', aim); $('tool-move').setAttribute('aria-pressed', !aim);
     vp.classList.toggle('aim', aim);
-    $('vp-hint').textContent = aim ? 'Aim: click or drag on the stage floor to point the selected lights there' : 'Drag empty space to orbit · Drag a fixture tag to slide it along the truss';
+    $('vp-hint').textContent = aim ? 'Aim: click or drag on the stage floor to point the selected lights there' : 'Drag empty space to orbit · Drag a fixture tag to slide it along its truss';
   }
   $('tool-move').addEventListener('click', () => setTool(false));
   $('tool-aim').addEventListener('click', () => setTool(true));
