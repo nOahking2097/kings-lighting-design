@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Kings Lighting Design</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a dark "stage" up top (a live 3D previs of a proscenium stage), then the studio's work set out like a show's lighting paperwork: specs in mono, prose in sans. */
+:root {
+  --bg: #EDEFF2;
+  --fg: #14171C;
+  --muted: #586070;
+  --line: #CDD2DA;
+  --surface: #E2E5EA;
+  --accent: #B8681A;
+  --accent-ink: #FFFFFF;
+  --stage: #0A0C10;
+  --stage-fg: #E9EBEF;
+  --stage-muted: #8A91A0;
+  --stage-line: #242833;
+  --beam: #FFC98A;
+  --gel: #2C5CFF;
+  --f-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1116; --fg: #E6E8EC; --muted: #8E95A3; --line: #262A33; --surface: #171A21;
+    --accent: #F0A24A; --accent-ink: #14171C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1116; --fg: #E6E8EC; --muted: #8E95A3; --line: #262A33; --surface: #171A21;
+  --accent: #F0A24A; --accent-ink: #14171C; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 16px; line-height: 1.6; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Header ---------- */
+.top { background: var(--stage); color: var(--stage-fg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; }
+.brand-mark { width: 22px; height: 22px; position: relative; }
+.brand-mark::before { content: ""; position: absolute; left: 50%; top: 0; width: 6px; height: 4px; transform: translateX(-50%); background: var(--stage-fg); border-radius: 1px; }
+.brand-mark::after { content: ""; position: absolute; left: 0; right: 0; top: 4px; bottom: 0; background: linear-gradient(var(--beam), transparent); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); opacity: .9; }
+.nav { display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; }
+.nav a { text-decoration: none; color: var(--stage-muted); }
+.nav a:hover { color: var(--stage-fg); }
+
+/* ---------- Hero / stage ---------- */
+.stage { background: var(--stage); color: var(--stage-fg); padding-bottom: 56px; }
+.hero-copy { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: end; padding-block: 40px 28px; }
+.hero-copy h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.98; font-weight: 800; }
+.hero-copy h1 em { font-style: normal; color: var(--beam); transition: color .4s; }
+.hero-copy p { color: var(--stage-muted); max-width: 46ch; font-size: 17px; }
+/* ---------- Previs console ---------- */
+.console { --c-panel: #0D1016; --c-tile: #161A22; --c-edge: #262B36; --sel: #F0A24A; --go: #1E7A49; --go-edge: #2EA061; --err: #FF8A7A;
+  border: 1px solid var(--stage-line); border-radius: 6px; overflow: hidden; background: var(--c-panel); font-size: 13px; }
+.c-top { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+.viewport { position: relative; min-height: 460px; background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
+.viewport:active { cursor: grabbing; }
+.viewport.aim { cursor: crosshair; touch-action: none; }
+.viewport canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
+.vp-tools { position: absolute; left: 12px; top: 12px; display: flex; gap: 4px; z-index: 3; }
+.vp-tools button { font: 500 12px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
+.vp-tools button[aria-pressed="true"] { border-color: var(--sel); color: var(--sel); }
+.vp-hint { position: absolute; left: 12px; right: 12px; bottom: 10px; font-family: var(--f-mono); font-size: 11px; color: var(--stage-muted); letter-spacing: .04em; pointer-events: none; z-index: 3; }
+.vp-cue { position: absolute; left: 12px; top: 46px; font-family: var(--f-mono); font-size: 12px; color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); padding: 4px 8px; border-radius: 3px; pointer-events: none; z-index: 3; }
+.vp-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--stage-muted); }
+.fx-label { position: absolute; left: 0; top: 0; font: 500 11px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .82); border: 1px solid var(--stage-line); border-radius: 3px; padding: 2px 6px; cursor: ew-resize; user-select: none; z-index: 2; touch-action: none; white-space: nowrap; }
+.fx-label.cyc { cursor: pointer; }
+.fx-label.sel { background: var(--sel); color: #17110A; border-color: var(--sel); }
+.sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: 460px; }
+.ctable { width: 100%; border-collapse: collapse; font: 12px var(--f-mono); font-variant-numeric: tabular-nums; color: var(--stage-fg); }
+.ctable th { position: sticky; top: 0; background: var(--c-panel); color: var(--stage-muted); font-weight: 500; text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--stage-line); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; z-index: 1; }
+.ctable td { padding: 7px 8px; border-bottom: 1px solid #181C25; white-space: nowrap; }
+.ctable tbody tr { cursor: pointer; }
+.ctable tbody tr:hover td { background: #131720; }
+.ctable tr.sel td { background: rgba(240, 162, 74, .12); }
+.ctable tr.sel td:first-child { box-shadow: inset 3px 0 var(--sel); }
+.ctable td.prog { color: var(--sel); }
+.ctable td.na { color: #3A404C; }
+.sw { display: inline-block; width: 14px; height: 14px; border-radius: 2px; vertical-align: -3px; border: 1px solid #333944; }
+.cmdline { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-top: 1px solid var(--stage-line); border-bottom: 1px solid var(--stage-line); background: #07080B; flex-wrap: wrap; }
+.cmdline label { font: 500 11px var(--f-mono); color: var(--sel); letter-spacing: .1em; }
+.console .cmdline input { flex: 1 1 240px; min-width: 0; font: 14px var(--f-mono); color: var(--stage-fg); background: transparent; border: 0; border-bottom: 1px solid transparent; padding: 4px 0; outline: none; }
+.console .cmdline input:focus { border-bottom-color: var(--sel); }
+.cmd-fb { font: 12px var(--f-mono); color: var(--stage-muted); }
+.cmd-fb.err { color: var(--err); }
+.c-deck { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, .95fr); }
+.c-sec { padding: 14px; border-right: 1px solid var(--stage-line); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.c-sec:last-child { border-right: 0; }
+.c-h { font: 500 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--stage-muted); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.c-h span { letter-spacing: .02em; text-transform: none; }
+.pool { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.tile { font: 500 11px var(--f-mono); color: var(--stage-fg); background: var(--c-tile); border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px; min-height: 46px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; line-height: 1.2; overflow: hidden; }
+.tile small { color: var(--stage-muted); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile:hover { border-color: #3A4150; }
+.tile.on { border-color: var(--sel); color: var(--sel); }
+.tile .bar { display: block; width: 100%; height: 6px; border-radius: 1px; }
+.pages { display: flex; gap: 4px; flex-wrap: wrap; }
+.pages button, .cbtn { font: 500 12px var(--f-mono); color: var(--stage-fg); background: var(--c-tile); border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 9px; cursor: pointer; }
+.pages button[aria-pressed="true"], .cbtn[aria-pressed="true"] { border-color: var(--sel); color: var(--sel); }
+.pages button:hover, .cbtn:hover { border-color: #3A4150; }
+.encs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.enc { display: grid; justify-items: center; gap: 3px; text-align: center; cursor: ns-resize; touch-action: none; user-select: none; outline: none; border-radius: 4px; padding: 6px 0; }
+.enc:focus-visible { box-shadow: 0 0 0 2px var(--sel); }
+.enc.off { opacity: .28; cursor: default; }
+.knob { width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #2B303B, #11141A); border: 1px solid #343B48; position: relative; }
+.knob::after { content: ""; position: absolute; left: 50%; top: 4px; width: 2px; height: 12px; margin-left: -1px; background: var(--sel); transform-origin: 1px 19px; transform: rotate(var(--rot, 0deg)); }
+.enc .lbl { font: 10.5px var(--f-mono); color: var(--stage-muted); text-transform: uppercase; letter-spacing: .06em; }
+.enc .val { font: 500 12px var(--f-mono); color: var(--stage-fg); font-variant-numeric: tabular-nums; }
+.btn-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.cbtn.warn { color: var(--err); }
+.cbtn.go { background: var(--go); border-color: var(--go-edge); color: #FFFFFF; font-weight: 600; }
+.cbtn.go:hover { filter: brightness(1.12); }
+.cuelist { max-height: 206px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
+.cuelist tr.cur td { color: var(--sel); }
+.cuelist tr.cur td:first-child::before { content: "▶ "; }
+.cuelist tr.next td:first-child::before { content: "› "; color: var(--stage-muted); }
+.fade-row { display: flex; align-items: center; gap: 8px; color: var(--stage-muted); font: 11px var(--f-mono); flex-wrap: wrap; }
+.fade-row input { width: 64px; font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 4px 6px; color-scheme: dark; }
+.go-row { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr; gap: 4px; }
+.go-row .cbtn { padding: 12px 6px; font-size: 13px; }
+.faders { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.fader { display: grid; justify-items: center; gap: 6px; }
+.fader input { writing-mode: vertical-lr; direction: rtl; width: 24px; height: 104px; accent-color: var(--sel); margin: 0; }
+.fader .v { font: 11px var(--f-mono); color: var(--stage-fg); font-variant-numeric: tabular-nums; }
+.fader label { font: 10px var(--f-mono); color: var(--stage-muted); text-transform: uppercase; letter-spacing: .04em; text-align: center; line-height: 1.2; }
+.keypad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.keypad button { font: 500 11px var(--f-mono); color: var(--stage-fg); background: var(--c-tile); border: 1px solid var(--c-edge); border-radius: 3px; padding: 11px 0; cursor: pointer; min-width: 0; overflow: hidden; }
+.keypad button:hover { border-color: #3A4150; }
+.keypad .k-fn { color: var(--sel); }
+.keypad .k-warn { color: var(--err); }
+.keypad .k-enter { grid-column: span 2; background: #1C212C; }
+.c-help { margin: 0; padding: 10px 14px; border-top: 1px solid var(--stage-line); font-size: 12.5px; color: var(--stage-muted); line-height: 1.55; }
+.c-help kbd { font: 11px var(--f-mono); color: var(--stage-fg); border: 1px solid var(--c-edge); border-radius: 3px; padding: 0 4px; }
+@media (max-width: 1100px) {
+  .c-deck { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .c-sec:nth-child(2) { border-right: 0; }
+  .c-sec:nth-child(-n+2) { border-bottom: 1px solid var(--stage-line); }
+}
+@media (max-width: 860px) {
+  .c-top { grid-template-columns: 1fr; }
+  .sheet { border-left: 0; border-top: 1px solid var(--stage-line); max-height: 260px; }
+  .viewport { min-height: 340px; }
+}
+@media (max-width: 600px) {
+  .c-deck { grid-template-columns: 1fr; }
+  .c-sec { border-right: 0; border-bottom: 1px solid var(--stage-line); }
+}
+
+/* ---------- Sections ---------- */
+section.band { padding-block: 88px; border-bottom: 1px solid var(--line); }
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; margin-bottom: 48px; align-items: end; }
+.sec-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.9rem); line-height: 1.05; font-weight: 800; }
+.sec-head p { color: var(--muted); max-width: 58ch; }
+
+.services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.svc { padding: 28px 28px 32px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 18px; }
+.svc:nth-child(odd) { border-right: 1px solid var(--line); }
+.svc:nth-child(even) { padding-left: 28px; }
+.svc svg { width: 56px; height: 56px; color: var(--accent); }
+.svc h3 { font-size: 21px; font-weight: 600; margin-bottom: 6px; }
+.svc p { color: var(--muted); }
+.svc .tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.svc .tags span { font: 12px var(--f-mono); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; color: var(--muted); }
+
+/* Productions */
+.projects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.proj { display: flex; flex-direction: column; gap: 14px; }
+.proj-img { aspect-ratio: 4 / 3; max-width: 100%; border-radius: 4px; overflow: hidden; background: var(--stage); position: relative; }
+.proj-img canvas { width: 100%; height: 100%; display: block; }
+.proj-img .tag { position: absolute; top: 10px; left: 10px; font: 11px var(--f-mono); color: #E9EBEF; background: rgba(10, 12, 16, .7); padding: 3px 7px; border-radius: 3px; letter-spacing: .06em; }
+.proj h3 { font-size: 20px; font-weight: 600; }
+.proj .venue { font: 12px var(--f-mono); color: var(--muted); letter-spacing: .04em; margin-top: -8px; }
+.proj p { color: var(--muted); font-size: 15px; }
+.spec { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); padding-top: 10px; gap: 8px; margin: 0; }
+.spec dt { font: 11px var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.spec dd { margin: 0; font: 500 15px var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* Process */
+.process { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 36px; }
+.process li { padding: 22px 22px 4px 0; border-top: 2px solid var(--fg); display: grid; gap: 8px; align-content: start; }
+.process li:not(:nth-child(3n+1)) { padding-left: 22px; border-left: 1px solid var(--line); }
+.process .n { font: 500 13px var(--f-mono); color: var(--accent); }
+.process h3 { font-size: 18px; font-weight: 600; }
+.process p { color: var(--muted); font-size: 14.5px; }
+.process .wk { font: 12px var(--f-mono); color: var(--muted); }
+
+/* Deliverables table */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+.tbl-wrap table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14.5px; }
+.tbl-wrap th, .tbl-wrap td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl-wrap th { font: 500 11px var(--f-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); background: var(--surface); }
+.tbl-wrap tr:last-child td { border-bottom: 0; }
+.tbl-wrap td.mono { font-size: 13.5px; }
+
+/* Brief */
+.brief { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px; }
+.brief-copy h2 { font-size: clamp(1.9rem, 3.6vw, 2.9rem); line-height: 1.05; font-weight: 800; margin-bottom: 16px; }
+.brief-copy p { color: var(--muted); max-width: 46ch; }
+.contact { margin: 28px 0 0; display: grid; gap: 10px; }
+.contact div { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.contact dt { font: 11px var(--f-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); width: 72px; }
+.contact dd { margin: 0; font-family: var(--f-mono); user-select: all; }
+form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--surface); padding: 24px; border-radius: 6px; }
+.field { display: grid; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 13px; font-weight: 500; }
+input[type="text"], input[type="email"], form select, textarea { font: inherit; font-size: 15px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; width: 100%; }
+textarea { min-height: 96px; resize: vertical; }
+.btn { font: 600 15px var(--f-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 4px; padding: 12px 18px; cursor: pointer; justify-self: start; }
+.btn:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.summary { grid-column: 1 / -1; display: grid; gap: 10px; }
+.summary pre { margin: 0; white-space: pre-wrap; font: 13px/1.6 var(--f-mono); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 14px; }
+.summary .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.summary .msg { font-size: 13px; color: var(--muted); }
+
+footer { padding-block: 32px; color: var(--muted); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 960px) {
+  .projects { grid-template-columns: 1fr 1fr; }
+  .process { grid-template-columns: 1fr 1fr; }
+  .process li:not(:nth-child(3n+1)) { padding-left: 0; border-left: 0; }
+  .process li:nth-child(even) { padding-left: 22px; border-left: 1px solid var(--line); }
+}
+@media (max-width: 720px) {
+  .hero-copy, .sec-head, .brief { grid-template-columns: 1fr; gap: 16px; }
+  .services { grid-template-columns: 1fr; }
+  .svc, .svc:nth-child(even) { padding: 24px 0; border-right: 0; }
+  .projects { grid-template-columns: 1fr; }
+  .process { grid-template-columns: 1fr; }
+  .process li:nth-child(even) { padding-left: 0; border-left: 0; }
+  form { grid-template-columns: 1fr; padding: 18px; }
+  .nav { display: none; }
+  section.band { padding-block: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kings Lighting Design</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#services">Services</a>
+      <a href="#work">Productions</a>
+      <a href="#process">Process</a>
+      <a href="#deliverables">Paperwork</a>
+      <a href="#brief">Book us</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="stage">
+    <div class="wrap">
+      <div class="hero-copy">
+        <h1>Write the cues <em>before</em> you get into the theater.</h1>
+        <p>We model your stage, set and lighting rig in 3D and program the show offline. You arrive at tech with a cue stack that already works, and your stage time goes into refining it.</p>
+      </div>
+
+      <div class="console" id="console">
+        <div class="c-top">
+          <div class="viewport" id="viewport" aria-label="3D proscenium stage with moving lights on a front-of-house truss and an overhead electric">
+            <div class="vp-tools" role="group" aria-label="Viewport tool">
+              <button type="button" id="tool-move" aria-pressed="true">Move / orbit</button>
+              <button type="button" id="tool-aim" aria-pressed="false">Aim</button>
+            </div>
+            <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
+            <div id="labels"></div>
+            <span class="vp-hint" id="vp-hint">Drag empty space to orbit · Drag a fixture tag to slide it along the truss</span>
+          </div>
+          <div class="sheet" aria-label="Fixture sheet">
+            <table class="ctable">
+              <thead><tr><th>Fix</th><th>Type</th><th>Dim</th><th>Pan</th><th>Tilt</th><th>Zoom</th><th>Col</th><th>X</th></tr></thead>
+              <tbody id="sheet-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cmdline">
+          <label for="cmd">CMD</label>
+          <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Fixture 101 Thru 104 At 75">
+          <span class="cmd-fb" id="cmd-fb" role="status">Ready</span>
+        </div>
+        <div class="c-deck">
+          <div class="c-sec">
+            <div class="c-h">Groups</div>
+            <div class="pool" id="pool-groups"></div>
+            <div class="c-h">Position presets</div>
+            <div class="pool" id="pool-pos"></div>
+            <div class="c-h">Color presets</div>
+            <div class="pool" id="pool-color"></div>
+          </div>
+          <div class="c-sec">
+            <div class="c-h">Programmer <span id="sel-info">No selection</span></div>
+            <div class="pages" id="enc-pages" role="group" aria-label="Encoder page"></div>
+            <div class="encs" id="encs"></div>
+            <div class="btn-row">
+              <button type="button" class="cbtn" id="b-locate">Locate</button>
+              <button type="button" class="cbtn" id="b-store">Store</button>
+              <button type="button" class="cbtn warn" id="b-clear">Clear</button>
+            </div>
+          </div>
+          <div class="c-sec">
+            <div class="c-h">Main cue list <span id="pb-state"></span></div>
+            <div class="cuelist">
+              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th></tr></thead><tbody id="cue-body"></tbody></table>
+            </div>
+            <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span></div>
+            <div class="go-row">
+              <button type="button" class="cbtn" id="b-back">Back</button>
+              <button type="button" class="cbtn" id="b-fx" aria-pressed="false">Ballyhoo FX</button>
+              <button type="button" class="cbtn go" id="b-go">Go</button>
+            </div>
+            <div class="faders" id="faders"></div>
+          </div>
+          <div class="c-sec">
+            <div class="c-h">Keypad</div>
+            <div class="keypad" id="keypad"></div>
+          </div>
+        </div>
+        <p class="c-help">Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="band" id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Lighting design for the stage, built in previs</h2>
+        <p>We design for plays, musicals, opera and dance. The 3D model holds the venue, the set and every fixture on the plot, so the design, the paperwork and the show file all come from one source.</p>
+      </div>
+      <div class="services">
+        <article class="svc">
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 12h44"/><path d="M14 12v4M28 12v4M42 12v4"/><path d="M14 16l-6 30M14 16l6 30M28 16l-5 30M28 16l5 30M42 16l-6 30M42 16l6 30" opacity=".45"/><path d="M4 46h48"/></svg>
+          <div>
+            <h3>Stage previsualization</h3>
+            <p>A live 3D model of the venue and set where we focus every unit, build looks and play back cues for the director before load-in.</p>
+            <div class="tags"><span>Capture</span><span>Vectorworks Spotlight</span><span>WYSIWYG</span></div>
+          </div>
+        </article>
+        <article class="svc">
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="10" width="40" height="36" rx="2"/><path d="M8 20h40M8 30h40" opacity=".5"/><circle cx="16" cy="15" r="2"/><circle cx="26" cy="15" r="2"/><circle cx="36" cy="15" r="2"/><circle cx="20" cy="25" r="2"/><circle cx="32" cy="25" r="2"/><path d="M18 38h20"/></svg>
+          <div>
+            <h3>Light plot &amp; paperwork</h3>
+            <p>Plot, section, channel hookup, instrument schedule and magic sheets, ready for the production electrician and the rental shop.</p>
+            <div class="tags"><span>Lightwright</span><span>DMX patch</span><span>Circuit map</span></div>
+          </div>
+        </article>
+        <article class="svc">
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="6" y="14" width="44" height="28" rx="2"/><path d="M12 34v-8M18 34v-12M24 34v-6M30 34v-10" /><path d="M36 22h8M36 28h8M36 34h8" opacity=".5"/></svg>
+          <div>
+            <h3>Offline cue programming</h3>
+            <p>Groups, palettes, effects and a first cue stack written against the previs model, so the board op starts tech on page one.</p>
+            <div class="tags"><span>ETC Eos</span><span>grandMA3</span><span>Timecode</span></div>
+          </div>
+        </article>
+        <article class="svc">
+          <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="6" y="18" width="20" height="22" rx="1"/><rect x="30" y="14" width="20" height="26" rx="1"/><path d="M26 29h4" /><path d="M10 46h36" opacity=".5"/></svg>
+          <div>
+            <h3>Tours &amp; transfers</h3>
+            <p>We adapt an existing design to each new venue's rig and trim heights, and the re-light is planned in the model before the truck arrives.</p>
+            <div class="tags"><span>Venue rig files</span><span>Re-focus charts</span><span>Show file merges</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="work">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Recent productions</h2>
+        <p>Three shows from the last season. Each image is a frame from the previs model that the director signed off before tech.</p>
+      </div>
+      <div class="projects">
+        <article class="proj">
+          <div class="proj-img"><canvas data-scene="play" width="480" height="360" aria-label="Previs frame: a lone figure in a warm pool of light in front of a deep blue cyclorama"></canvas><span class="tag">PLAY</span></div>
+          <h3>The Salt Marsh</h3>
+          <span class="venue">420-seat proscenium · 6-week run</span>
+          <p>A single estuary horizon that shifts from dawn to storm over two hours. The cyc carries the weather and tight specials carry the actors.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd>148</dd></div><div><dt>Fixtures</dt><dd>112</dd></div><div><dt>Console</dt><dd>Eos</dd></div></dl>
+        </article>
+        <article class="proj">
+          <div class="proj-img"><canvas data-scene="opera" width="480" height="360" aria-label="Previs frame: red back light shafts through haze onto a staircase"></canvas><span class="tag">OPERA</span></div>
+          <h3>Orpheus Below</h3>
+          <span class="venue">1,100-seat opera house · Rep</span>
+          <p>Heavy haze and saturated back light for the underworld, with the return to earth played in open white. The show had to re-light in two hours on every rep changeover.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd>214</dd></div><div><dt>Fixtures</dt><dd>286</dd></div><div><dt>Console</dt><dd>MA3</dd></div></dl>
+        </article>
+        <article class="proj">
+          <div class="proj-img"><canvas data-scene="dance" width="480" height="360" aria-label="Previs frame: dancers lit by low side light from booms"></canvas><span class="tag">DANCE</span></div>
+          <h3>Glasswork</h3>
+          <span class="venue">Touring · 14 venues</span>
+          <p>Shin-busters and head-highs on booms sculpt the dancers with side light. We rebuilt the plot in the model for each venue on the tour.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd>96</dd></div><div><dt>Fixtures</dt><dd>64</dd></div><div><dt>Console</dt><dd>Ion Xe</dd></div></dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>From first read-through to opening night</h2>
+        <p>A typical mid-scale play runs ten to twelve weeks from first meeting to opening night. We join as early as the set designer's first model box.</p>
+      </div>
+      <ol class="process">
+        <li><span class="n">01</span><h3>Read &amp; concept</h3><p>Script breakdown, references and a lighting storyboard agreed with the director and set designer.</p><span class="wk">Weeks 1–2</span></li>
+        <li><span class="n">02</span><h3>Previs model</h3><p>We build the venue, set and masking from the CAD files, using the house's rep plot as the starting rig.</p><span class="wk">Weeks 2–4</span></li>
+        <li><span class="n">03</span><h3>Plot &amp; paperwork</h3><p>The light plot and hookup go to the production electrician and rental shop for pricing.</p><span class="wk">Weeks 4–6</span></li>
+        <li><span class="n">04</span><h3>Offline programming</h3><p>We write the cue stack against the model and show it to the director in a previs session.</p><span class="wk">Weeks 6–9</span></li>
+        <li><span class="n">05</span><h3>Load-in &amp; focus</h3><p>Hang, focus with our focus charts and check the patch against the model.</p><span class="wk">Week 10</span></li>
+        <li><span class="n">06</span><h3>Tech &amp; previews</h3><p>We refine cues in the room, give notes each preview and freeze the show at opening.</p><span class="wk">Weeks 11–12</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="deliverables">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Show paperwork</h2>
+        <p>Everything the electrics team needs to hang, focus and run the show, in the formats they already use.</p>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Document</th><th>Format</th><th>Used by</th></tr></thead>
+          <tbody>
+            <tr><td>Light plot and section</td><td class="mono">VWX, DWG, PDF</td><td>Production electrician, venue</td></tr>
+            <tr><td>Channel hookup and instrument schedule</td><td class="mono">Lightwright, PDF</td><td>Electricians, rental shop</td></tr>
+            <tr><td>Focus charts with photos from the model</td><td class="mono">PDF</td><td>Focus crew</td></tr>
+            <tr><td>Magic sheet</td><td class="mono">PDF, Eos magic sheet</td><td>Designer, programmer</td></tr>
+            <tr><td>Show file with cue stack</td><td class="mono">Eos .esf, grandMA3 show</td><td>Board operator</td></tr>
+            <tr><td>Previs renders and cue playback video</td><td class="mono">PNG 4K, MP4</td><td>Director, producers</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="brief">
+    <div class="wrap brief">
+      <div class="brief-copy">
+        <h2>Book us for your production</h2>
+        <p>Tell us about the show and the venue. We reply within two working days with our availability, a fee proposal and first thoughts on the design.</p>
+        <dl class="contact">
+          <div><dt>Email</dt><dd>noahking110@gmail.com</dd></div>
+          <div><dt>Phone</dt><dd>(609) 703-2604</dd></div>
+          <div><dt>Address</dt><dd>24 High School Drive, Egg Harbor Township, NJ 08234</dd></div>
+        </dl>
+      </div>
+      <form id="brief-form" novalidate>
+        <div class="field"><label for="f-name">Name</label><input type="text" id="f-name" value="Alex Morgan" autocomplete="name"></div>
+        <div class="field"><label for="f-email">Email</label><input type="email" id="f-email" value="alex@example.com" autocomplete="email"></div>
+        <div class="field"><label for="f-type">Production type</label>
+          <select id="f-type"><option selected>Play</option><option>Musical</option><option>Opera</option><option>Dance</option><option>Concert</option><option>Touring production</option></select></div>
+        <div class="field"><label for="f-area">Venue size</label>
+          <select id="f-area"><option>Under 200 seats</option><option selected>200–600 seats</option><option>600–1,500 seats</option><option>Over 1,500 seats</option></select></div>
+        <div class="field full"><label for="f-tech">First tech date</label><input type="text" id="f-tech" value="March 2027"></div>
+        <div class="field full"><label for="f-notes">About the show</label>
+          <textarea id="f-notes">New two-act play on a single set: a lighthouse keeper's cottage. The director wants the weather outside to feel like a character, so the cyc and window light need a lot of range.</textarea></div>
+        <button type="submit" class="btn">Prepare my enquiry</button>
+        <div class="summary" id="summary" hidden>
+          <pre id="summary-text"></pre>
+          <div class="row"><button type="button" class="btn ghost" id="copy">Copy enquiry</button><span class="msg" id="copy-msg">Paste it into an email to the studio address.</span></div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  const clone = o => JSON.parse(JSON.stringify(o));
+
+  function kelvinRGB(k) {
+    const t = k / 100; let r, g, b;
+    if (t <= 66) { r = 255; g = 99.4708025861 * Math.log(t) - 161.1195681661; }
+    else { r = 329.698727446 * Math.pow(t - 60, -0.1332047592); g = 288.1221695283 * Math.pow(t - 60, -0.0755148492); }
+    if (t >= 66) b = 255; else if (t <= 19) b = 0; else b = 138.5177312231 * Math.log(t - 10) - 305.0447927307;
+    const c = v => Math.max(0, Math.min(255, Math.round(v)));
+    return [c(r), c(g), c(b)];
+  }
+
+  // ================= Rig =================
+  const TRUSS = { foh: { y: 7, z: 9.5, min: -5.5, max: 5.5 }, elec: { y: 6.6, z: -1.2, min: -6, max: 6 } };
+  const MOVER = ['dim', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
+  const FIX = [];
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push({ id: 101 + i, type: 'Spot', truss: 'foh', x0: x, attrs: MOVER, n: i }));
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push({ id: 201 + i, type: 'Wash', truss: 'elec', x0: x, attrs: MOVER, n: i }));
+  FIX.push({ id: 301, type: 'Cyc', attrs: ['dim', 'r', 'g', 'b'], n: 0 });
+  const byId = Object.fromEntries(FIX.map(f => [f.id, f]));
+  const ALL = FIX.map(f => f.id);
+
+  const ATTR = {
+    dim: { label: 'Dim', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
+    pan: { label: 'Pan', min: -270, max: 270, step: 1, fmt: v => Math.round(v) + '°' },
+    tilt: { label: 'Tilt', min: -135, max: 135, step: 1, fmt: v => Math.round(v) + '°' },
+    zoom: { label: 'Zoom', min: 6, max: 50, step: 0.5, fmt: v => Math.round(v) + '°' },
+    r: { label: 'Red', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
+    g: { label: 'Green', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
+    b: { label: 'Blue', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
+    x: { label: 'Truss X', min: -6, max: 6, step: 0.05, fmt: v => v.toFixed(2) + ' m' }
+  };
+  const PAGES = [['Dimmer', ['dim']], ['Position', ['pan', 'tilt']], ['Beam', ['zoom']], ['Color', ['r', 'g', 'b']], ['Move', ['x']]];
+
+  const GELS = [
+    { name: 'N/C', sub: 'Open white', hex: '#ffffff' },
+    { name: 'L204', sub: 'Full CTO', hex: '#ffb46b' },
+    { name: 'L201', sub: 'Full CTB', hex: '#a9c8ff' },
+    { name: 'L147', sub: 'Apricot', hex: '#ff9a5c' },
+    { name: 'L106', sub: 'Primary Red', hex: '#e4142c' },
+    { name: 'L139', sub: 'Primary Green', hex: '#14a845' },
+    { name: 'R80', sub: 'Primary Blue', hex: '#2b5cff' },
+    { name: 'L181', sub: 'Congo Blue', hex: '#3a14b0' }
+  ];
+  const hexRGB = h => ({ r: Math.round(parseInt(h.substr(1, 2), 16) / 2.55), g: Math.round(parseInt(h.substr(3, 2), 16) / 2.55), b: Math.round(parseInt(h.substr(5, 2), 16) / 2.55) });
+  const gel = name => hexRGB(GELS.find(x => x.name === name).hex);
+  const kcol = k => { const [r, g, b] = kelvinRGB(k); return { r: Math.round(r / 2.55), g: Math.round(g / 2.55), b: Math.round(b / 2.55) }; };
+
+  const ACTORS = [[-2.3, 1.5, 0.9], [0.1, 1.5, -0.6], [2.4, 1.5, 0.6]];
+  function aimAt(f, fx, P) {
+    const T = TRUSS[f.truss];
+    const vx = P[0] - fx, vy = P[1] - (T.y - 0.43), vz = P[2] - T.z;
+    const h = Math.hypot(vx, vz);
+    return { tilt: deg(Math.atan2(h, -vy)), pan: deg(Math.atan2(-vx, -vz)) };
+  }
+  const POS = [
+    { name: 'DSR', sub: 'Down right', aim: f => [-3.5, 0.6, 2.2] },
+    { name: 'DSC', sub: 'Down centre', aim: f => [0, 0.6, 2.2] },
+    { name: 'DSL', sub: 'Down left', aim: f => [3.5, 0.6, 2.2] },
+    { name: 'CS', sub: 'Centre', aim: f => [0, 0.6, 0] },
+    { name: 'USC', sub: 'Upstage', aim: f => [0, 0.6, -2.8] },
+    { name: 'Actors', sub: 'Specials', aim: f => ACTORS[f.n % 3] },
+    { name: 'Fan', sub: 'Straight out', aim: (f, x) => [x * 1.2, 0, f.truss === 'foh' ? 1.5 : 1.8] },
+    { name: 'Home', sub: 'Pan/tilt 0', home: true }
+  ];
+  const GROUPS = [
+    { name: 'All', ids: ALL },
+    { name: 'FOH spots', ids: [101, 102, 103, 104] },
+    { name: 'Washes', ids: [201, 202, 203, 204] },
+    { name: 'Cyc', ids: [301] },
+    { name: 'Odd', ids: [101, 103, 201, 203] },
+    { name: 'Even', ids: [102, 104, 202, 204] },
+    { name: 'Spots SR', ids: [101, 102] },
+    { name: 'Spots SL', ids: [103, 104] }
+  ];
+
+  // ================= Show data =================
+  function defaults(f) {
+    const d = { dim: 0, r: 100, g: 100, b: 100 };
+    if (f.type !== 'Cyc') Object.assign(d, { pan: 0, tilt: 0, zoom: f.type === 'Spot' ? 20 : 32, x: f.x0 });
+    return d;
+  }
+  function look(build) {
+    const s = {};
+    FIX.forEach(f => { const d = defaults(f); Object.assign(d, build(f) || {}); s[f.id] = d; });
+    return s;
+  }
+  const aimP = (f, P) => aimAt(f, f.x0, P);
+  const q1 = look(f => f.type === 'Spot' ? Object.assign({ dim: 0 }, aimP(f, ACTORS[f.n % 3]))
+    : f.type === 'Wash' ? Object.assign({ dim: 30 }, gel('R80'), aimP(f, [f.x0 * 1.2, 0, 1.8]))
+    : Object.assign({ dim: 40 }, gel('R80')));
+  const q2 = look(f => f.type === 'Spot' ? Object.assign({ dim: 65, zoom: 22 }, kcol(3600), aimP(f, ACTORS[f.n % 3]))
+    : f.type === 'Wash' ? Object.assign({ dim: 40 }, gel('L201'), aimP(f, [f.x0 * 1.2, 0, 1.8]))
+    : Object.assign({ dim: 75 }, gel('L147')));
+  const q3 = look(f => f.type === 'Spot' ? Object.assign({ dim: 35, zoom: 14 }, kcol(6500), aimP(f, ACTORS[f.n % 3]))
+    : f.type === 'Wash' ? Object.assign({ dim: 90, zoom: 10 }, gel('L201'), aimP(f, ACTORS[f.n % 3]))
+    : Object.assign({ dim: 90 }, gel('L181')));
+  const q4 = look(f => f.type === 'Spot' ? Object.assign({ dim: f.id === 104 ? 0 : 70, zoom: 18 }, kcol(2200), aimP(f, ACTORS[f.n % 3]))
+    : f.type === 'Wash' ? Object.assign({ dim: 45, zoom: 36 }, gel('L147'), aimP(f, [0, 0.6, 0]))
+    : Object.assign({ dim: 25 }, gel('L106')));
+  const q5 = clone(q4); Object.values(q5).forEach(v => { v.dim = 0; });
+  let cues = [
+    { num: 1, name: 'Preset', fade: 0, state: q1 },
+    { num: 2, name: 'Dawn', fade: 5, state: q2 },
+    { num: 3, name: 'Storm', fade: 2, state: q3 },
+    { num: 4, name: 'Fireside', fade: 4, state: q4 },
+    { num: 5, name: 'Blackout', fade: 1.5, state: q5 }
+  ];
+  let curIdx = 0;
+  let pb = clone(q1);
+  let programmer = {};
+  let selection = [];
+  let fade = null;
+  let fx = false;
+  let encPage = 0;
+  const masters = { gm: 100, seq: 100, foh: 100, wash: 100, cyc: 100, haze: 35 };
+  let dirty = true, uiDirty = true;
+  const changed = () => { dirty = true; uiDirty = true; };
+
+  const val = (id, a) => { const p = programmer[id]; return (p && a in p) ? p[a] : pb[id][a]; };
+  const inProg = (id, a) => !!(programmer[id] && a in programmer[id]);
+  function outDim(f) {
+    const d = inProg(f.id, 'dim') ? programmer[f.id].dim : pb[f.id].dim * masters.seq / 100;
+    const gm = f.type === 'Spot' ? masters.foh : f.type === 'Wash' ? masters.wash : masters.cyc;
+    return d * gm / 100 * masters.gm / 100;
+  }
+
+  // ================= Feedback =================
+  function fb(msg, err) { const el = $('cmd-fb'); el.textContent = msg; el.classList.toggle('err', !!err); }
+  function fmtIds(ids) {
+    const s = [...ids].sort((a, b) => a - b), out = [];
+    for (let i = 0; i < s.length; i++) {
+      let j = i; while (j + 1 < s.length && s[j + 1] === s[j] + 1) j++;
+      out.push(j > i ? s[i] + ' Thru ' + s[j] : String(s[i])); i = j;
+    }
+    return out.join(' + ');
+  }
+
+  // ================= Programmer actions =================
+  function select(ids, mode) {
+    if (mode === 'toggle') ids.forEach(id => { const i = selection.indexOf(id); if (i >= 0) selection.splice(i, 1); else selection.push(id); });
+    else if (mode === 'add') ids.forEach(id => { if (!selection.includes(id)) selection.push(id); });
+    else selection = [...ids];
+    changed();
+  }
+  function setAttr(ids, a, v) {
+    let n = 0;
+    ids.forEach(id => {
+      const f = byId[id]; if (!f.attrs.includes(a)) return;
+      let lo = ATTR[a].min, hi = ATTR[a].max;
+      if (a === 'x') { lo = TRUSS[f.truss].min; hi = TRUSS[f.truss].max; }
+      (programmer[id] = programmer[id] || {})[a] = clamp(v, lo, hi); n++;
+    });
+    changed(); return n;
+  }
+  function nudge(a, dv) {
+    if (!selection.length) { fb('Select fixtures first', true); return; }
+    selection.forEach(id => { if (byId[id].attrs.includes(a)) setAttr([id], a, val(id, a) + dv); });
+  }
+  function needSel() { if (!selection.length) { fb('Select fixtures first', true); return false; } return true; }
+  function applyColor(c, label) {
+    if (!needSel()) return;
+    setAttr(selection, 'r', c.r); setAttr(selection, 'g', c.g); setAttr(selection, 'b', c.b);
+    fb('Color ' + label + ' on ' + fmtIds(selection));
+  }
+  function applyPos(p) {
+    if (!needSel()) return;
+    const movers = selection.filter(id => byId[id].type !== 'Cyc');
+    if (!movers.length) { fb('The cyc light has no position', true); return; }
+    movers.forEach(id => {
+      const f = byId[id];
+      const a = p.home ? { pan: 0, tilt: 0 } : aimAt(f, val(id, 'x'), p.aim(f, val(id, 'x')));
+      setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt);
+    });
+    fb('Position ' + p.name + ' on ' + fmtIds(movers));
+  }
+  function locate() {
+    if (!needSel()) return;
+    setAttr(selection, 'dim', 100); setAttr(selection, 'r', 100); setAttr(selection, 'g', 100); setAttr(selection, 'b', 100);
+    selection.forEach(id => { const f = byId[id]; if (f.type === 'Cyc') return; const a = aimAt(f, val(id, 'x'), [0, 0.6, 0]); setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt); setAttr([id], 'zoom', defaults(f).zoom); });
+    fb('Located ' + fmtIds(selection));
+  }
+  function clearKey() {
+    if (selection.length) { selection = []; fb('Selection cleared. Press Clear again to empty the programmer'); }
+    else if (Object.keys(programmer).length) { programmer = {}; fb('Programmer cleared'); }
+    else fb('Nothing to clear');
+    changed();
+  }
+
+  // ================= Playback =================
+  function gotoIdx(i, instant) {
+    if (i < 0 || i >= cues.length) return;
+    const c = cues[i]; curIdx = i;
+    if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
+    else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
+    fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
+    changed();
+  }
+  function go() { if (curIdx + 1 >= cues.length) { fb('End of cue list. Click a cue or type Cue 1 to start again', true); return; } gotoIdx(curIdx + 1); }
+  function back() { if (curIdx <= 0) { fb('Already at the first cue', true); return; } gotoIdx(curIdx - 1); }
+  function gotoNum(n) { const i = cues.findIndex(c => c.num === n); if (i < 0) { fb('There is no cue ' + n, true); return; } gotoIdx(i); }
+  function store(num) {
+    const state = {};
+    FIX.forEach(f => { const o = {}; f.attrs.forEach(a => { o[a] = val(f.id, a); }); state[f.id] = o; });
+    if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
+    const t = Math.max(0, +$('fade').value || 0);
+    let c = cues.find(x => x.num === num);
+    if (c) { c.state = state; c.fade = t; }
+    else { c = { num, name: 'Cue ' + num, fade: t, state }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    curIdx = cues.indexOf(c); pb = clone(state); fade = null; programmer = {};
+    fb('Stored cue ' + num + ' (' + t + ' s fade). Programmer cleared');
+    changed();
+  }
+  function deleteCue(n) {
+    const i = cues.findIndex(c => c.num === n);
+    if (i < 0) { fb('There is no cue ' + n, true); return; }
+    cues.splice(i, 1); if (curIdx >= cues.length) curIdx = cues.length - 1; else if (i < curIdx) curIdx--;
+    fb('Deleted cue ' + n); changed();
+  }
+  function stepFade(now) {
+    const k = Math.min(1, (now - fade.t0) / fade.dur);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    FIX.forEach(f => { const a = fade.from[f.id], b = fade.to[f.id], o = {}; for (const key in b) o[key] = a[key] + (b[key] - a[key]) * e; pb[f.id] = o; });
+    if (k >= 1) { pb = clone(fade.to); fade = null; }
+    changed();
+  }
+
+  // ================= Command line =================
+  const ALIAS = { f: 'fixture', fix: 'fixture', fixture: 'fixture', g: 'group', grp: 'group', group: 'group', t: 'thru', thru: 'thru', through: 'thru',
+    c: 'cue', q: 'cue', cue: 'cue', s: 'store', store: 'store', at: 'at', '@': 'at', full: 'full', fl: 'full', go: 'go', back: 'back',
+    goto: 'goto', clear: 'clear', clr: 'clear', locate: 'locate', '+': '+', '-': '-', delete: 'delete', del: 'delete', out: 'out' };
+  function exec(raw) {
+    const words = raw.trim().replace(/([@+\-])/g, ' $1 ').split(/\s+/).filter(Boolean);
+    if (!words.length) return;
+    const t = [];
+    for (const w of words) {
+      if (/^\d+(\.\d+)?$/.test(w)) t.push(+w);
+      else if (ALIAS[w.toLowerCase()]) t.push(ALIAS[w.toLowerCase()]);
+      else { fb('Unknown word "' + w + '"', true); return; }
+    }
+    const head = t[0], num = t.find(x => typeof x === 'number');
+    if (t.length === 1 && head === 'clear') return clearKey();
+    if (t.length === 1 && head === 'go') return go();
+    if (t.length === 1 && head === 'back') return back();
+    if (t.length === 1 && head === 'locate') return locate();
+    if (head === 'store') return store(num == null ? null : num);
+    if (head === 'goto' || head === 'cue') { if (num == null) { fb('Which cue? e.g. Cue 3', true); return; } return gotoNum(num); }
+    if (head === 'delete') { if (num == null) { fb('Which cue? e.g. Delete Cue 4', true); return; } return deleteCue(num); }
+
+    let mode = 'fixture', op = '+', thru = false, last = null, sel = null, i = 0;
+    for (; i < t.length; i++) {
+      const k = t[i];
+      if (k === 'at' || k === 'full' || k === 'out') break;
+      if (k === 'fixture' || k === 'group') { mode = k; continue; }
+      if (k === '+' || k === '-') { op = k; continue; }
+      if (k === 'thru') { thru = true; continue; }
+      if (typeof k !== 'number') { fb('Cannot use "' + k + '" here', true); return; }
+      let ids;
+      if (mode === 'group') { const g = GROUPS[k - 1]; if (!g) { fb('There is no group ' + k, true); return; } ids = g.ids; }
+      else if (thru && last != null) { const lo = Math.min(last, k), hi = Math.max(last, k); ids = ALL.filter(id => id >= lo && id <= hi); thru = false; }
+      else { if (!byId[k]) { fb('There is no fixture ' + k + '. Fixtures are 101–104, 201–204 and 301', true); return; } ids = [k]; }
+      sel = sel || [];
+      if (op === '-') sel = sel.filter(id => !ids.includes(id)); else ids.forEach(id => { if (!sel.includes(id)) sel.push(id); });
+      op = '+'; if (mode === 'fixture') last = k;
+    }
+    if (sel) { selection = sel; changed(); }
+    if (i >= t.length) { fb(sel ? 'Selected ' + (sel.length ? fmtIds(sel) : 'nothing') : 'Nothing to do', !sel); return; }
+    let level;
+    if (t[i] === 'full') level = 100;
+    else if (t[i] === 'out') level = 0;
+    else { const v = t[i + 1]; level = v === 'full' ? 100 : v === 'out' ? 0 : v; }
+    if (typeof level !== 'number') { fb('At what level? e.g. At 50', true); return; }
+    if (!needSel()) return;
+    setAttr(selection, 'dim', level);
+    fb(fmtIds(selection) + ' at ' + Math.round(clamp(level, 0, 100)) + '%');
+  }
+  const cmd = $('cmd');
+  cmd.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); exec(cmd.value); cmd.value = ''; }
+    else if (e.key === 'Escape') cmd.value = '';
+  });
+
+  // ================= Build console UI =================
+  const KEYS = [['Fixture', 'fn'], ['Group', 'fn'], ['Cue', 'fn'], ['Store', 'fn'], ['7'], ['8'], ['9'], ['Thru', 'fn'], ['4'], ['5'], ['6'], ['+', 'fn'],
+    ['1'], ['2'], ['3'], ['-', 'fn'], ['0'], ['.'], ['At', 'fn'], ['Full', 'fn'], ['Clear', 'warn'], ['⌫'], ['Enter', 'enter']];
+  KEYS.forEach(([k, cls]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = k;
+    if (cls) b.className = 'k-' + cls;
+    b.addEventListener('click', () => {
+      let v = cmd.value;
+      if (/^[\d.]$/.test(k)) { if (v && !/[\s\d.]$/.test(v)) v += ' '; cmd.value = v + k; }
+      else if (k === '⌫') cmd.value = v.replace(/\s+$/, '').replace(/(\S+|\S)$/, m => /^[A-Za-z]+$/.test(m) ? '' : m.slice(0, -1)).replace(/\s+$/, ' ').replace(/^\s+$/, '');
+      else if (k === 'Enter') { exec(v); cmd.value = ''; }
+      else if (k === 'Clear') { if (v.trim()) cmd.value = ''; else clearKey(); }
+      else if (k === 'Full') { exec((v.trim() ? v + ' ' : '') + 'At Full'); cmd.value = ''; }
+      else cmd.value = (v.replace(/\s+$/, '') + ' ' + k + ' ').replace(/^\s+/, '');
+    });
+    $('keypad').appendChild(b);
+  });
+
+  function tile(main, sub, extra) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tile';
+    b.innerHTML = '<span></span><small></small>';
+    b.firstChild.textContent = main; b.lastChild.textContent = sub;
+    if (extra) b.insertBefore(extra, b.lastChild);
+    return b;
+  }
+  const groupTiles = GROUPS.map((g, i) => {
+    const b = tile((i + 1) + ' ' + g.name, g.ids.length + ' fixture' + (g.ids.length > 1 ? 's' : ''));
+    b.addEventListener('click', e => { select(g.ids, e.shiftKey ? 'add' : 'replace'); fb('Group ' + (i + 1) + ' ' + g.name + ': ' + fmtIds(selection)); });
+    $('pool-groups').appendChild(b); return b;
+  });
+  POS.forEach(p => { const b = tile(p.name, p.sub); b.addEventListener('click', () => applyPos(p)); $('pool-pos').appendChild(b); });
+  GELS.forEach(gl => {
+    const bar = document.createElement('span'); bar.className = 'bar'; bar.style.background = gl.hex;
+    const b = tile(gl.name, gl.sub, bar);
+    b.addEventListener('click', () => applyColor(hexRGB(gl.hex), gl.name));
+    $('pool-color').appendChild(b);
+  });
+
+  // Encoders
+  const encEls = [];
+  for (let i = 0; i < 4; i++) {
+    const el = document.createElement('div'); el.className = 'enc'; el.tabIndex = 0; el.setAttribute('role', 'slider');
+    el.innerHTML = '<span class="knob"></span><span class="lbl"></span><span class="val"></span>';
+    let py = null, acc = 0;
+    el.addEventListener('pointerdown', e => { if (!el.dataset.attr) return; py = e.clientY; acc = 0; el.setPointerCapture(e.pointerId); el.focus(); });
+    el.addEventListener('pointermove', e => {
+      if (py == null) return; const a = el.dataset.attr, A = ATTR[a];
+      acc += (py - e.clientY) * (A.max - A.min) / 260; py = e.clientY;
+      const steps = Math.trunc(acc / A.step); if (steps) { acc -= steps * A.step; nudge(a, steps * A.step); }
+    });
+    const up = () => { py = null; };
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+    el.addEventListener('wheel', e => { if (!el.dataset.attr) return; e.preventDefault(); const A = ATTR[el.dataset.attr]; nudge(el.dataset.attr, (e.deltaY < 0 ? 1 : -1) * A.step * (e.shiftKey ? 10 : 2)); }, { passive: false });
+    el.addEventListener('keydown', e => {
+      if (!el.dataset.attr) return; const A = ATTR[el.dataset.attr];
+      const m = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
+      if (m) { e.preventDefault(); nudge(el.dataset.attr, m * A.step * (e.shiftKey ? 10 : 1)); }
+    });
+    $('encs').appendChild(el); encEls.push(el);
+  }
+  const pageBtns = PAGES.map(([name], i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = name;
+    b.addEventListener('click', () => { encPage = i; uiDirty = true; });
+    $('enc-pages').appendChild(b); return b;
+  });
+
+  // Faders
+  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['wash', 'Wash'], ['cyc', 'Cyc'], ['haze', 'Haze']].forEach(([k, label]) => {
+    const w = document.createElement('div'); w.className = 'fader';
+    w.innerHTML = '<span class="v"></span><input type="range" min="0" max="100" step="1"><label></label>';
+    const inp = w.querySelector('input'), v = w.querySelector('.v'), l = w.querySelector('label');
+    inp.id = 'fd-' + k; l.htmlFor = inp.id; l.textContent = label; inp.value = masters[k]; v.textContent = masters[k];
+    inp.addEventListener('input', () => { masters[k] = +inp.value; v.textContent = inp.value; changed(); });
+    $('faders').appendChild(w);
+  });
+
+  $('b-go').addEventListener('click', go);
+  $('b-back').addEventListener('click', back);
+  $('b-store').addEventListener('click', () => store(null));
+  $('b-clear').addEventListener('click', clearKey);
+  $('b-locate').addEventListener('click', locate);
+  $('b-fx').addEventListener('click', () => { fx = !fx; $('b-fx').setAttribute('aria-pressed', fx); fb(fx ? 'Ballyhoo running on the FOH spots' : 'Ballyhoo stopped'); changed(); });
+
+  // Fixture sheet
+  const sheetRows = {};
+  FIX.forEach(f => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td></td><td></td><td data-a="dim"></td><td data-a="pan"></td><td data-a="tilt"></td><td data-a="zoom"></td><td data-a="col"></td><td data-a="x"></td>';
+    tr.cells[0].textContent = f.id; tr.cells[1].textContent = f.type;
+    tr.addEventListener('click', e => { select([f.id], e.shiftKey || e.ctrlKey || e.metaKey ? 'toggle' : 'replace'); fb('Selected ' + (selection.length ? fmtIds(selection) : 'nothing')); });
+    $('sheet-body').appendChild(tr); sheetRows[f.id] = tr;
+  });
+
+  function renderUI() {
+    FIX.forEach(f => {
+      const tr = sheetRows[f.id]; tr.classList.toggle('sel', selection.includes(f.id));
+      [...tr.cells].slice(2).forEach(td => {
+        const a = td.dataset.a;
+        if (a === 'col') {
+          const r = val(f.id, 'r'), g = val(f.id, 'g'), b = val(f.id, 'b');
+          td.innerHTML = '<span class="sw"></span>'; td.firstChild.style.background = `rgb(${r * 2.55},${g * 2.55},${b * 2.55})`;
+          td.className = inProg(f.id, 'r') || inProg(f.id, 'g') || inProg(f.id, 'b') ? 'prog' : '';
+          return;
+        }
+        if (!f.attrs.includes(a)) { td.textContent = '—'; td.className = 'na'; return; }
+        const v = val(f.id, a);
+        td.textContent = a === 'dim' ? (v >= 99.5 ? 'FL' : Math.round(v)) : a === 'x' ? v.toFixed(1) : Math.round(v);
+        td.className = inProg(f.id, a) ? 'prog' : '';
+      });
+    });
+    const attrs = PAGES[encPage][1];
+    pageBtns.forEach((b, i) => b.setAttribute('aria-pressed', i === encPage));
+    encEls.forEach((el, i) => {
+      const a = attrs[i];
+      if (!a) { el.dataset.attr = ''; el.classList.add('off'); el.querySelector('.lbl').textContent = '—'; el.querySelector('.val').textContent = ''; el.style.setProperty('--rot', '0deg'); el.removeAttribute('aria-label'); el.tabIndex = -1; return; }
+      const A = ATTR[a]; el.dataset.attr = a; el.classList.remove('off'); el.tabIndex = 0;
+      el.querySelector('.lbl').textContent = A.label;
+      const id = selection.find(s => byId[s].attrs.includes(a));
+      const v = id != null ? val(id, a) : null;
+      el.querySelector('.val').textContent = v == null ? '—' : A.fmt(v);
+      const lo = a === 'x' ? -6 : A.min, hi = a === 'x' ? 6 : A.max;
+      el.style.setProperty('--rot', (v == null ? 0 : ((v - lo) / (hi - lo)) * 270 - 135) + 'deg');
+      el.setAttribute('aria-label', A.label); el.setAttribute('aria-valuemin', A.min); el.setAttribute('aria-valuemax', A.max);
+      if (v != null) el.setAttribute('aria-valuenow', Math.round(v * 100) / 100); else el.removeAttribute('aria-valuenow');
+    });
+    $('sel-info').textContent = selection.length ? fmtIds(selection) : 'No selection';
+    const key = [...selection].sort().join();
+    groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && key === [...GROUPS[i].ids].sort().join()));
+    const body = $('cue-body'); body.innerHTML = '';
+    cues.forEach((c, i) => {
+      const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
+      tr.innerHTML = '<td></td><td></td><td></td>';
+      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s';
+      tr.addEventListener('click', () => gotoIdx(i));
+      body.appendChild(tr);
+    });
+    $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : '');
+    const c = cues[curIdx];
+    $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (Object.keys(programmer).length ? ' + programmer' : '');
+  }
+
+  // ================= 3D stage =================
+  const vp = $('viewport');
+  let scene3d = null, aimMode = false;
+
+  function build3D() {
+    if (!window.THREE) throw new Error('three missing');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    vp.prepend(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x030304);
+    const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 120);
+
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 0.2, 9), new THREE.MeshStandardMaterial({ color: 0x1c1b1a, roughness: 0.7 }));
+    deck.position.set(0, -0.1, -0.5); deck.receiveShadow = true; scene.add(deck);
+    const house = new THREE.Mesh(new THREE.PlaneGeometry(30, 24), new THREE.MeshStandardMaterial({ color: 0x08080a, roughness: 1 }));
+    house.rotation.x = -Math.PI / 2; house.position.set(0, -1.1, 14); scene.add(house);
+    const apronFace = new THREE.Mesh(new THREE.PlaneGeometry(14, 1), new THREE.MeshStandardMaterial({ color: 0x0c0c0d, roughness: 1 }));
+    apronFace.position.set(0, -0.6, 4.0); scene.add(apronFace);
+
+    const cycCanvas = document.createElement('canvas'); cycCanvas.width = 4; cycCanvas.height = 256;
+    const cc = cycCanvas.getContext('2d');
+    const cg = cc.createLinearGradient(0, 0, 0, 256);
+    cg.addColorStop(0, '#222'); cg.addColorStop(0.55, '#777'); cg.addColorStop(1, '#fff');
+    cc.fillStyle = cg; cc.fillRect(0, 0, 4, 256);
+    const cycMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: new THREE.CanvasTexture(cycCanvas), emissiveIntensity: 0.6, roughness: 1 });
+    const cyc = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), cycMat);
+    cyc.position.set(0, 4, -4.8); scene.add(cyc);
+
+    const prosMat = new THREE.MeshStandardMaterial({ color: 0x140b0c, roughness: 0.9 });
+    [[-6.6, 3.6, 1.6, 7.2], [6.6, 3.6, 1.6, 7.2]].forEach(([x, y, w, h]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 3.6); scene.add(m);
+    });
+    const header = new THREE.Mesh(new THREE.BoxGeometry(14.8, 1.4, 0.6), prosMat); header.position.set(0, 6.9, 3.6); scene.add(header);
+
+    const velvet = new THREE.MeshStandardMaterial({ color: 0x5a0c14, roughness: 0.95, side: THREE.DoubleSide });
+    function drape(w, h, folds, amp) {
+      const g = new THREE.PlaneGeometry(w, h, folds * 8, 1);
+      const p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin((p.getX(i) / w) * folds * Math.PI * 2) * amp);
+      g.computeVertexNormals(); return g;
+    }
+    [-1, 1].forEach(side => {
+      const leg = new THREE.Mesh(drape(2.2, 6.3, 6, 0.12), velvet);
+      leg.position.set(side * 4.85, 3.15, 3.1); leg.receiveShadow = true; scene.add(leg);
+      const leg2 = new THREE.Mesh(drape(1.8, 6.3, 5, 0.1), new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 1, side: THREE.DoubleSide }));
+      leg2.position.set(side * 5.6, 3.15, 0.2); scene.add(leg2);
+    });
+    const border = new THREE.Mesh(drape(12, 1.0, 22, 0.08), velvet); border.position.set(0, 5.7, 3.1); scene.add(border);
+
+    function actor(x, z, color, h) {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.26, h * 0.62, 20), new THREE.MeshStandardMaterial({ color, roughness: 0.75 }));
+      body.position.y = h * 0.49; body.castShadow = true;
+      const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, h * 0.5, 16), new THREE.MeshStandardMaterial({ color: 0x1d1d22, roughness: 0.8 }));
+      legs.position.y = h * 0.25; legs.castShadow = true;
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), new THREE.MeshStandardMaterial({ color: 0xc89a7c, roughness: 0.6 }));
+      head.position.y = h * 0.93; head.castShadow = true;
+      g.add(legs, body, head); g.position.set(x, 0, z); scene.add(g);
+    }
+    actor(-2.3, 0.9, 0x6d5a45, 1.75);
+    actor(0.1, -0.6, 0x3d5468, 1.82);
+    actor(2.4, 0.6, 0x7a3a34, 1.68);
+    const bench = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.45), new THREE.MeshStandardMaterial({ color: 0x4a3626, roughness: 0.8 }));
+    bench.position.set(0.1, 0.225, -1.7); bench.castShadow = bench.receiveShadow = true; scene.add(bench);
+    const platform = new THREE.Mesh(new THREE.BoxGeometry(4, 0.6, 1.8), new THREE.MeshStandardMaterial({ color: 0x2a2826, roughness: 0.85 }));
+    platform.position.set(-3.2, 0.3, -3.2); platform.castShadow = platform.receiveShadow = true; scene.add(platform);
+
+    scene.add(new THREE.HemisphereLight(0x6070a0, 0x050505, 0.07));
+
+    const pipeMat = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: 0.6, roughness: 0.4 });
+    Object.values(TRUSS).forEach(T => {
+      const len = T.max - T.min + 1.2;
+      [-0.1, 0.1].forEach(dz => {
+        const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 8), pipeMat);
+        p.rotation.z = Math.PI / 2; p.position.set(0, T.y + 0.03, T.z + dz); scene.add(p);
+      });
+    });
+
+    const obj = {};
+    FIX.forEach(f => {
+      if (f.type === 'Cyc') return;
+      const T = TRUSS[f.truss];
+      const root = new THREE.Group(); root.position.set(f.x0, T.y, T.z); scene.add(root);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1b1d22, roughness: 0.5, emissive: 0x000000 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.1, 0.3), baseMat); base.position.y = -0.08; root.add(base);
+      const pan = new THREE.Group(); pan.position.y = -0.13; root.add(pan);
+      const armMat = new THREE.MeshStandardMaterial({ color: 0x24272d, roughness: 0.5 });
+      const yokeTop = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.04, 0.12), armMat); pan.add(yokeTop);
+      [-1, 1].forEach(s => { const arm = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.34, 0.12), armMat); arm.position.set(s * 0.21, -0.17, 0); pan.add(arm); });
+      const tilt = new THREE.Group(); tilt.position.y = -0.3; pan.add(tilt);
+      const r = f.type === 'Spot' ? 0.13 : 0.17;
+      const head = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r, 0.38, 20), new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 }));
+      tilt.add(head);
+      const lens = new THREE.Mesh(new THREE.CircleGeometry(r * 0.8, 24), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      lens.rotation.x = Math.PI / 2; lens.position.y = -0.192; tilt.add(lens);
+      const spot = new THREE.SpotLight(0xffffff, 0, 34, 0.3, f.type === 'Spot' ? 0.25 : 0.75, 1.1);
+      spot.position.y = -0.2; tilt.add(spot);
+      const tgt = new THREE.Object3D(); tgt.position.y = -10; tilt.add(tgt); spot.target = tgt;
+      if (f.type === 'Spot') { spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0006; spot.shadow.camera.near = 0.5; }
+      const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
+      const cone = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+      cone.position.y = -0.2; tilt.add(cone);
+      obj[f.id] = { root, pan, tilt, spot, cone, lens, baseMat, len: 14 };
+    });
+
+    // Fixture tags
+    const labels = {};
+    FIX.forEach(f => {
+      const el = document.createElement('div'); el.className = 'fx-label' + (f.type === 'Cyc' ? ' cyc' : '');
+      el.textContent = f.id; el.title = f.type + ' ' + f.id + (f.type === 'Cyc' ? '' : ' · drag to move along the truss');
+      $('labels').appendChild(el); labels[f.id] = el;
+      let drag = null;
+      el.addEventListener('pointerdown', e => {
+        e.stopPropagation(); e.preventDefault();
+        const add = e.shiftKey || e.ctrlKey || e.metaKey;
+        if (add) { select([f.id], 'toggle'); return; }
+        if (!selection.includes(f.id)) select([f.id], 'replace');
+        drag = { sx: e.clientX, moved: false }; el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', e => {
+        if (!drag || f.type === 'Cyc') return;
+        if (Math.abs(e.clientX - drag.sx) > 3) drag.moved = true;
+        if (!drag.moved) return;
+        const P = hit(e, new THREE.Plane(new THREE.Vector3(0, 0, 1), -TRUSS[f.truss].z));
+        if (P) { setAttr([f.id], 'x', P.x); fb(f.id + ' moved to X ' + val(f.id, 'x').toFixed(2) + ' m'); }
+      });
+      el.addEventListener('pointerup', () => {
+        if (drag && !drag.moved) { select([f.id], 'replace'); fb('Selected ' + f.id); }
+        drag = null;
+      });
+      el.addEventListener('pointercancel', () => { drag = null; });
+    });
+
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    function hit(e, plane) {
+      const r = vp.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const out = new THREE.Vector3();
+      return ray.ray.intersectPlane(plane, out) ? out : null;
+    }
+    const deckPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    function aimHere(e) {
+      const movers = selection.filter(id => byId[id].type !== 'Cyc');
+      if (!movers.length) { fb('Select moving lights, then click the stage to aim them', true); return; }
+      const P = hit(e, deckPlane);
+      if (!P || Math.abs(P.x) > 7 || P.z < -4.8 || P.z > 4) return;
+      movers.forEach(id => { const a = aimAt(byId[id], val(id, 'x'), [P.x, 0, P.z]); setAttr([id], 'pan', a.pan); setAttr([id], 'tilt', a.tilt); });
+      fb('Aimed ' + fmtIds(movers) + ' at X ' + P.x.toFixed(1) + ' m, Z ' + P.z.toFixed(1) + ' m');
+    }
+
+    let az = 0.15, el = 0.12, dist = 20;
+    const lookAt = new THREE.Vector3(0, 3.2, -0.3);
+    function placeCam() {
+      camera.position.set(lookAt.x + dist * Math.sin(az) * Math.cos(el), lookAt.y + dist * Math.sin(el), lookAt.z + dist * Math.cos(az) * Math.cos(el));
+      camera.lookAt(lookAt);
+    }
+    let orbit = null, aiming = false;
+    vp.addEventListener('pointerdown', e => {
+      if (e.target.closest('.vp-tools')) return;
+      vp.setPointerCapture(e.pointerId);
+      if (aimMode) { aiming = true; aimHere(e); return; }
+      orbit = { x: e.clientX, y: e.clientY };
+    });
+    vp.addEventListener('pointermove', e => {
+      if (aiming) { aimHere(e); return; }
+      if (!orbit) return;
+      az = clamp(az - (e.clientX - orbit.x) * 0.005, -0.8, 0.8);
+      el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 0.6);
+      orbit = { x: e.clientX, y: e.clientY }; dirty = true;
+    });
+    const end = () => { orbit = null; aiming = false; };
+    vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
+
+    function resize() {
+      const w = vp.clientWidth, h = vp.clientHeight;
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      dist = w / h < 1.1 ? 28 : 20;
+      camera.updateProjectionMatrix(); dirty = true;
+    }
+    new ResizeObserver(resize).observe(vp);
+
+    const v3 = new THREE.Vector3();
+    function render(now) {
+      FIX.forEach(f => {
+        const d = outDim(f) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
+        if (f.type === 'Cyc') { cycMat.emissive.setRGB(r, g, b); cycMat.emissiveIntensity = 0.03 + 0.95 * d; return; }
+        const o = obj[f.id];
+        let pan = val(f.id, 'pan'), tilt = val(f.id, 'tilt');
+        if (fx && f.type === 'Spot') { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
+        o.root.position.x = val(f.id, 'x');
+        o.pan.rotation.y = rad(pan); o.tilt.rotation.x = rad(tilt);
+        const zoom = val(f.id, 'zoom');
+        o.spot.angle = rad(zoom / 2); o.spot.color.setRGB(r, g, b);
+        o.spot.intensity = (f.type === 'Spot' ? 3.2 : 2.6) * d;
+        const rr = Math.tan(rad(zoom / 2)) * o.len;
+        o.cone.scale.set(rr, o.len, rr);
+        o.cone.material.color.setRGB(r, g, b);
+        o.cone.material.opacity = masters.haze / 100 * d * (f.type === 'Spot' ? 0.06 : 0.07);
+        o.cone.visible = o.cone.material.opacity > 0.002;
+        o.lens.material.color.setRGB(0.07 + r * d, 0.07 + g * d, 0.07 + b * d);
+        o.baseMat.emissive.setHex(selection.includes(f.id) ? 0x8a5410 : 0x000000);
+      });
+      placeCam();
+      scene.updateMatrixWorld();
+      renderer.render(scene, camera);
+      const w = vp.clientWidth, h = vp.clientHeight;
+      FIX.forEach(f => {
+        const lb = labels[f.id];
+        if (f.type === 'Cyc') v3.set(0, 7.4, -4.8); else obj[f.id].root.getWorldPosition(v3).add(new THREE.Vector3(0, 0.32, 0));
+        v3.project(camera);
+        const off = v3.z > 1;
+        lb.hidden = off;
+        if (!off) lb.style.transform = `translate(${((v3.x + 1) / 2 * w).toFixed(1)}px, ${((1 - v3.y) / 2 * h).toFixed(1)}px) translate(-50%, -100%)`;
+        lb.classList.toggle('sel', selection.includes(f.id));
+      });
+    }
+    resize();
+    return { render };
+  }
+
+  try { scene3d = build3D(); }
+  catch (err) {
+    const f = document.createElement('div'); f.className = 'vp-fallback';
+    f.textContent = 'This browser could not start 3D graphics. The console, fixture sheet and cue list still work.';
+    vp.appendChild(f);
+    $('vp-hint').hidden = true;
+  }
+
+  function setTool(aim) {
+    aimMode = aim;
+    $('tool-aim').setAttribute('aria-pressed', aim); $('tool-move').setAttribute('aria-pressed', !aim);
+    vp.classList.toggle('aim', aim);
+    $('vp-hint').textContent = aim ? 'Aim: click or drag on the stage floor to point the selected lights there' : 'Drag empty space to orbit · Drag a fixture tag to slide it along the truss';
+  }
+  $('tool-move').addEventListener('click', () => setTool(false));
+  $('tool-aim').addEventListener('click', () => setTool(true));
+
+  function loop(now) {
+    if (fade) stepFade(now);
+    if (scene3d && (dirty || fx)) { scene3d.render(now); dirty = false; }
+    if (uiDirty) { renderUI(); uiDirty = false; }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ---------- Production thumbnails ----------
+  function glow(ctx, x, y, r, rgb, a) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  function shaft(ctx, x1, y1, x2, y2, w, rgb, a) {
+    const g = ctx.createLinearGradient(x1, y1, x2, y2);
+    g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`);
+    const ang = Math.atan2(y2 - y1, x2 - x1) + Math.PI / 2;
+    const dx = Math.cos(ang) * w / 2, dy = Math.sin(ang) * w / 2;
+    ctx.fillStyle = g; ctx.beginPath();
+    ctx.moveTo(x1 - dx * 0.1, y1 - dy * 0.1); ctx.lineTo(x1 + dx * 0.1, y1 + dy * 0.1);
+    ctx.lineTo(x2 + dx, y2 + dy); ctx.lineTo(x2 - dx, y2 - dy); ctx.fill();
+  }
+  function figure(ctx, x, y, s, fill) {
+    ctx.fillStyle = fill;
+    ctx.beginPath(); ctx.arc(x, y - 52 * s, 7 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x - 9 * s, y - 44 * s); ctx.lineTo(x + 9 * s, y - 44 * s); ctx.lineTo(x + 6 * s, y); ctx.lineTo(x - 6 * s, y); ctx.fill();
+  }
+  function frame(ctx, W, H) {
+    ctx.fillStyle = '#120809'; ctx.fillRect(0, 0, 26, H); ctx.fillRect(W - 26, 0, 26, H); ctx.fillRect(0, 0, W, 22);
+  }
+  const scenes = {
+    play(ctx, W, H) {
+      const sky = ctx.createLinearGradient(0, 0, 0, 260);
+      sky.addColorStop(0, '#050a1e'); sky.addColorStop(0.6, '#10307a'); sky.addColorStop(1, '#5d8be0');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, 260);
+      ctx.fillStyle = '#07080b'; ctx.fillRect(0, 252, W, H - 252);
+      ctx.fillStyle = '#0a0d14'; ctx.beginPath(); ctx.moveTo(0, 262); ctx.quadraticCurveTo(140, 236, 260, 252); ctx.quadraticCurveTo(380, 266, W, 244); ctx.lineTo(W, 270); ctx.lineTo(0, 270); ctx.fill();
+      const warm = kelvinRGB(3200).join(',');
+      ctx.fillStyle = `rgba(${warm},.3)`; ctx.beginPath(); ctx.ellipse(250, 312, 70, 16, 0, 0, Math.PI * 2); ctx.fill();
+      glow(ctx, 250, 300, 80, warm, 0.25);
+      figure(ctx, 250, 312, 1.3, '#0b0b0d');
+      glow(ctx, 248, 236, 14, warm, 0.5);
+      frame(ctx, W, H);
+    },
+    opera(ctx, W, H) {
+      ctx.fillStyle = '#060304'; ctx.fillRect(0, 0, W, H);
+      const red = '228,20,44';
+      [[110, 0, 150, 300], [240, 0, 240, 300], [370, 0, 330, 300]].forEach(([x1, y1, x2, y2]) => shaft(ctx, x1, y1, x2, y2, 110, red, 0.35));
+      glow(ctx, 240, 300, 260, red, 0.12);
+      ctx.fillStyle = '#170708';
+      for (let i = 0; i < 6; i++) ctx.fillRect(130 + i * 12, 300 - i * 22, 220 - i * 24, 22);
+      ctx.fillStyle = `rgba(${red},.5)`;
+      for (let i = 0; i < 6; i++) ctx.fillRect(130 + i * 12, 300 - i * 22, 220 - i * 24, 2);
+      figure(ctx, 240, 168, 1.0, '#050203');
+      frame(ctx, W, H);
+    },
+    dance(ctx, W, H) {
+      ctx.fillStyle = '#07060c'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#0e0c16'; ctx.fillRect(0, 270, W, H - 270);
+      const lav = '190,170,255', amber = kelvinRGB(2700).join(',');
+      shaft(ctx, 26, 262, 460, 268, 70, lav, 0.32);
+      shaft(ctx, W - 26, 224, 20, 226, 60, amber, 0.26);
+      [[130, 300, 1.25], [240, 290, 1.1], [350, 305, 1.3]].forEach(([x, y, s]) => {
+        figure(ctx, x, y, s, '#1a1626');
+        ctx.fillStyle = `rgba(${lav},.55)`; ctx.fillRect(x - 6 * s, y - 44 * s, 3 * s, 44 * s);
+        ctx.fillStyle = `rgba(${amber},.45)`; ctx.fillRect(x + 4 * s, y - 40 * s, 3 * s, 40 * s);
+      });
+      ctx.fillStyle = '#222'; ctx.fillRect(30, 140, 4, 140); ctx.fillRect(W - 34, 140, 4, 140);
+      frame(ctx, W, H);
+    }
+  };
+  document.querySelectorAll('canvas[data-scene]').forEach(c => scenes[c.dataset.scene](c.getContext('2d'), c.width, c.height));
+
+  // ---------- Enquiry builder ----------
+  $('brief-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const txt = [
+      'New production enquiry',
+      '----------------------',
+      'Name:          ' + $('f-name').value,
+      'Email:         ' + $('f-email').value,
+      'Production:    ' + $('f-type').value,
+      'Venue size:    ' + $('f-area').value,
+      'First tech:    ' + $('f-tech').value,
+      'Demo console:  ' + cues.length + ' cues in the cue list',
+      '',
+      $('f-notes').value
+    ].join('\n');
+    $('summary-text').textContent = txt;
+    $('summary').hidden = false;
+    $('copy-msg').textContent = 'Paste it into an email to noahking110@gmail.com.';
+  });
+  $('copy').addEventListener('click', () => {
+    const text = $('summary-text').textContent;
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents($('summary-text'));
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      $('copy-msg').textContent = 'Text selected. Press Ctrl+C or ⌘C to copy.';
+    };
+    try {
+      navigator.clipboard.writeText(text).then(() => { $('copy-msg').textContent = 'Copied to clipboard.'; }, fallback);
+    } catch (_) { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>
