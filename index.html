@@ -84,6 +84,7 @@ a { color: inherit; }
 .vp-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--stage-muted); }
 .fx-label { position: absolute; left: 0; top: 0; font: 500 10px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .82); border: 1px solid var(--stage-line); border-radius: 3px; padding: 1px 4px; cursor: ew-resize; user-select: none; z-index: 2; touch-action: none; white-space: nowrap; }
 .fx-label.cyc { cursor: pointer; }
+.bar-label { position: absolute; left: 0; top: 0; font: 10px var(--f-mono); color: var(--sel); letter-spacing: .04em; pointer-events: none; white-space: nowrap; z-index: 1; }
 .fx-label.sel { background: var(--sel); color: #17110A; border-color: var(--sel); }
 .sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: 620px; }
 .patch { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--stage-line); }
@@ -291,6 +292,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="vp-tools" role="group" aria-label="Viewport tool">
               <button type="button" id="tool-move" aria-pressed="true">Move / orbit</button>
               <button type="button" id="tool-aim" aria-pressed="false">Aim</button>
+              <button type="button" id="tool-cyc" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
@@ -311,6 +313,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn" id="p-add">Add lights</button>
           <button type="button" class="cbtn" id="p-change">Change selected to this type</button>
           <button type="button" class="cbtn warn" id="p-del">Remove selected</button>
+          <button type="button" class="cbtn" id="p-bar-add">Add bar</button>
+          <button type="button" class="cbtn warn" id="p-bar-del">Remove bar</button>
           <span class="patch-count" id="p-count"></span>
         </div>
         <div class="cmdline">
@@ -355,7 +359,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -516,6 +520,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
   const clone = o => JSON.parse(JSON.stringify(o));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function kelvinRGB(k) {
     const t = k / 100; let r, g, b;
@@ -529,9 +534,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   // ================= Rig =================
   const TRUSS = {
     foh: { name: 'FOH truss', y: 7, z: 9.5, min: -5.8, max: 5.8, base: 100 },
-    e1: { name: '1st electric', y: 6.6, z: 1.8, min: -6, max: 6, base: 200 },
-    e2: { name: '2nd electric', y: 6.6, z: -1.2, min: -6, max: 6, base: 300 },
-    floor: { name: 'Upstage floor', y: 0, z: -4.45, min: -6.5, max: 6.5, base: 400, floor: true }
+    e1: { name: '1st electric', y: 6.6, z: 2.4, min: -6, max: 6, base: 200, elec: true },
+    e2: { name: '2nd electric', y: 6.6, z: 0.6, min: -6, max: 6, base: 300, elec: true },
+    e3: { name: '3rd electric', y: 6.6, z: -1.2, min: -6, max: 6, base: 400, elec: true },
+    e4: { name: '4th electric', y: 6.4, z: -3.4, min: -6, max: 6, base: 500, elec: true },
+    floor: { name: 'Upstage floor', y: 0, z: -4.45, min: -6.5, max: 6.5, base: 600, floor: true }
   };
   const TYPES = {
     spot: { label: 'Moving spot', short: 'Spot', plural: 'Spots', group: 'Moving lights', zoom: [8, 40], def: 20, pen: 0.25, power: 3.2, r: 0.13, len: 0.38, haze: 0.06, moving: true },
@@ -547,9 +554,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let FIX = [], byId = {};
   [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(101 + i, 'spot', 'foh', x)));
   [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(201 + i, 'wash', 'e1', x)));
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(301 + i, 'beam', 'e2', x)));
-  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(401 + i, 'par', 'floor', x)));
-  FIX.push(mk(501, 'cyc', null, 0));
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(301 + i, 'profile', 'e2', x)));
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e3', x)));
+  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e4', x)));
+  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(601 + i, 'par', 'floor', x)));
+  FIX.push(mk(901, 'cyc', null, 0));
   function reindex() {
     FIX.sort((a, b) => a.id - b.id);
     byId = Object.fromEntries(FIX.map(f => [f.id, f]));
@@ -626,7 +635,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (f.type !== 'cyc') Object.assign(d, { pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
     return d;
   }
-  const role = f => f.type === 'cyc' ? 'cyc' : TRUSS[f.truss].floor ? 'floor' : f.type;
+  const role = f => f.type === 'cyc' ? 'cyc' : (TRUSS[f.truss].floor || f.truss === 'e4') ? 'floor' : f.type;
   function resolveAt(f, at) {
     if (typeof at === 'function') at = at(f);
     if (at === 'actors') return ACTORS[f.n % 3];
@@ -670,6 +679,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 3, 3, 9] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
     ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 2.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
   ];
+  const PROFILE = {
+    Morning: { dim: 40, k: 4300, zoom: 26, at: 'actors' }, Midday: { dim: 60, gel: 'N/C', zoom: 30, at: 'actors' },
+    Sunset: { dim: 40, gel: 'L147', at: 'actors' }, 'After the storm': { dim: 30, gel: 'L201', at: 'actors' },
+    Dream: { dim: 30, gel: 'L170', zoom: 40, at: 'cs' }, 'Curtain call': { dim: 80, gel: 'L204', zoom: 36, at: 'fan' }
+  };
+  LOOKS.forEach(L => { L[2].profile = PROFILE[L[0]] || { at: 'actors' }; });
   let cues = LOOKS.map(([name, fadeT, spec], i) => ({ num: i + 1, name, fade: fadeT, state: look(spec) }));
   const bo = clone(cues[cues.length - 1].state); Object.values(bo).forEach(v => { v.dim = 0; });
   cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo });
@@ -689,7 +704,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const inProg = (id, a) => !!(programmer[id] && a in programmer[id]);
   function outDim(f) {
     const d = inProg(f.id, 'dim') ? programmer[f.id].dim : pb[f.id].dim * masters.seq / 100;
-    const gm = f.truss === 'foh' ? masters.foh : (f.truss === 'e1' || f.truss === 'e2') ? masters.over : masters.floor;
+    const gm = f.truss === 'foh' ? masters.foh : (TRUSS[f.truss] && TRUSS[f.truss].elec) ? masters.over : masters.floor;
     return d * gm / 100 * masters.gm / 100;
   }
 
@@ -804,6 +819,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     rebuildPatch();
     fb(fmtIds(ids) + ' changed to ' + TYPES[type].label);
   }
+  const ORD = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+  function addBar() {
+    const elecs = Object.values(TRUSS).filter(T => T.elec);
+    if (elecs.length >= 8) { fb('The grid holds up to 8 electrics', true); return; }
+    const zs = [3.0, ...elecs.map(T => T.z).sort((a, b) => b - a), -4.2];
+    let best = 0, gap = -1;
+    for (let i = 0; i < zs.length - 1; i++) { const g = zs[i] - zs[i + 1]; if (g > gap) { gap = g; best = (zs[i] + zs[i + 1]) / 2; } }
+    if (gap < 0.6) { fb('There is no room for another electric over the stage', true); return; }
+    let n = 1; while (TRUSS['e' + n]) n++;
+    const used = Object.values(TRUSS).map(T => T.base); let base = 700; while (used.includes(base) || base === 900) base += 100;
+    const key = 'e' + n;
+    TRUSS[key] = { name: (ORD[n - 1] || n + 'th') + ' electric', y: 6.5, z: Math.round(best * 100) / 100, min: -6, max: 6, base, elec: true };
+    if (scene3d) scene3d.addBar(key);
+    rebuildPatch(); pPos.value = key;
+    fb('Added the ' + TRUSS[key].name + ' (' + (best >= 0 ? best.toFixed(1) + ' m downstage' : (-best).toFixed(1) + ' m upstage') + ' of centre). Add lights to it with Add lights');
+  }
+  function removeBar(key) {
+    const T = TRUSS[key];
+    if (!T || !T.elec) { fb('Only electrics can be removed. Pick one in Position first', true); return; }
+    const n = FIX.filter(f => f.truss === key).length;
+    if (n) { fb('The ' + T.name + ' still has ' + n + ' light' + (n > 1 ? 's' : '') + '. Select its group, press Remove selected, then remove the bar', true); return; }
+    delete TRUSS[key];
+    if (scene3d) scene3d.removeBar(key);
+    rebuildPatch();
+    fb('Removed the ' + T.name);
+  }
+
   function removeLights() {
     if (!needSel()) return;
     const ids = selection.filter(id => byId[id].type !== 'cyc');
@@ -966,8 +1008,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     og[t.group].appendChild(o);
   });
   pType.value = 'beam';
-  Object.entries(TRUSS).forEach(([k, T]) => { const o = document.createElement('option'); o.value = k; o.textContent = T.name; pPos.appendChild(o); });
-  pPos.value = 'e2';
+  function fillPos() {
+    const keep = pPos.value;
+    pPos.innerHTML = '';
+    Object.entries(TRUSS).sort((a, b) => (b[1].floor ? -99 : b[1].z) - (a[1].floor ? -99 : a[1].z))
+      .forEach(([k, T]) => { const o = document.createElement('option'); o.value = k; o.textContent = T.name; pPos.appendChild(o); });
+    pPos.value = TRUSS[keep] ? keep : 'e3';
+  }
+  fillPos(); pPos.value = 'e3';
+  pPos.addEventListener('change', () => { dirty = true; });
+  $('p-bar-add').addEventListener('click', addBar);
+  $('p-bar-del').addEventListener('click', () => removeBar(pPos.value));
   $('p-add').addEventListener('click', () => addLights(pType.value, pPos.value, +$('p-qty').value));
   $('p-change').addEventListener('click', () => changeType(pType.value));
   $('p-del').addEventListener('click', removeLights);
@@ -1030,7 +1081,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
   }
   function rebuildPatch() {
-    buildSheet(); buildGroupPool();
+    buildSheet(); buildGroupPool(); fillPos();
     const n = FIX.length;
     $('p-count').textContent = n + ' lights patched · ' + Object.keys(TYPES).map(k => [k, FIX.filter(f => f.type === k).length]).filter(x => x[1]).map(([k, c]) => c + ' ' + (c > 1 ? TYPES[k].plural : TYPES[k].short)).join(', ');
     changed();
@@ -1125,6 +1176,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 3.6); scene.add(m);
     });
     const header = new THREE.Mesh(new THREE.BoxGeometry(14.8, 1.4, 0.6), prosMat); header.position.set(0, 6.9, 3.6); scene.add(header);
+    const houseWall = new THREE.MeshStandardMaterial({ color: 0x0b0809, roughness: 1 });
+    const above = new THREE.Mesh(new THREE.BoxGeometry(34, 12, 0.5), houseWall); above.position.set(0, 13.6, 3.62); scene.add(above);
+    [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(10, 20, 0.5), houseWall); w.position.set(sd * 12.4, 8, 3.62); scene.add(w); });
 
     const velvet = new THREE.MeshStandardMaterial({ color: 0x5a0c14, roughness: 0.95, side: THREE.DoubleSide });
     function drape(w, h, folds, amp) {
@@ -1162,14 +1216,46 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     scene.add(new THREE.HemisphereLight(0x6070a0, 0x050505, 0.07));
 
     const pipeMat = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: 0.6, roughness: 0.4 });
-    Object.values(TRUSS).forEach(T => {
-      if (T.floor) return;
-      const len = T.max - T.min + 1.2;
-      [-0.1, 0.1].forEach(dz => {
-        const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 8), pipeMat);
-        p.rotation.z = Math.PI / 2; p.position.set(0, T.y + 0.03, T.z + dz); scene.add(p);
-      });
-    });
+    const bars = {};
+    function addBar(key) {
+      const T = TRUSS[key], g = new THREE.Group();
+      const mat = pipeMat.clone();
+      if (!T.floor) {
+        const len = T.max - T.min + 1.2;
+        [-0.1, 0.1].forEach(dz => {
+          const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 8), mat);
+          p.rotation.z = Math.PI / 2; p.position.set(0, T.y + 0.03, T.z + dz); g.add(p);
+        });
+        [-1, 1].forEach(s => { const line = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 3, 4), pipeMat); line.position.set(s * (T.max - 0.5), T.y + 1.53, T.z); g.add(line); });
+      }
+      scene.add(g);
+      const el = document.createElement('div'); el.className = 'bar-label'; el.textContent = T.name;
+      $('labels').appendChild(el);
+      bars[key] = { g, el, mat };
+      dirty = true;
+    }
+    function removeBar(key) {
+      const b = bars[key]; if (!b) return;
+      scene.remove(b.g); b.g.traverse(m => { if (m.geometry) m.geometry.dispose(); });
+      b.el.remove(); delete bars[key]; dirty = true;
+    }
+    Object.keys(TRUSS).forEach(addBar);
+
+    // Back wall, seen when the cyc is flown out
+    const brick = document.createElement('canvas'); brick.width = 256; brick.height = 256;
+    const bc = brick.getContext('2d');
+    bc.fillStyle = '#1a1716'; bc.fillRect(0, 0, 256, 256);
+    for (let row = 0; row < 16; row++) for (let col = -1; col < 5; col++) {
+      const x = col * 64 + (row % 2) * 32, y = row * 16;
+      const t = 38 + Math.floor(Math.random() * 18);
+      bc.fillStyle = `rgb(${t + 14},${t},${t - 6})`; bc.fillRect(x + 2, y + 2, 60, 12);
+    }
+    const brickTex = new THREE.CanvasTexture(brick); brickTex.wrapS = brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(6, 3.5); brickTex.encoding = THREE.sRGBEncoding;
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.95 }));
+    backWall.position.set(0, 4.5, -5.4); backWall.receiveShadow = true; scene.add(backWall);
+    let cycY = 4, cycTarget = 4;
+    function flyCyc(isIn) { cycTarget = isIn ? 4 : 15; if (reduceMotion) cycY = cycTarget; dirty = true; }
+    const busy = () => Math.abs(cycY - cycTarget) > 0.005;
 
     // A fixed pool of real lights is shared by the brightest fixtures, so the rig can grow without overloading the graphics card.
     const POOL = 14, pool = [];
@@ -1315,12 +1401,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const ty = TYPES[L.f.type];
         s.angle = rad(L.zoom / 2); s.penumbra = ty.pen; s.color.setRGB(L.r, L.g, L.b); s.intensity = ty.power * L.d;
       });
+      if (busy()) { cycY += (cycTarget - cycY) * 0.06; if (!busy()) cycY = cycTarget; }
+      cyc.position.y = cycY;
       placeCam();
       renderer.render(scene, camera);
       const w = vp.clientWidth, h = vp.clientHeight;
+      Object.entries(bars).forEach(([key, b]) => {
+        const T = TRUSS[key]; if (!T) return;
+        const on = key === $('p-pos').value;
+        b.mat.emissive.setHex(on ? 0x6a3e0c : 0x000000);
+        v3.set(T.max + 0.45, T.floor ? 0.15 : T.y, T.z).project(camera);
+        const off = !on || v3.z > 1 || v3.x > 1.05;
+        b.el.hidden = off;
+        if (!off) b.el.style.transform = `translate(${((v3.x + 1) / 2 * w).toFixed(1)}px, ${((1 - v3.y) / 2 * h).toFixed(1)}px) translate(0, -50%)`;
+      });
       FIX.forEach(f => {
         const lb = labels[f.id]; if (!lb) return;
-        if (f.type === 'cyc') v3.set(0, 7.4, -4.8);
+        if (f.type === 'cyc') v3.set(0, cycY + 3.4, -4.8);
         else obj[f.id].root.getWorldPosition(v3).add(up.set(0, TRUSS[f.truss].floor ? 0.85 : 0.32, 0));
         v3.project(camera);
         const off = v3.z > 1;
@@ -1330,7 +1427,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, addFixture, removeFixture };
+    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, busy };
   }
 
   try { scene3d = build3D(); }
@@ -1348,12 +1445,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     vp.classList.toggle('aim', aim);
     $('vp-hint').textContent = aim ? 'Aim: click or drag on the stage floor to point the selected lights there' : 'Drag empty space to orbit · Drag a fixture tag to slide it along its truss';
   }
+  let cycIn = true;
+  $('tool-cyc').addEventListener('click', () => {
+    cycIn = !cycIn;
+    $('tool-cyc').setAttribute('aria-pressed', cycIn); $('tool-cyc').textContent = cycIn ? 'Cyc in' : 'Cyc out';
+    if (scene3d) scene3d.flyCyc(cycIn);
+    fb(cycIn ? 'Flying the cyc in' : 'Flying the cyc out. The back wall is now the backdrop');
+  });
   $('tool-move').addEventListener('click', () => setTool(false));
   $('tool-aim').addEventListener('click', () => setTool(true));
 
   function loop(now) {
     if (fade) stepFade(now);
-    if (scene3d && (dirty || fx)) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy())) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
