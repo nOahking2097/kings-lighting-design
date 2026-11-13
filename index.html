@@ -69,10 +69,11 @@ a { color: inherit; }
 .hero-copy h1 em { font-style: normal; color: var(--beam); transition: color .4s; }
 .hero-copy p { color: var(--stage-muted); max-width: 46ch; font-size: 17px; }
 /* ---------- Previs console ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .console { --c-panel: #0D1016; --c-tile: #161A22; --c-edge: #262B36; --sel: #F0A24A; --go: #1E7A49; --go-edge: #2EA061; --err: #FF8A7A;
   border: 1px solid var(--stage-line); border-radius: 6px; overflow: hidden; background: var(--c-panel); font-size: 13px; }
-.c-top { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); }
-.viewport { position: relative; min-height: 620px; background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
+.c-top { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+.viewport { position: relative; min-height: clamp(560px, 80vh, 960px); background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
 .viewport:active { cursor: grabbing; }
 .viewport.aim { cursor: crosshair; touch-action: none; }
 .viewport.setmode { cursor: move; touch-action: none; }
@@ -89,7 +90,20 @@ a { color: inherit; }
 .fx-label.cyc { cursor: pointer; }
 .bar-label { position: absolute; left: 0; top: 0; font: 10px var(--f-mono); color: var(--sel); letter-spacing: .04em; pointer-events: none; white-space: nowrap; z-index: 1; }
 .fx-label.sel { background: var(--sel); color: #17110A; border-color: var(--sel); }
-.sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: 620px; }
+.sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: clamp(560px, 80vh, 960px); }
+.viewport:fullscreen { min-height: 0; width: 100%; height: 100%; }
+.viewport.vp-max { position: fixed; inset: 0; z-index: 60; min-height: 0; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.vp-play { position: absolute; right: 12px; top: 12px; display: none; gap: 4px; z-index: 3; }
+.viewport:fullscreen .vp-play, .viewport.vp-max .vp-play { display: flex; }
+.vp-play button { font: 600 13px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 8px 14px; cursor: pointer; }
+.vp-play .go { background: var(--go); border-color: var(--go-edge); color: #FFFFFF; }
+.auth { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 10px 12px; border-bottom: 1px solid var(--stage-line); background: #07080B; }
+.auth .patch-h { margin-right: 4px; }
+.auth input { font: 13px var(--f-mono); color: var(--stage-fg); background: var(--c-panel); border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 8px; min-width: 0; flex: 1 1 180px; max-width: 260px; color-scheme: dark; }
+.auth .msg { font: 12px var(--f-mono); color: var(--stage-muted); }
+.auth .msg.err { color: var(--err); }
+.console.locked .edit, .console.locked .edit-tool { opacity: .35; pointer-events: none; }
+.console.locked .fx-label { pointer-events: none; }
 .patch { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--stage-line); }
 .patch-h { font: 500 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--sel); margin-right: 4px; }
 .patch label { font: 11px var(--f-mono); color: var(--stage-muted); }
@@ -167,7 +181,7 @@ a { color: inherit; }
 @media (max-width: 860px) {
   .c-top { grid-template-columns: 1fr; }
   .sheet { border-left: 0; border-top: 1px solid var(--stage-line); max-height: 260px; }
-  .viewport { min-height: 400px; }
+  .viewport { min-height: 440px; }
 }
 @media (max-width: 600px) {
   .c-deck { grid-template-columns: 1fr; }
@@ -289,18 +303,30 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <p>We model your stage, set and lighting rig in 3D and program the show offline. You arrive at tech with a cue stack that already works, and your stage time goes into refining it.</p>
       </div>
 
-      <div class="console" id="console">
+      <div class="console locked" id="console">
+        <form class="auth" id="auth" autocomplete="on" novalidate>
+          <span class="patch-h" id="auth-h">Viewing only</span>
+          <span id="auth-fields" style="display:contents">
+            <label class="sr-only" for="a-email">Admin email</label><input id="a-email" type="email" autocomplete="username" placeholder="Admin email">
+            <label class="sr-only" for="a-pass">Password</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="Password">
+            <button type="submit" class="cbtn" id="a-in">Admin sign in</button>
+          </span>
+          <button type="button" class="cbtn" id="a-out" hidden>Lock console</button>
+          <span class="msg" id="a-msg" role="status">Visitors can watch and run cues. Sign in to edit the rig, cues and set.</span>
+        </form>
         <div class="c-top">
           <div class="viewport" id="viewport" aria-label="3D proscenium stage with moving lights on a front-of-house truss and an overhead electric">
             <div class="vp-tools" role="group" aria-label="Viewport tool">
               <button type="button" id="tool-move" aria-pressed="true">Orbit</button>
               <button type="button" id="tool-pan" aria-pressed="false">Pan</button>
-              <button type="button" id="tool-aim" aria-pressed="false">Aim</button>
-              <button type="button" id="tool-set" aria-pressed="false">Set</button>
-              <button type="button" id="tool-cyc" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
-              <button type="button" id="tool-curtain" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
+              <button type="button" id="tool-aim" class="edit-tool" aria-pressed="false">Aim</button>
+              <button type="button" id="tool-set" class="edit-tool" aria-pressed="false">Set</button>
+              <button type="button" id="tool-cyc" class="edit-tool" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
+              <button type="button" id="tool-curtain" class="edit-tool" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
               <button type="button" id="tool-mask" aria-pressed="false" title="Show or hide the border and the wall above the stage">Masking off</button>
+              <button type="button" id="tool-fs" title="Fill the screen with the stage (Esc to leave)">Full screen</button>
             </div>
+            <div class="vp-play" role="group" aria-label="Playback"><button type="button" id="fs-back">Back</button><button type="button" class="go" id="fs-go">Go</button></div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
             <span class="vp-hint" id="vp-hint">Drag to orbit · Right-drag or Shift-drag to pan · Scroll to zoom · Double-click to reset</span>
@@ -312,7 +338,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             </table>
           </div>
         </div>
-        <div class="patch" role="group" aria-label="Patch lights">
+        <div class="patch edit" role="group" aria-label="Patch lights">
           <span class="patch-h">Patch</span>
           <label for="p-type">Light type</label><select id="p-type"></select>
           <label for="p-pos">Position</label><select id="p-pos"></select>
@@ -325,7 +351,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn warn" id="p-bar-del">Remove bar</button>
           <span class="patch-count" id="p-count"></span>
         </div>
-        <div class="patch" role="group" aria-label="Set and actors">
+        <div class="patch edit" role="group" aria-label="Set and actors">
           <span class="patch-h">Set</span>
           <label for="s-kind">Piece</label><select id="s-kind"></select>
           <button type="button" class="cbtn" id="s-add">Add to stage</button>
@@ -334,13 +360,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn warn" id="s-del">Remove piece</button>
           <span class="patch-count" id="s-info"></span>
         </div>
-        <div class="cmdline">
+        <div class="cmdline edit">
           <label for="cmd">CMD</label>
           <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Fixture 101 Thru 104 At 75">
           <span class="cmd-fb" id="cmd-fb" role="status">Ready</span>
         </div>
         <div class="c-deck">
-          <div class="c-sec">
+          <div class="c-sec edit">
             <div class="c-h">Groups</div>
             <div class="pool" id="pool-groups"></div>
             <div class="c-h">Position presets</div>
@@ -348,7 +374,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="c-h">Color presets</div>
             <div class="pool" id="pool-color"></div>
           </div>
-          <div class="c-sec">
+          <div class="c-sec edit">
             <div class="c-h">Programmer <span id="sel-info">No selection</span></div>
             <div class="pages" id="enc-pages" role="group" aria-label="Encoder page"></div>
             <div class="encs" id="encs"></div>
@@ -363,21 +389,21 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="cuelist">
               <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th><th>Curtain</th></tr></thead><tbody id="cue-body"></tbody></table>
             </div>
-            <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
+            <div class="fade-row edit"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
             <div class="fade-row"><span id="save-state">Your cues, rig and set save in this browser</span></div>
             <div class="go-row">
               <button type="button" class="cbtn" id="b-back">Back</button>
-              <button type="button" class="cbtn" id="b-fx" aria-pressed="false">Ballyhoo FX</button>
+              <button type="button" class="cbtn edit" id="b-fx" aria-pressed="false">Ballyhoo FX</button>
               <button type="button" class="cbtn go" id="b-go">Go</button>
             </div>
-            <div class="faders" id="faders"></div>
+            <div class="faders edit" id="faders"></div>
           </div>
-          <div class="c-sec">
+          <div class="c-sec edit">
             <div class="c-h">Keypad</div>
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -855,6 +881,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     changed();
   }
   function setAttr(ids, a, v) {
+    if (!isAdmin) return;
     ids.forEach(id => {
       const f = byId[id]; if (!f || !f.attrs.includes(a)) return;
       let lo = ATTR[a].min, hi = ATTR[a].max;
@@ -1008,6 +1035,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function back() { if (curIdx <= 0) { fb('Already at the first cue', true); return; } gotoIdx(curIdx - 1); }
   function gotoNum(n) { const i = cues.findIndex(c => c.num === n); if (i < 0) { fb('There is no cue ' + n, true); return; } gotoIdx(i); }
   function store(num) {
+    if (!isAdmin) { fb('Sign in as admin to store cues', true); return; }
     const state = {};
     FIX.forEach(f => { const o = {}; f.attrs.forEach(a => { o[a] = val(f.id, a); }); state[f.id] = o; });
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
@@ -1033,6 +1061,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     changed();
   }
   function deleteCue(n) {
+    if (!isAdmin) return;
     const i = cues.findIndex(c => c.num === n);
     if (i < 0) { fb('There is no cue ' + n, true); return; }
     cues.splice(i, 1); if (curIdx >= cues.length) curIdx = cues.length - 1; else if (i < curIdx) curIdx--;
@@ -1067,6 +1096,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     c: 'cue', q: 'cue', cue: 'cue', s: 'store', store: 'store', at: 'at', '@': 'at', full: 'full', fl: 'full', go: 'go', back: 'back',
     goto: 'goto', clear: 'clear', clr: 'clear', locate: 'locate', '+': '+', '-': '-', delete: 'delete', del: 'delete', out: 'out' };
   function exec(raw) {
+    if (!isAdmin) { fb('Sign in as admin to use the command line', true); return; }
     const words = raw.trim().replace(/([@+\-])/g, ' $1 ').split(/\s+/).filter(Boolean);
     if (!words.length) return;
     const t = [];
@@ -1304,6 +1334,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
   }
   function rebuildPatch() {
+    setTimeout(applyLock, 0);
     buildSheet(); buildGroupPool(); fillPos();
     const n = FIX.length;
     $('p-count').textContent = n + ' lights patched · ' + Object.keys(TYPES).map(k => [k, FIX.filter(f => f.type === k).length]).filter(x => x[1]).map(([k, c]) => c + ' ' + (c > 1 ? TYPES[k].plural : TYPES[k].short)).join(', ');
@@ -1938,6 +1969,68 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   $('tool-move').addEventListener('click', () => setTool('move'));
   $('tool-aim').addEventListener('click', () => setTool('aim'));
   $('tool-set').addEventListener('click', () => setTool('set'));
+
+  // ---- Admin lock (a convenience lock for a public page; the check runs in the visitor's browser) ----
+  const ADMIN_HASH = '597e54ab42ebbbf76dc90a59fa2f849aee3dd9734d058b31460d16036a3a580e';
+  const ADMIN_KEY = 'kld-admin-v1';
+  let isAdmin = false;
+  async function digest(email, pass) {
+    const data = new TextEncoder().encode('kld-admin|' + email.trim().toLowerCase() + '|' + pass);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function applyLock() {
+    const locked = !isAdmin;
+    $('console').classList.toggle('locked', locked);
+    document.querySelectorAll('.console .edit button, .console .edit input, .console .edit select, .console .edit-tool').forEach(el => { el.disabled = locked; });
+    document.querySelectorAll('.console .edit [tabindex]').forEach(el => { el.tabIndex = locked ? -1 : 0; });
+    $('auth-fields').hidden = !locked; $('auth-fields').style.display = locked ? 'contents' : 'none';
+    $('a-out').hidden = locked;
+    $('auth-h').textContent = locked ? 'Viewing only' : 'Admin';
+    if (locked && (toolMode === 'aim' || toolMode === 'set')) setTool('move');
+  }
+  $('auth').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('a-msg');
+    if (!window.crypto || !crypto.subtle) { msg.textContent = 'This browser cannot check the password here. Open the site over https.'; msg.classList.add('err'); return; }
+    const h = await digest($('a-email').value, $('a-pass').value);
+    if (h === ADMIN_HASH) {
+      isAdmin = true; $('a-pass').value = '';
+      try { localStorage.setItem(ADMIN_KEY, h); } catch (err) {}
+      msg.textContent = 'Signed in on this device. Press Lock console when you are done.'; msg.classList.remove('err');
+      applyLock(); fb('Admin mode: editing is unlocked');
+    } else {
+      msg.textContent = 'That email and password do not match. Check both and try again.'; msg.classList.add('err');
+    }
+  });
+  $('a-out').addEventListener('click', () => {
+    isAdmin = false;
+    try { localStorage.removeItem(ADMIN_KEY); } catch (err) {}
+    $('a-msg').textContent = 'Locked. Visitors can watch and run cues.'; $('a-msg').classList.remove('err');
+    applyLock(); fb('Console locked');
+  });
+  try { if (localStorage.getItem(ADMIN_KEY) === ADMIN_HASH) { isAdmin = true; $('a-msg').textContent = 'Signed in on this device.'; } } catch (err) {}
+  applyLock();
+
+  // ---- Full screen (falls back to filling the browser window where full screen is not allowed) ----
+  function isFull() { return document.fullscreenElement === vp || vp.classList.contains('vp-max'); }
+  function fsLabel() { $('tool-fs').textContent = isFull() ? 'Exit full screen' : 'Full screen'; }
+  async function toggleFull() {
+    if (isFull()) {
+      if (document.fullscreenElement) { try { await document.exitFullscreen(); } catch (e) {} }
+      vp.classList.remove('vp-max'); document.body.style.overflow = ''; fsLabel(); return;
+    }
+    try {
+      if (!vp.requestFullscreen) throw new Error('no fullscreen');
+      await vp.requestFullscreen();
+    } catch (e) { vp.classList.add('vp-max'); document.body.style.overflow = 'hidden'; }
+    fsLabel();
+  }
+  $('tool-fs').addEventListener('click', toggleFull);
+  document.addEventListener('fullscreenchange', fsLabel);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && vp.classList.contains('vp-max')) { vp.classList.remove('vp-max'); document.body.style.overflow = ''; fsLabel(); } });
+  $('fs-go').addEventListener('click', go);
+  $('fs-back').addEventListener('click', back);
 
   function loop(now) {
     if (fade) stepFade(now);
