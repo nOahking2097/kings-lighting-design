@@ -76,6 +76,8 @@ a { color: inherit; }
 .viewport:active { cursor: grabbing; }
 .viewport.aim { cursor: crosshair; touch-action: none; }
 .viewport.setmode { cursor: move; touch-action: none; }
+.viewport.panmode { cursor: all-scroll; touch-action: none; }
+.vp-tools { flex-wrap: wrap; max-width: calc(100% - 200px); }
 .viewport canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
 .vp-tools { position: absolute; left: 12px; bottom: 34px; display: flex; gap: 4px; z-index: 3; }
 .vp-tools button { font: 500 12px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
@@ -291,14 +293,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <div class="c-top">
           <div class="viewport" id="viewport" aria-label="3D proscenium stage with moving lights on a front-of-house truss and an overhead electric">
             <div class="vp-tools" role="group" aria-label="Viewport tool">
-              <button type="button" id="tool-move" aria-pressed="true">Move / orbit</button>
+              <button type="button" id="tool-move" aria-pressed="true">Orbit</button>
+              <button type="button" id="tool-pan" aria-pressed="false">Pan</button>
               <button type="button" id="tool-aim" aria-pressed="false">Aim</button>
               <button type="button" id="tool-set" aria-pressed="false">Set</button>
               <button type="button" id="tool-cyc" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
+              <button type="button" id="tool-curtain" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
-            <span class="vp-hint" id="vp-hint">Drag to orbit · Scroll to zoom · Double-click to reset · Drag a light tag to move it</span>
+            <span class="vp-hint" id="vp-hint">Drag to orbit · Right-drag or Shift-drag to pan · Scroll to zoom · Double-click to reset</span>
           </div>
           <div class="sheet" aria-label="Fixture sheet">
             <table class="ctable">
@@ -324,6 +328,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <label for="s-kind">Piece</label><select id="s-kind"></select>
           <button type="button" class="cbtn" id="s-add">Add to stage</button>
           <button type="button" class="cbtn" id="s-rot">Rotate 45°</button>
+          <button type="button" class="cbtn" id="s-fly">Fly in / out</button>
           <button type="button" class="cbtn warn" id="s-del">Remove piece</button>
           <span class="patch-count" id="s-info"></span>
         </div>
@@ -354,7 +359,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div class="c-sec">
             <div class="c-h">Main cue list <span id="pb-state"></span></div>
             <div class="cuelist">
-              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th></tr></thead><tbody id="cue-body"></tbody></table>
+              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th><th>Curtain</th></tr></thead><tbody id="cue-body"></tbody></table>
             </div>
             <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span></div>
             <div class="go-row">
@@ -369,7 +374,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Build a set with the <b>Set</b> bar: add scenery, furniture and actors, then use the <b>Set</b> tool to drag them around and <b>Rotate 45°</b> to turn them. Each stored cue remembers where the set and actors stand and whether the cyc is in, so actors move between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -638,7 +643,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { id: 'p3', kind: 'lamp', x: 4.6, z: -2.6, rot: 0 },
     { id: 'a1', kind: 'lead', x: -2.3, z: 0.9, rot: 0 },
     { id: 'a2', kind: 'dress', x: 0.1, z: -0.6, rot: 0 },
-    { id: 'a3', kind: 'elder', x: 2.4, z: 0.6, rot: 0 }
+    { id: 'a3', kind: 'elder', x: 2.4, z: 0.6, rot: 0 },
+    { id: 'p4', kind: 'window', x: -0.6, z: -3.9, rot: 0, fly: 1 }
   ];
   let setSeq = 10, selSet = null, lay = null;
   const actorsNow = () => SET.filter(o => PIECES[o.kind].actor);
@@ -661,9 +667,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     'Curtain call': [[-1.5, 2.6], [0, 2.8], [1.5, 2.6]]
   };
   const CYC_OUT = new Set(['Concert']);
-  const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot }]));
-  function layoutFor(act) {
+  const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot, fly: o.fly || 0 }]));
+  const WINDOW_IN = new Set(['Moonlight', 'Fireside']);
+  function layoutFor(act, name) {
     const L = snapLayout();
+    if (L.p4) L.p4.fly = WINDOW_IN.has(name) ? 0 : 1;
     ['a1', 'a2', 'a3'].forEach((id, i) => { if (L[id]) { L[id].x = act[i][0]; L[id].z = act[i][1]; L[id].rot = clamp(-act[i][0] * 7, -35, 35); } });
     return L;
   }
@@ -755,11 +763,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   LOOKS.forEach(L => { L[2].profile = PROFILE[L[0]] || { at: 'actors' }; });
   let cues = LOOKS.map(([name, fadeT, spec], i) => {
     const act = ACT[name] || ACT.Preset;
-    return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), layout: layoutFor(act) };
+    return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), curtain: true, layout: layoutFor(act, name) };
   });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
 
   let curIdx = 0;
@@ -943,6 +951,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
     if (c.cyc != null) setCyc(c.cyc, true);
+    if (c.curtain != null) setCurtain(c.curtain, true);
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
     changed();
@@ -956,8 +965,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -970,7 +979,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
   function startLayout(target, dur) {
     const from = {}, to = {};
-    SET.forEach(o => { const t = target[o.id]; if (!t) return; from[o.id] = { x: o.x, z: o.z, rot: o.rot }; to[o.id] = t; });
+    SET.forEach(o => { const t = target[o.id]; if (!t) return; from[o.id] = { x: o.x, z: o.z, rot: o.rot, fly: o.fly || 0 }; to[o.id] = Object.assign({ fly: 0 }, t); });
     if (!dur || dur <= 0) { SET.forEach(o => { if (to[o.id]) Object.assign(o, clone(to[o.id])); }); lay = null; changed(); return; }
     lay = { from, to, t0: performance.now(), dur: dur * 1000 };
   }
@@ -978,7 +987,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const k = Math.min(1, (now - lay.t0) / lay.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     SET.forEach(o => {
       const a = lay.from[o.id], b = lay.to[o.id]; if (!a) return;
-      o.x = a.x + (b.x - a.x) * e; o.z = a.z + (b.z - a.z) * e;
+      o.x = a.x + (b.x - a.x) * e; o.z = a.z + (b.z - a.z) * e; o.fly = a.fly + (b.fly - a.fly) * e;
       const d = ((((b.rot - a.rot) % 360) + 540) % 360) - 180; o.rot = a.rot + d * e;
     });
     if (k >= 1) lay = null;
@@ -1123,7 +1132,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const sc = Math.min(d, 3) - Math.hypot(x, z) * 0.12;
       if (sc > bs) { bs = sc; best = [x, z]; }
     }
-    const o = { id: (PIECES[kind].actor ? 'a' : 'p') + (++setSeq), kind, x: best[0], z: best[1], rot: 0 };
+    const o = { id: (PIECES[kind].actor ? 'a' : 'p') + (++setSeq), kind, x: best[0], z: best[1], rot: 0, fly: 0 };
     SET.push(o); if (scene3d) scene3d.addSet(o);
     selSet = o.id; setTool('set'); changed();
     fb('Added ' + PIECES[kind].label + '. Drag it with the Set tool, then Store so cues remember where it stands');
@@ -1134,6 +1143,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
     lay = null; o.rot = Math.round((o.rot + 45) / 45) * 45 % 360; changed();
     fb(PIECES[o.kind].label + ' turned to ' + o.rot + '°');
+  });
+  $('s-fly').addEventListener('click', () => {
+    const o = SET.find(x => x.id === selSet);
+    if (!o) { fb('Pick the Set tool and click a piece first', true); return; }
+    if (PIECES[o.kind].actor) { fb('Actors cannot fly. Drag them offstage instead', true); return; }
+    const out = (o.fly || 0) < 0.5;
+    const L = {}; L[o.id] = { x: o.x, z: o.z, rot: o.rot, fly: out ? 1 : 0 };
+    startLayout(L, 3);
+    fb((out ? 'Flying out ' : 'Flying in ') + PIECES[o.kind].label + '. Store to save it in a cue');
   });
   $('s-del').addEventListener('click', () => {
     const o = SET.find(x => x.id === selSet);
@@ -1245,14 +1263,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
     $('sel-info').textContent = selection.length ? fmtIds(selection) : 'No selection';
     const so = SET.find(o => o.id === selSet);
-    $('s-info').textContent = so ? PIECES[so.kind].label + ' · X ' + so.x.toFixed(1) + ' m, Z ' + so.z.toFixed(1) + ' m, ' + Math.round(((so.rot % 360) + 360) % 360) + '°' : SET.length + ' pieces on stage · pick the Set tool to drag them';
+    $('s-info').textContent = so ? PIECES[so.kind].label + ' · X ' + so.x.toFixed(1) + ' m, Z ' + so.z.toFixed(1) + ' m, ' + Math.round(((so.rot % 360) + 360) % 360) + '°' + ((so.fly || 0) > 0.5 ? ' · flown out' : '') : SET.length + ' pieces on stage · pick the Set tool to drag them';
     const key = [...selection].sort().join();
     groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && GROUPS[i] && key === [...GROUPS[i].ids].sort().join()));
     const body = $('cue-body'); body.innerHTML = '';
     cues.forEach((c, i) => {
       const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
-      tr.innerHTML = '<td></td><td></td><td></td><td></td>';
-      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.cyc === false ? 'Out' : 'In';
+      tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td>';
+      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.cyc === false ? 'Out' : 'In'; tr.cells[4].textContent = c.curtain === false ? 'Shut' : 'Open';
       tr.addEventListener('click', () => gotoIdx(i));
       body.appendChild(tr);
     });
@@ -1319,6 +1337,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       leg2.position.set(side * 5.6, 3.15, 0.2); scene.add(leg2);
     });
     const border = new THREE.Mesh(drape(12, 1.0, 22, 0.08), velvet); border.position.set(0, 5.7, 3.1); scene.add(border);
+    // Main curtain (a traveller): two halves that part to the sides
+    const grandMat = new THREE.MeshStandardMaterial({ color: 0x6e0f1b, roughness: 0.92, side: THREE.DoubleSide });
+    const halves = [-1, 1].map(sd => { const m = new THREE.Mesh(drape(7.2, 6.4, 18, 0.1), grandMat); m.position.set(sd * 3.6, 3.2, 3.32); m.castShadow = m.receiveShadow = true; scene.add(m); return { m, sd }; });
+    let curtV = 1, curtT = 1, lastNow = 0;
+    function placeCurtain() {
+      const sx = 1 - 0.8 * curtV, w = 7.2 * sx, edge = 5.7 * curtV;
+      halves.forEach(({ m, sd }) => { m.scale.set(sx, 1, 1 + 2.2 * curtV); m.position.x = sd * (edge + w / 2); });
+    }
+    placeCurtain();
+    let curtAnim = null;
+    function moveCurtain(open) { curtT = open ? 1 : 0; curtAnim = { from: curtV, t0: performance.now(), dur: 2400 * Math.abs(curtT - curtV) }; if (reduceMotion || !curtAnim.dur) { curtV = curtT; curtAnim = null; placeCurtain(); } dirty = true; }
 
     // ---- Set pieces and actors ----
     const setObj = {};
@@ -1460,7 +1489,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     backWall.position.set(0, 4.5, -5.4); backWall.receiveShadow = true; scene.add(backWall);
     let cycY = 4, cycTarget = 4;
     function flyCyc(isIn) { cycTarget = isIn ? 4 : 15; if (reduceMotion) cycY = cycTarget; dirty = true; }
-    const busy = () => Math.abs(cycY - cycTarget) > 0.005;
+    const busy = () => Math.abs(cycY - cycTarget) > 0.005 || !!curtAnim;
 
     // A fixed pool of real lights is shared by the brightest fixtures, so the rig can grow without overloading the graphics card.
     const POOL = 14, pool = [];
@@ -1558,9 +1587,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       for (const h of hits) { let o = h.object; while (o && !o.userData.setId) o = o.parent; if (o) return o.userData.setId; }
       return null;
     }
+    let pan = null, panY = 0;
+    vp.addEventListener('contextmenu', e => e.preventDefault());
     vp.addEventListener('pointerdown', e => {
       if (e.target.closest('.vp-tools')) return;
       vp.setPointerCapture(e.pointerId);
+      if (e.button === 1 || e.button === 2 || (e.shiftKey && toolMode !== 'set') || toolMode === 'pan') { e.preventDefault(); pan = { x: e.clientX, y: e.clientY }; return; }
       if (toolMode === 'aim') { aiming = true; aimHere(e); return; }
       if (toolMode === 'set') {
         const id = pickSet(e);
@@ -1574,6 +1606,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       orbit = { x: e.clientX, y: e.clientY };
     });
     vp.addEventListener('pointermove', e => {
+      if (pan) {
+        const k = dist * 0.0011, dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+        lookAt.x = clamp(lookAt.x - Math.cos(az) * dx * k, -7, 7);
+        lookAt.z = clamp(lookAt.z + Math.sin(az) * dx * k, -4.5, 4);
+        panY = clamp(panY + dy * k, -3.5, 3.5);
+        lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6 + panY;
+        pan = { x: e.clientX, y: e.clientY }; dirty = true; return;
+      }
       if (dragSet) {
         const P = hit(e, deckPlane);
         if (P) { dragSet.o.x = clamp(P.x + dragSet.dx, -STAGE.x, STAGE.x); dragSet.o.z = clamp(P.z + dragSet.dz, STAGE.zMin, STAGE.zMax); changed(); }
@@ -1585,19 +1625,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 0.6);
       orbit = { x: e.clientX, y: e.clientY }; dirty = true;
     });
-    const end = () => { orbit = null; aiming = false; dragSet = null; };
+    const end = () => { orbit = null; aiming = false; dragSet = null; pan = null; };
     vp.addEventListener('wheel', e => {
       e.preventDefault();
       const step = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
       zoomF = clamp(zoomF * Math.exp(step * 0.0008), 0.35, 1.6);
       dist = baseDist * zoomF;
       // Lower the look point as you zoom in, so close-ups frame the actors rather than the rig.
-      lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6;
+      lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6 + panY;
       dirty = true;
     }, { passive: false });
     vp.addEventListener('dblclick', e => {
-      if (e.target.closest('.vp-tools') || toolMode !== 'move') return;
-      zoomF = 1; dist = baseDist; lookAt.y = 3.9; az = 0.15; el = 0.1; dirty = true;
+      if (e.target.closest('.vp-tools') || (toolMode !== 'move' && toolMode !== 'pan')) return;
+      zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, 3.9, -0.3); az = 0.15; el = 0.1; dirty = true;
     });
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
@@ -1613,7 +1653,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     function render(now) {
       SET.forEach(o => {
         const so = setObj[o.id]; if (!so) return;
-        so.g.position.set(o.x, 0, o.z); so.g.rotation.y = rad(o.rot);
+        so.g.position.set(o.x, (o.fly || 0) * 9.5, o.z); so.g.rotation.y = rad(o.rot);
         const on = selSet === o.id;
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
@@ -1647,7 +1687,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const ty = TYPES[L.f.type];
         s.angle = rad(L.zoom / 2); s.penumbra = ty.pen; s.color.setRGB(L.r, L.g, L.b); s.intensity = ty.power * L.d;
       });
-      if (busy()) { cycY += (cycTarget - cycY) * 0.06; if (!busy()) cycY = cycTarget; }
+      const dt = Math.min(0.1, Math.max(0, (now - (lastNow || now)) / 1000)); lastNow = now;
+      if (Math.abs(cycY - cycTarget) > 0.005) cycY += (cycTarget - cycY) * (1 - Math.exp(-dt * 3.2)); else cycY = cycTarget;
+      if (curtAnim) { const k = Math.min(1, (performance.now() - curtAnim.t0) / curtAnim.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; curtV = curtAnim.from + (curtT - curtAnim.from) * e; placeCurtain(); if (k >= 1) curtAnim = null; }
       cyc.position.y = cycY;
       placeCam();
       renderer.render(scene, camera);
@@ -1673,7 +1715,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, busy, addSet, removeSet };
+    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -1687,15 +1729,28 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   function setTool(mode) {
     toolMode = mode;
-    ['move', 'aim', 'set'].forEach(m => $('tool-' + m).setAttribute('aria-pressed', m === mode));
+    ['move', 'pan', 'aim', 'set'].forEach(m => $('tool-' + m).setAttribute('aria-pressed', m === mode));
+    vp.classList.toggle('panmode', mode === 'pan');
     vp.classList.toggle('aim', mode === 'aim'); vp.classList.toggle('setmode', mode === 'set');
     if (mode !== 'set' && selSet) { selSet = null; changed(); }
     $('vp-hint').textContent = {
-      move: 'Drag to orbit · Scroll to zoom · Double-click to reset · Drag a light tag to move it',
+      move: 'Drag to orbit · Right-drag or Shift-drag to pan · Scroll to zoom · Double-click to reset',
+      pan: 'Pan: drag to slide the view sideways and up or down · scroll to zoom · double-click to reset',
       aim: 'Aim: click the stage floor to point the selected lights there · scroll to zoom',
       set: 'Set: drag scenery and actors · drag empty space to orbit · scroll to zoom'
     }[mode];
   }
+  let curtainOpen = true;
+  function setCurtain(v, quiet) {
+    if (v === curtainOpen) return;
+    curtainOpen = v;
+    $('tool-curtain').setAttribute('aria-pressed', curtainOpen); $('tool-curtain').textContent = curtainOpen ? 'Curtain open' : 'Curtain shut';
+    if (scene3d) scene3d.moveCurtain(curtainOpen);
+    if (!quiet) fb(curtainOpen ? 'Opening the main curtain. Store to save it in a cue' : 'Closing the main curtain. Store to save it in a cue');
+    uiDirty = true;
+  }
+  $('tool-curtain').addEventListener('click', () => setCurtain(!curtainOpen));
+  $('tool-pan').addEventListener('click', () => setTool('pan'));
   let cycIn = true;
   function setCyc(v, quiet) {
     if (v === cycIn) return;
