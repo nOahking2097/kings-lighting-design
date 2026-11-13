@@ -362,7 +362,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         </div>
         <div class="cmdline edit">
           <label for="cmd">CMD</label>
-          <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Fixture 101 Thru 104 At 75">
+          <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Fixture 1 Thru 6 At 75">
           <span class="cmd-fb" id="cmd-fb" role="status">Ready</span>
         </div>
         <div class="c-deck">
@@ -403,7 +403,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -617,6 +617,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const c = {};
     FIX.forEach(f => { if (f.type === 'cyc') { f.n = 0; return; } c[f.truss] = c[f.truss] || 0; f.n = c[f.truss]++; });
   }
+  // Number the lights 1, 2, 3 … in rig order (FOH first, then each electric, then the floor, the cyc last).
+  function renumber(list) { const map = {}; [...list].sort((a, b) => a.id - b.id).forEach((f, i) => { map[f.id] = i + 1; f.id = i + 1; }); return map; }
+  renumber(FIX);
   reindex();
   const typeName = f => f.type === 'cyc' ? 'Cyc' : TYPES[f.type].short;
   const isMoving = f => f.type !== 'cyc' && TYPES[f.type].moving;
@@ -824,9 +827,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function loadShow() {
     try {
       const d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-      if (!d || d.v !== 2 || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) return null;
+      if (!d || (d.v !== 2 && d.v !== 3) || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) return null;
       Object.keys(TRUSS).forEach(k => delete TRUSS[k]); Object.assign(TRUSS, d.truss);
       FIX = d.fix.filter(x => x.type === 'cyc' || (TYPES[x.type] && TRUSS[x.truss])).map(x => mk(x.id, x.type, x.truss, x.x0));
+      if (d.v === 2) {
+        // Older saves numbered lights 101, 201 … : renumber them from 1 and update every cue to match.
+        const map = renumber(FIX);
+        d.cues.forEach(c => { const st = {}; Object.entries(c.state).forEach(([k, v]) => { if (map[k] != null) st[map[k]] = v; }); c.state = st; });
+      }
       reindex();
       cues = d.cues; SET = d.set; setSeq = d.seq || 50;
       return d;
@@ -840,7 +848,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let saveDirty = false, lastSave = 0;
   function saveShow() {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 2, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0 })), truss: TRUSS, cues, set: SET, seq: setSeq, cur: curIdx, cyc: cycIn, curtain: curtainOpen }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 3, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0 })), truss: TRUSS, cues, set: SET, seq: setSeq, cur: curIdx, cyc: cycIn, curtain: curtainOpen }));
       $('save-state').textContent = 'Saved in this browser';
     } catch (e) { $('save-state').textContent = 'Could not save in this browser'; }
   }
@@ -944,7 +952,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     for (let k = 0; k < qty; k++) {
       if (FIX.length >= MAX_TOTAL) { full = 'The rig is full at ' + MAX_TOTAL + ' lights'; fb(full + '. Remove some first', true); break; }
       if (FIX.filter(f => f.truss === truss).length >= MAX_PER_TRUSS) { full = 'The ' + T.name + ' is full at ' + MAX_PER_TRUSS + ' lights'; fb(full + '. Pick another position', true); break; }
-      let id = T.base + 1; while (byId[id]) id++;
+      const id = FIX.reduce((m, f) => Math.max(m, f.id), 0) + 1;
       const f = mk(id, type, truss, freeX(truss));
       FIX.push(f); reindex();
       const d = defaults(f);
