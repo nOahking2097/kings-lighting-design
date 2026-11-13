@@ -298,7 +298,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
-            <span class="vp-hint" id="vp-hint">Drag empty space to orbit · Drag a fixture tag to slide it along its truss</span>
+            <span class="vp-hint" id="vp-hint">Drag to orbit · Scroll to zoom · Double-click to reset · Drag a light tag to move it</span>
           </div>
           <div class="sheet" aria-label="Fixture sheet">
             <table class="ctable">
@@ -1543,7 +1543,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       fb('Aimed ' + fmtIds(movers) + ' at X ' + P.x.toFixed(1) + ' m, Z ' + P.z.toFixed(1) + ' m');
     }
 
-    let az = 0.15, el = 0.1, dist = 18;
+    let az = 0.15, el = 0.1, dist = 18, baseDist = 18, zoomF = 1;
     const lookAt = new THREE.Vector3(0, 3.9, -0.3);
     function placeCam() {
       camera.position.set(lookAt.x + dist * Math.sin(az) * Math.cos(el), lookAt.y + dist * Math.sin(el), lookAt.z + dist * Math.cos(az) * Math.cos(el));
@@ -1586,12 +1586,25 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       orbit = { x: e.clientX, y: e.clientY }; dirty = true;
     });
     const end = () => { orbit = null; aiming = false; dragSet = null; };
+    vp.addEventListener('wheel', e => {
+      e.preventDefault();
+      const step = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      zoomF = clamp(zoomF * Math.exp(step * 0.0008), 0.35, 1.6);
+      dist = baseDist * zoomF;
+      // Lower the look point as you zoom in, so close-ups frame the actors rather than the rig.
+      lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6;
+      dirty = true;
+    }, { passive: false });
+    vp.addEventListener('dblclick', e => {
+      if (e.target.closest('.vp-tools') || toolMode !== 'move') return;
+      zoomF = 1; dist = baseDist; lookAt.y = 3.9; az = 0.15; el = 0.1; dirty = true;
+    });
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
     function resize() {
       const w = vp.clientWidth, h = vp.clientHeight;
       renderer.setSize(w, h, false); camera.aspect = w / h;
-      dist = w / h < 1.1 ? 26 : 18;
+      baseDist = w / h < 1.1 ? 26 : 18; dist = baseDist * zoomF;
       camera.updateProjectionMatrix(); dirty = true;
     }
     new ResizeObserver(resize).observe(vp);
@@ -1678,9 +1691,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     vp.classList.toggle('aim', mode === 'aim'); vp.classList.toggle('setmode', mode === 'set');
     if (mode !== 'set' && selSet) { selSet = null; changed(); }
     $('vp-hint').textContent = {
-      move: 'Drag empty space to orbit · Drag a fixture tag to slide it along its truss',
-      aim: 'Aim: click or drag on the stage floor to point the selected lights there',
-      set: 'Set: drag scenery and actors around the stage · drag empty space to orbit'
+      move: 'Drag to orbit · Scroll to zoom · Double-click to reset · Drag a light tag to move it',
+      aim: 'Aim: click the stage floor to point the selected lights there · scroll to zoom',
+      set: 'Set: drag scenery and actors · drag empty space to orbit · scroll to zoom'
     }[mode];
   }
   let cycIn = true;
