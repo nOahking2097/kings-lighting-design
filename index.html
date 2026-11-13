@@ -75,6 +75,7 @@ a { color: inherit; }
 .viewport { position: relative; min-height: 620px; background: #050608; cursor: grab; touch-action: pan-y; overflow: hidden; }
 .viewport:active { cursor: grabbing; }
 .viewport.aim { cursor: crosshair; touch-action: none; }
+.viewport.setmode { cursor: move; touch-action: none; }
 .viewport canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
 .vp-tools { position: absolute; left: 12px; bottom: 34px; display: flex; gap: 4px; z-index: 3; }
 .vp-tools button { font: 500 12px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
@@ -292,6 +293,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="vp-tools" role="group" aria-label="Viewport tool">
               <button type="button" id="tool-move" aria-pressed="true">Move / orbit</button>
               <button type="button" id="tool-aim" aria-pressed="false">Aim</button>
+              <button type="button" id="tool-set" aria-pressed="false">Set</button>
               <button type="button" id="tool-cyc" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
@@ -316,6 +318,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn" id="p-bar-add">Add bar</button>
           <button type="button" class="cbtn warn" id="p-bar-del">Remove bar</button>
           <span class="patch-count" id="p-count"></span>
+        </div>
+        <div class="patch" role="group" aria-label="Set and actors">
+          <span class="patch-h">Set</span>
+          <label for="s-kind">Piece</label><select id="s-kind"></select>
+          <button type="button" class="cbtn" id="s-add">Add to stage</button>
+          <button type="button" class="cbtn" id="s-rot">Rotate 45°</button>
+          <button type="button" class="cbtn warn" id="s-del">Remove piece</button>
+          <span class="patch-count" id="s-info"></span>
         </div>
         <div class="cmdline">
           <label for="cmd">CMD</label>
@@ -344,7 +354,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div class="c-sec">
             <div class="c-h">Main cue list <span id="pb-state"></span></div>
             <div class="cuelist">
-              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th></tr></thead><tbody id="cue-body"></tbody></table>
+              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th></tr></thead><tbody id="cue-body"></tbody></table>
             </div>
             <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span></div>
             <div class="go-row">
@@ -359,7 +369,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Build a set with the <b>Set</b> bar: add scenery, furniture and actors, then use the <b>Set</b> tool to drag them around and <b>Rotate 45°</b> to turn them. Each stored cue remembers where the set and actors stand and whether the cyc is in, so actors move between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -599,7 +609,64 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const gel = name => hexRGB(GELS.find(x => x.name === name).hex);
   const kcol = k => { const [r, g, b] = kelvinRGB(k); return { r: Math.round(r / 2.55), g: Math.round(g / 2.55), b: Math.round(b / 2.55) }; };
 
-  const ACTORS = [[-2.3, 1.5, 0.9], [0.1, 1.5, -0.6], [2.4, 1.5, 0.6]];
+  // ================= Set & actors =================
+  const PIECES = {
+    platform: { label: 'Platform', group: 'Scenery' },
+    stairs: { label: 'Stairs', group: 'Scenery' },
+    flat: { label: 'Flat wall', group: 'Scenery' },
+    door: { label: 'Doorway flat', group: 'Scenery' },
+    window: { label: 'Window flat', group: 'Scenery' },
+    column: { label: 'Column', group: 'Scenery' },
+    tree: { label: 'Tree', group: 'Scenery' },
+    table: { label: 'Table', group: 'Furniture & props' },
+    chair: { label: 'Chair', group: 'Furniture & props' },
+    bench: { label: 'Bench', group: 'Furniture & props' },
+    crate: { label: 'Crate', group: 'Furniture & props' },
+    lamp: { label: 'Lamp post (lit)', group: 'Furniture & props' },
+    fire: { label: 'Campfire (lit)', group: 'Furniture & props' },
+    lead: { label: 'Actor · long coat', group: 'People', actor: true },
+    dress: { label: 'Actor · dress', group: 'People', actor: true },
+    elder: { label: 'Actor · hat and cane', group: 'People', actor: true },
+    suit: { label: 'Actor · suit and tie', group: 'People', actor: true },
+    dancer: { label: 'Actor · dancer', group: 'People', actor: true },
+    child: { label: 'Actor · child', group: 'People', actor: true }
+  };
+  const STAGE = { x: 6.3, zMin: -4.4, zMax: 3.4 };
+  let SET = [
+    { id: 'p1', kind: 'platform', x: -3.2, z: -3.2, rot: 0 },
+    { id: 'p2', kind: 'bench', x: 0.1, z: -1.7, rot: 0 },
+    { id: 'p3', kind: 'lamp', x: 4.6, z: -2.6, rot: 0 },
+    { id: 'a1', kind: 'lead', x: -2.3, z: 0.9, rot: 0 },
+    { id: 'a2', kind: 'dress', x: 0.1, z: -0.6, rot: 0 },
+    { id: 'a3', kind: 'elder', x: 2.4, z: 0.6, rot: 0 }
+  ];
+  let setSeq = 10, selSet = null, lay = null;
+  const actorsNow = () => SET.filter(o => PIECES[o.kind].actor);
+  function liveActor(i) { const A = actorsNow(); if (!A.length) return [0, 1.5, 0]; const a = A[i % A.length]; return [a.x, 1.5, a.z]; }
+  const ACT = {
+    Preset: [[-2.3, 0.9], [0.1, -0.6], [2.4, 0.6]],
+    Dawn: [[-3, -0.2], [-0.8, 1.2], [3.2, -1.0]],
+    Morning: [[-1.2, 1.6], [1.0, 1.0], [3.0, -0.2]],
+    Midday: [[-2.3, 0.9], [0.1, -0.6], [2.4, 0.6]],
+    Sunset: [[-2.0, -1.0], [-0.6, -1.0], [2.6, 1.4]],
+    Dusk: [[-3.5, 1.0], [0.4, 0.2], [3.5, -1.4]],
+    Moonlight: [[-0.5, 0.6], [0.6, 0.6], [4.0, -1.9]],
+    Storm: [[-2.6, 2.0], [0, 2.4], [2.6, 2.0]],
+    Lightning: [[-2.6, 2.0], [0, 2.4], [2.6, 2.0]],
+    'After the storm': [[-1.5, 0.4], [0.2, -0.8], [1.8, 0.8]],
+    Fireside: [[-0.9, 0.3], [0.9, 0.3], [0, 1.3]],
+    Solo: [[-4.5, -2.4], [0, 1.6], [4.5, -1.8]],
+    Dream: [[-2, 0], [0, -1], [2, 0]],
+    Concert: [[-2, 2.2], [0, 2.6], [2, 2.2]],
+    'Curtain call': [[-1.5, 2.6], [0, 2.8], [1.5, 2.6]]
+  };
+  const CYC_OUT = new Set(['Concert']);
+  const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot }]));
+  function layoutFor(act) {
+    const L = snapLayout();
+    ['a1', 'a2', 'a3'].forEach((id, i) => { if (L[id]) { L[id].x = act[i][0]; L[id].z = act[i][1]; L[id].rot = clamp(-act[i][0] * 7, -35, 35); } });
+    return L;
+  }
   function aimAt(f, fx, P) {
     const T = TRUSS[f.truss], s = T.floor ? -1 : 1;
     let vx = P[0] - fx, vy = P[1] - (T.y - s * 0.43), vz = P[2] - T.z;
@@ -614,7 +681,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { name: 'DSL', sub: 'Down left', aim: () => [3.5, 0.6, 2.2] },
     { name: 'CS', sub: 'Centre', aim: () => [0, 0.6, 0] },
     { name: 'USC', sub: 'Upstage', aim: () => [0, 0.6, -2.8] },
-    { name: 'Actors', sub: 'Specials', aim: f => ACTORS[f.n % 3] },
+    { name: 'Actors', sub: 'Specials', aim: f => liveActor(f.n) },
     { name: 'Fan', sub: 'Straight out', aim: (f, x) => fanPt(f, x) },
     { name: 'Home', sub: 'Pan/tilt 0', home: true }
   ];
@@ -636,15 +703,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     return d;
   }
   const role = f => f.type === 'cyc' ? 'cyc' : (TRUSS[f.truss].floor || f.truss === 'e4') ? 'floor' : f.type;
-  function resolveAt(f, at) {
+  function resolveAt(f, at, act) {
     if (typeof at === 'function') at = at(f);
-    if (at === 'actors') return ACTORS[f.n % 3];
+    if (at === 'actors') return act ? [act[f.n % 3][0], 1.5, act[f.n % 3][1]] : liveActor(f.n);
+    if (at === 'actor2') return act ? [act[1][0], 1.5, act[1][1]] : liveActor(1);
     if (at === 'fan') return fanPt(f, f.x0);
     if (at === 'cs') return [0, 0.6, 0];
     if (at === 'cyc') return [f.x0 * 1.1, 4.5, -4.8];
     return at;
   }
-  function look(spec) {
+  function look(spec, act) {
     const s = {};
     FIX.forEach(f => {
       const d = defaults(f);
@@ -655,7 +723,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (p.zoom != null && f.type !== 'cyc') d.zoom = clamp(p.zoom, ...TYPES[f.type].zoom);
         if (p.gel) Object.assign(d, gel(p.gel));
         if (p.k) Object.assign(d, kcol(p.k));
-        if (p.at && f.type !== 'cyc') Object.assign(d, aimAt(f, f.x0, resolveAt(f, p.at)));
+        if (p.at && f.type !== 'cyc') Object.assign(d, aimAt(f, f.x0, resolveAt(f, p.at, act)));
       }
       s[f.id] = d;
     });
@@ -674,7 +742,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 2.5, 0, 2.5] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' } }],
     ['After the storm', 3, { spot: { dim: 40, k: 4300, zoom: 22, at: 'actors' }, wash: { dim: 30, gel: 'L115', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'L115', at: 'cyc' }, cyc: { dim: 50, gel: 'L115' } }],
     ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
-    ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: ACTORS[1] }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
+    ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: 'actor2' }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
     ['Dream', 5, { spot: { dim: 40, gel: 'L170', zoom: 30, at: 'actors' }, wash: { dim: 50, gel: 'L128', at: 'fan' }, beam: { dim: 60, gel: 'L170', at: 'actors' }, floor: { dim: 60, gel: 'L170', at: 'cyc' }, cyc: { dim: 55, gel: 'L128' } }],
     ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 3, 3, 9] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
     ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 2.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
@@ -685,9 +753,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     Dream: { dim: 30, gel: 'L170', zoom: 40, at: 'cs' }, 'Curtain call': { dim: 80, gel: 'L204', zoom: 36, at: 'fan' }
   };
   LOOKS.forEach(L => { L[2].profile = PROFILE[L[0]] || { at: 'actors' }; });
-  let cues = LOOKS.map(([name, fadeT, spec], i) => ({ num: i + 1, name, fade: fadeT, state: look(spec) }));
-  const bo = clone(cues[cues.length - 1].state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo });
+  let cues = LOOKS.map(([name, fadeT, spec], i) => {
+    const act = ACT[name] || ACT.Preset;
+    return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), layout: layoutFor(act) };
+  });
+  const lastQ = cues[cues.length - 1];
+  const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, layout: clone(lastQ.layout) });
+  Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
 
   let curIdx = 0;
   let pb = clone(cues[0].state);
@@ -869,6 +942,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const c = cues[i]; curIdx = i;
     if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
+    if (c.cyc != null) setCyc(c.cyc, true);
+    if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
     changed();
   }
@@ -881,10 +956,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; }
-    else { c = { num, name: 'Cue ' + num, fade: t, state }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
-    curIdx = cues.indexOf(c); pb = clone(state); fade = null; programmer = {};
-    fb('Stored cue ' + num + ' (' + t + ' s fade). Programmer cleared');
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
+    fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
   }
   function deleteCue(n) {
@@ -892,6 +967,22 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (i < 0) { fb('There is no cue ' + n, true); return; }
     cues.splice(i, 1); if (curIdx >= cues.length) curIdx = cues.length - 1; else if (i < curIdx) curIdx--;
     fb('Deleted cue ' + n); changed();
+  }
+  function startLayout(target, dur) {
+    const from = {}, to = {};
+    SET.forEach(o => { const t = target[o.id]; if (!t) return; from[o.id] = { x: o.x, z: o.z, rot: o.rot }; to[o.id] = t; });
+    if (!dur || dur <= 0) { SET.forEach(o => { if (to[o.id]) Object.assign(o, clone(to[o.id])); }); lay = null; changed(); return; }
+    lay = { from, to, t0: performance.now(), dur: dur * 1000 };
+  }
+  function stepLayout(now) {
+    const k = Math.min(1, (now - lay.t0) / lay.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    SET.forEach(o => {
+      const a = lay.from[o.id], b = lay.to[o.id]; if (!a) return;
+      o.x = a.x + (b.x - a.x) * e; o.z = a.z + (b.z - a.z) * e;
+      const d = ((((b.rot - a.rot) % 360) + 540) % 360) - 180; o.rot = a.rot + d * e;
+    });
+    if (k >= 1) lay = null;
+    changed();
   }
   function stepFade(now) {
     const k = Math.min(1, (now - fade.t0) / fade.dur);
@@ -1018,6 +1109,38 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   fillPos(); pPos.value = 'e3';
   pPos.addEventListener('change', () => { dirty = true; });
   $('p-bar-add').addEventListener('click', addBar);
+  const sKind = $('s-kind'), sog = {};
+  Object.entries(PIECES).forEach(([k, p]) => {
+    if (!sog[p.group]) { sog[p.group] = document.createElement('optgroup'); sog[p.group].label = p.group; sKind.appendChild(sog[p.group]); }
+    const o = document.createElement('option'); o.value = k; o.textContent = p.label; sog[p.group].appendChild(o);
+  });
+  sKind.value = 'stairs';
+  function addPiece(kind) {
+    if (SET.length >= 40) { fb('The stage holds up to 40 pieces', true); return; }
+    let best = [0, 1], bs = -Infinity;
+    for (let x = -5; x <= 5; x += 1) for (let z = -3; z <= 2.5; z += 0.5) {
+      const d = SET.length ? Math.min(...SET.map(o => Math.hypot(o.x - x, o.z - z))) : 9;
+      const sc = Math.min(d, 3) - Math.hypot(x, z) * 0.12;
+      if (sc > bs) { bs = sc; best = [x, z]; }
+    }
+    const o = { id: (PIECES[kind].actor ? 'a' : 'p') + (++setSeq), kind, x: best[0], z: best[1], rot: 0 };
+    SET.push(o); if (scene3d) scene3d.addSet(o);
+    selSet = o.id; setTool('set'); changed();
+    fb('Added ' + PIECES[kind].label + '. Drag it with the Set tool, then Store so cues remember where it stands');
+  }
+  $('s-add').addEventListener('click', () => addPiece(sKind.value));
+  $('s-rot').addEventListener('click', () => {
+    const o = SET.find(x => x.id === selSet);
+    if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
+    lay = null; o.rot = Math.round((o.rot + 45) / 45) * 45 % 360; changed();
+    fb(PIECES[o.kind].label + ' turned to ' + o.rot + '°');
+  });
+  $('s-del').addEventListener('click', () => {
+    const o = SET.find(x => x.id === selSet);
+    if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
+    SET = SET.filter(x => x !== o); if (scene3d) scene3d.removeSet(o.id); selSet = null; changed();
+    fb('Removed ' + PIECES[o.kind].label);
+  });
   $('p-bar-del').addEventListener('click', () => removeBar(pPos.value));
   $('p-add').addEventListener('click', () => addLights(pType.value, pPos.value, +$('p-qty').value));
   $('p-change').addEventListener('click', () => changeType(pType.value));
@@ -1121,13 +1244,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       if (v != null) el.setAttribute('aria-valuenow', Math.round(v * 100) / 100); else el.removeAttribute('aria-valuenow');
     });
     $('sel-info').textContent = selection.length ? fmtIds(selection) : 'No selection';
+    const so = SET.find(o => o.id === selSet);
+    $('s-info').textContent = so ? PIECES[so.kind].label + ' · X ' + so.x.toFixed(1) + ' m, Z ' + so.z.toFixed(1) + ' m, ' + Math.round(((so.rot % 360) + 360) % 360) + '°' : SET.length + ' pieces on stage · pick the Set tool to drag them';
     const key = [...selection].sort().join();
     groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && GROUPS[i] && key === [...GROUPS[i].ids].sort().join()));
     const body = $('cue-body'); body.innerHTML = '';
     cues.forEach((c, i) => {
       const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
-      tr.innerHTML = '<td></td><td></td><td></td>';
-      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s';
+      tr.innerHTML = '<td></td><td></td><td></td><td></td>';
+      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.cyc === false ? 'Out' : 'In';
       tr.addEventListener('click', () => gotoIdx(i));
       body.appendChild(tr);
     });
@@ -1138,7 +1263,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   // ================= 3D stage =================
   const vp = $('viewport');
-  let scene3d = null, aimMode = false;
+  let scene3d = null, toolMode = 'move';
 
   function build3D() {
     if (!window.THREE) throw new Error('three missing');
@@ -1195,23 +1320,103 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
     const border = new THREE.Mesh(drape(12, 1.0, 22, 0.08), velvet); border.position.set(0, 5.7, 3.1); scene.add(border);
 
-    function actor(x, z, color, h) {
-      const g = new THREE.Group();
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.26, h * 0.62, 20), new THREE.MeshStandardMaterial({ color, roughness: 0.75 }));
-      body.position.y = h * 0.49; body.castShadow = true;
-      const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, h * 0.5, 16), new THREE.MeshStandardMaterial({ color: 0x1d1d22, roughness: 0.8 }));
-      legs.position.y = h * 0.25; legs.castShadow = true;
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), new THREE.MeshStandardMaterial({ color: 0xc89a7c, roughness: 0.6 }));
-      head.position.y = h * 0.93; head.castShadow = true;
-      g.add(legs, body, head); g.position.set(x, 0, z); scene.add(g);
+    // ---- Set pieces and actors ----
+    const setObj = {};
+    const SKIN = { lead: 0xc89a7c, dress: 0x8d5a3b, elder: 0xe0b597, suit: 0xb07a55, dancer: 0x5c3a24, child: 0xd8a882 };
+    function buildPiece(kind) {
+      const g = new THREE.Group(), mats = [];
+      const M = (color, o) => { const m = new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.8 }, o || {})); m.userData.e0 = m.emissive.getHex(); m.userData.ei0 = m.emissiveIntensity; mats.push(m); return m; };
+      const put = (mesh, x, y, z, parent) => { mesh.position.set(x, y, z); mesh.castShadow = mesh.receiveShadow = true; (parent || g).add(mesh); return mesh; };
+      const B = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+      const C = (rt, rb, h, m, seg) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg || 16), m);
+      const SP = (r, m, ws, hs, tl) => new THREE.Mesh(new THREE.SphereGeometry(r, ws || 20, hs || 14, 0, Math.PI * 2, 0, tl || Math.PI), m);
+      switch (kind) {
+        case 'platform': put(B(4, 0.6, 1.8, M(0x2a2826, { roughness: 0.85 })), 0, 0.3, 0); break;
+        case 'stairs': { const m = M(0x3a3530); for (let i = 0; i < 4; i++) put(B(1.6, 0.15 * (i + 1), 0.3, m), 0, 0.075 * (i + 1), 0.45 - i * 0.3); break; }
+        case 'flat': { put(B(3, 3.5, 0.1, M(0x6b5e4f, { roughness: 0.9 })), 0, 1.75, 0); const t = M(0x3b3027); put(B(3, 0.18, 0.14, t), 0, 0.09, 0.02); put(B(3, 0.1, 0.14, t), 0, 3.45, 0.02); break; }
+        case 'door': {
+          const w = M(0x5d6b5a, { roughness: 0.9 });
+          put(B(1.05, 3.5, 0.1, w), -0.975, 1.75, 0); put(B(1.05, 3.5, 0.1, w), 0.975, 1.75, 0); put(B(0.9, 1.2, 0.1, w), 0, 2.9, 0);
+          const hinge = new THREE.Group(); hinge.position.set(-0.45, 0, 0.05); hinge.rotation.y = -0.7; g.add(hinge);
+          put(B(0.88, 2.28, 0.05, M(0x5a3b22)), 0.44, 1.14, 0, hinge);
+          break;
+        }
+        case 'window': {
+          const w = M(0x7a6a58, { roughness: 0.9 }), fr = M(0xe8e2d6);
+          put(B(1.1, 3.5, 0.1, w), -0.95, 1.75, 0); put(B(1.1, 3.5, 0.1, w), 0.95, 1.75, 0);
+          put(B(0.8, 1.2, 0.1, w), 0, 0.6, 0); put(B(0.8, 1.1, 0.1, w), 0, 2.95, 0);
+          put(B(0.8, 0.04, 0.06, fr), 0, 1.8, 0); put(B(0.04, 1.2, 0.06, fr), 0, 1.8, 0); put(B(0.9, 0.06, 0.16, fr), 0, 1.2, 0.04);
+          break;
+        }
+        case 'column': { const m = M(0xcfc8bb, { roughness: 0.7 }); put(B(0.7, 0.2, 0.7, m), 0, 0.1, 0); put(C(0.24, 0.27, 3.0, m, 24), 0, 1.7, 0); put(B(0.7, 0.2, 0.7, m), 0, 3.3, 0); break; }
+        case 'tree': { put(C(0.12, 0.2, 2.2, M(0x4a3424), 10), 0, 1.1, 0); const lf = M(0x22402a, { roughness: 0.95 }); put(SP(0.9, lf), 0, 2.6, 0); put(SP(0.7, lf), 0.55, 2.2, 0.2); put(SP(0.65, lf), -0.5, 2.3, -0.1); break; }
+        case 'table': { const m = M(0x6a4a2e); put(B(1.4, 0.06, 0.8, m), 0, 0.75, 0); [[-0.62, -0.32], [0.62, -0.32], [-0.62, 0.32], [0.62, 0.32]].forEach(([x, z]) => put(B(0.06, 0.72, 0.06, m), x, 0.36, z)); break; }
+        case 'chair': { const m = M(0x5a3b22); put(B(0.45, 0.05, 0.45, m), 0, 0.45, 0); put(B(0.45, 0.5, 0.05, m), 0, 0.72, -0.2); [[-0.19, -0.19], [0.19, -0.19], [-0.19, 0.19], [0.19, 0.19]].forEach(([x, z]) => put(B(0.04, 0.45, 0.04, m), x, 0.225, z)); break; }
+        case 'bench': { const m = M(0x4a3626); put(B(1.6, 0.08, 0.45, m), 0, 0.42, 0); put(B(0.08, 0.38, 0.4, m), -0.7, 0.19, 0); put(B(0.08, 0.38, 0.4, m), 0.7, 0.19, 0); break; }
+        case 'crate': put(B(0.7, 0.7, 0.7, M(0x8a6a3e)), 0, 0.35, 0); break;
+        case 'lamp': {
+          const m = M(0x1c1d20, { metalness: 0.5, roughness: 0.4 });
+          put(B(0.3, 0.1, 0.3, m), 0, 0.05, 0); put(C(0.04, 0.05, 2.8, m, 10), 0, 1.45, 0); put(B(0.28, 0.06, 0.28, m), 0, 2.88, 0);
+          put(B(0.22, 0.32, 0.22, M(0xffe2b0, { emissive: 0xffb35c, emissiveIntensity: 1.4 })), 0, 3.07, 0); put(B(0.3, 0.05, 0.3, m), 0, 3.25, 0);
+          break;
+        }
+        case 'fire': {
+          const lg = M(0x3a2616);
+          [0, 1.05, 2.1].forEach(a => { const l = put(C(0.05, 0.05, 0.7, lg, 8), 0, 0.06, 0); l.rotation.set(0, a, Math.PI / 2); });
+          const fl = M(0xff8a2a, { emissive: 0xff6a10, emissiveIntensity: 1.6 });
+          [[0, 0.3, 0, 0.16, 0.5], [0.1, 0.22, 0.06, 0.1, 0.34], [-0.09, 0.2, -0.05, 0.09, 0.3]].forEach(([x, y, z, r, h]) => { const c = new THREE.Mesh(new THREE.ConeGeometry(r, h, 10), fl); c.position.set(x, y, z); g.add(c); });
+          break;
+        }
+        default: {
+          // People. Each style has its own height, build, clothes and pose. They face the audience.
+          const S = {
+            lead: { h: 1.82, top: 0x3e3a33, legs: 0x1f2024, hair: 0x2a1d14 },
+            dress: { h: 1.68, top: 0x8a2a3a, legs: 0x8a2a3a, hair: 0x120c08 },
+            elder: { h: 1.72, top: 0x5b6a52, legs: 0x3a3430, hair: 0xd8d4cc },
+            suit: { h: 1.86, top: 0x23272e, legs: 0x23272e, hair: 0x1a1410 },
+            dancer: { h: 1.74, top: 0x2a3a6a, legs: 0x2a3a6a, hair: 0x0e0a08 },
+            child: { h: 1.18, top: 0xe0a43a, legs: 0x2f4b7a, hair: 0x6a3d1e }
+          }[kind];
+          const body = new THREE.Group(); body.scale.setScalar(S.h / 1.75); g.add(body);
+          const skin = M(SKIN[kind], { roughness: 0.6 }), top = M(S.top, { roughness: 0.85 }), legs = M(S.legs, { roughness: 0.85 }), hair = M(S.hair, { roughness: 0.95 }), shoe = M(0x121212, { roughness: 0.6 });
+          const P = (mesh, x, y, z) => put(mesh, x, y, z, body);
+          if (kind !== 'dress') { P(C(0.075, 0.06, 0.86, legs), -0.1, 0.47, 0); P(C(0.075, 0.06, 0.86, legs), 0.1, 0.47, 0); }
+          P(B(0.12, 0.07, 0.26, shoe), -0.1, 0.035, 0.05); P(B(0.12, 0.07, 0.26, shoe), 0.1, 0.035, 0.05);
+          P(C(kind === 'dancer' ? 0.17 : 0.2, 0.15, 0.58, top), 0, 1.18, 0);
+          const sh = P(SP(0.2, top, 16, 8, Math.PI / 2), 0, 1.45, 0); sh.scale.y = 0.4;
+          P(C(0.05, 0.055, 0.1, skin), 0, 1.53, 0);
+          P(SP(0.11, skin), 0, 1.65, 0);
+          P(B(0.03, 0.04, 0.04, skin), 0, 1.64, 0.11);
+          P(SP(0.118, hair, 20, 10, Math.PI * 0.55), 0, 1.665, -0.012);
+          const arm = (side, rz, rx) => {
+            const p = new THREE.Group(); p.position.set(side * 0.24, 1.42, 0); p.rotation.set(rx || 0, 0, side * rz); body.add(p);
+            put(C(0.045, 0.04, 0.62, kind === 'dancer' ? skin : top), 0, -0.31, 0, p); put(SP(0.045, skin, 10, 8), 0, -0.64, 0, p);
+          };
+          if (kind === 'lead') { P(C(0.22, 0.31, 0.95, top), 0, 0.98, 0); P(B(0.3, 0.08, 0.06, top), 0, 1.47, 0.14); arm(-1, 0.14); arm(1, 0.14); }
+          if (kind === 'dress') { P(C(0.16, 0.42, 0.98, legs), 0, 0.5, 0); P(C(0.1, 0.13, 0.42, hair), 0, 1.48, -0.08); arm(-1, 0.12); arm(1, 1.2, -0.5); }
+          if (kind === 'elder') {
+            const hat = M(0x2a2622); P(C(0.17, 0.17, 0.02, hat, 24), 0, 1.76, 0); P(C(0.1, 0.11, 0.14, hat, 20), 0, 1.84, 0);
+            body.rotation.x = 0.1; arm(-1, 0.1); arm(1, 0.12, -0.35);
+            put(C(0.016, 0.016, 0.95, M(0x3b2516), 6), 0.34, 0.47, 0.25, body);
+          }
+          if (kind === 'suit') { P(C(0.21, 0.19, 0.7, top), 0, 1.12, 0); P(B(0.05, 0.32, 0.01, M(0x9a1c24)), 0, 1.3, 0.2); P(B(0.14, 0.12, 0.01, M(0xeeeeea)), 0, 1.42, 0.198); arm(-1, 0.08); arm(1, 0.08, -0.25); }
+          if (kind === 'dancer') { P(SP(0.06, hair, 12, 8), 0, 1.75, -0.07); arm(-1, 2.5); arm(1, 2.5); }
+          if (kind === 'child') { P(SP(0.05, hair, 12, 8), 0, 1.66, -0.13); arm(-1, 0.25, 0.35); arm(1, 0.25, -0.35); }
+        }
+      }
+      return { g, mats };
     }
-    actor(-2.3, 0.9, 0x6d5a45, 1.75);
-    actor(0.1, -0.6, 0x3d5468, 1.82);
-    actor(2.4, 0.6, 0x7a3a34, 1.68);
-    const bench = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.45), new THREE.MeshStandardMaterial({ color: 0x4a3626, roughness: 0.8 }));
-    bench.position.set(0.1, 0.225, -1.7); bench.castShadow = bench.receiveShadow = true; scene.add(bench);
-    const platform = new THREE.Mesh(new THREE.BoxGeometry(4, 0.6, 1.8), new THREE.MeshStandardMaterial({ color: 0x2a2826, roughness: 0.85 }));
-    platform.position.set(-3.2, 0.3, -3.2); platform.castShadow = platform.receiveShadow = true; scene.add(platform);
+    function addSet(o) {
+      const { g, mats } = buildPiece(o.kind);
+      g.userData.setId = o.id; g.position.set(o.x, 0, o.z); g.rotation.y = rad(o.rot);
+      scene.add(g); setObj[o.id] = { g, mats, on: false }; dirty = true;
+    }
+    function removeSet(id) {
+      const so = setObj[id]; if (!so) return;
+      scene.remove(so.g); so.g.traverse(m => { if (m.geometry) m.geometry.dispose(); }); so.mats.forEach(m => m.dispose());
+      delete setObj[id]; dirty = true;
+    }
+    SET.forEach(addSet);
 
     scene.add(new THREE.HemisphereLight(0x6070a0, 0x050505, 0.07));
 
@@ -1344,21 +1549,43 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       camera.position.set(lookAt.x + dist * Math.sin(az) * Math.cos(el), lookAt.y + dist * Math.sin(el), lookAt.z + dist * Math.cos(az) * Math.cos(el));
       camera.lookAt(lookAt);
     }
-    let orbit = null, aiming = false;
+    let orbit = null, aiming = false, dragSet = null;
+    function pickSet(e) {
+      const r = vp.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hits = ray.intersectObjects(Object.values(setObj).map(x => x.g), true);
+      for (const h of hits) { let o = h.object; while (o && !o.userData.setId) o = o.parent; if (o) return o.userData.setId; }
+      return null;
+    }
     vp.addEventListener('pointerdown', e => {
       if (e.target.closest('.vp-tools')) return;
       vp.setPointerCapture(e.pointerId);
-      if (aimMode) { aiming = true; aimHere(e); return; }
+      if (toolMode === 'aim') { aiming = true; aimHere(e); return; }
+      if (toolMode === 'set') {
+        const id = pickSet(e);
+        if (id) {
+          const o = SET.find(x => x.id === id), P = hit(e, deckPlane);
+          dragSet = { o, dx: P ? o.x - P.x : 0, dz: P ? o.z - P.z : 0 };
+          lay = null; selSet = id; changed(); return;
+        }
+        if (selSet) { selSet = null; changed(); }
+      }
       orbit = { x: e.clientX, y: e.clientY };
     });
     vp.addEventListener('pointermove', e => {
+      if (dragSet) {
+        const P = hit(e, deckPlane);
+        if (P) { dragSet.o.x = clamp(P.x + dragSet.dx, -STAGE.x, STAGE.x); dragSet.o.z = clamp(P.z + dragSet.dz, STAGE.zMin, STAGE.zMax); changed(); }
+        return;
+      }
       if (aiming) { aimHere(e); return; }
       if (!orbit) return;
       az = clamp(az - (e.clientX - orbit.x) * 0.005, -0.8, 0.8);
       el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 0.6);
       orbit = { x: e.clientX, y: e.clientY }; dirty = true;
     });
-    const end = () => { orbit = null; aiming = false; };
+    const end = () => { orbit = null; aiming = false; dragSet = null; };
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
     function resize() {
@@ -1371,6 +1598,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
     const v3 = new THREE.Vector3(), up = new THREE.Vector3();
     function render(now) {
+      SET.forEach(o => {
+        const so = setObj[o.id]; if (!so) return;
+        so.g.position.set(o.x, 0, o.z); so.g.rotation.y = rad(o.rot);
+        const on = selSet === o.id;
+        if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
+      });
       const lit = [];
       FIX.forEach(f => {
         const d = outDim(f) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
@@ -1427,7 +1660,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, busy };
+    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -1439,24 +1672,34 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
   rebuildPatch();
 
-  function setTool(aim) {
-    aimMode = aim;
-    $('tool-aim').setAttribute('aria-pressed', aim); $('tool-move').setAttribute('aria-pressed', !aim);
-    vp.classList.toggle('aim', aim);
-    $('vp-hint').textContent = aim ? 'Aim: click or drag on the stage floor to point the selected lights there' : 'Drag empty space to orbit · Drag a fixture tag to slide it along its truss';
+  function setTool(mode) {
+    toolMode = mode;
+    ['move', 'aim', 'set'].forEach(m => $('tool-' + m).setAttribute('aria-pressed', m === mode));
+    vp.classList.toggle('aim', mode === 'aim'); vp.classList.toggle('setmode', mode === 'set');
+    if (mode !== 'set' && selSet) { selSet = null; changed(); }
+    $('vp-hint').textContent = {
+      move: 'Drag empty space to orbit · Drag a fixture tag to slide it along its truss',
+      aim: 'Aim: click or drag on the stage floor to point the selected lights there',
+      set: 'Set: drag scenery and actors around the stage · drag empty space to orbit'
+    }[mode];
   }
   let cycIn = true;
-  $('tool-cyc').addEventListener('click', () => {
-    cycIn = !cycIn;
+  function setCyc(v, quiet) {
+    if (v === cycIn) return;
+    cycIn = v;
     $('tool-cyc').setAttribute('aria-pressed', cycIn); $('tool-cyc').textContent = cycIn ? 'Cyc in' : 'Cyc out';
     if (scene3d) scene3d.flyCyc(cycIn);
-    fb(cycIn ? 'Flying the cyc in' : 'Flying the cyc out. The back wall is now the backdrop');
-  });
-  $('tool-move').addEventListener('click', () => setTool(false));
-  $('tool-aim').addEventListener('click', () => setTool(true));
+    if (!quiet) fb(cycIn ? 'Flying the cyc in. Store to save it in a cue' : 'Flying the cyc out. Store to save it in a cue');
+    uiDirty = true;
+  }
+  $('tool-cyc').addEventListener('click', () => setCyc(!cycIn));
+  $('tool-move').addEventListener('click', () => setTool('move'));
+  $('tool-aim').addEventListener('click', () => setTool('aim'));
+  $('tool-set').addEventListener('click', () => setTool('set'));
 
   function loop(now) {
     if (fade) stepFade(now);
+    if (lay) stepLayout(now);
     if (scene3d && (dirty || fx || scene3d.busy())) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
