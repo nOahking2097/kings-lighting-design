@@ -342,7 +342,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <span class="patch-h">Patch</span>
           <label for="p-type">Light type</label><select id="p-type"></select>
           <label for="p-pos">Position</label><select id="p-pos"></select>
-          <label for="p-qty">Qty</label><select id="p-qty"><option>1</option><option selected>2</option><option>4</option><option>6</option></select>
+          <label for="p-qty">Qty</label><select id="p-qty"><option>1</option><option selected>2</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>16</option><option>20</option><option>24</option></select>
           <button type="button" class="cbtn" id="p-add">Add lights</button>
           <button type="button" class="cbtn" id="p-change">Change selected to this type</button>
           <button type="button" class="cbtn warn" id="p-del">Remove selected</button>
@@ -595,7 +595,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     laser: { label: 'Laser (beam fan)', short: 'Laser', plural: 'Lasers', group: 'Effects', zoom: [0, 60], def: 30, pen: 0, power: 0, r: 0.09, len: 0.26, haze: 0.5, laser: true, moving: true }
   };
   const MOVER = ['dim', 'strobe', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
-  const MAX_PER_TRUSS = 14, MAX_TOTAL = 60;
+  const MAX_PER_TRUSS = 40, MAX_TOTAL = 200;
   const mk = (id, type, truss, x) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0 });
   let FIX = [], byId = {};
   const X6 = [-6.75, -4.05, -1.35, 1.35, 4.05, 6.75], X4 = [-6, -2, 2, 6];
@@ -939,10 +939,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     return Math.round(best * 100) / 100;
   }
   function addLights(type, truss, qty) {
+    let full = '';
     const T = TRUSS[truss], added = [];
     for (let k = 0; k < qty; k++) {
-      if (FIX.length >= MAX_TOTAL) { fb('The rig is full (' + MAX_TOTAL + ' lights). Remove some first', true); break; }
-      if (FIX.filter(f => f.truss === truss).length >= MAX_PER_TRUSS) { fb(T.name + ' is full (' + MAX_PER_TRUSS + ' lights)', true); break; }
+      if (FIX.length >= MAX_TOTAL) { full = 'The rig is full at ' + MAX_TOTAL + ' lights'; fb(full + '. Remove some first', true); break; }
+      if (FIX.filter(f => f.truss === truss).length >= MAX_PER_TRUSS) { full = 'The ' + T.name + ' is full at ' + MAX_PER_TRUSS + ' lights'; fb(full + '. Pick another position', true); break; }
       let id = T.base + 1; while (byId[id]) id++;
       const f = mk(id, type, truss, freeX(truss));
       FIX.push(f); reindex();
@@ -957,7 +958,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     setAttr(added, 'dim', 60);
     aimIds(added, f => TRUSS[f.truss].floor ? [f.x0 * 1.1, 5.5, CYCZ] : [0, 0.6, 0]);
     rebuildPatch();
-    fb('Added ' + added.length + ' × ' + TYPES[type].label + ' on the ' + T.name + ': ' + fmtIds(added) + '. Store to keep them in a cue');
+    fb('Added ' + added.length + ' × ' + TYPES[type].label + ' on the ' + T.name + ': ' + fmtIds(added) + (full ? '. ' + full : '') + '. Store to keep them in a cue', !!full);
   }
   function changeType(type) {
     if (!needSel()) return;
