@@ -299,6 +299,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" id="tool-set" aria-pressed="false">Set</button>
               <button type="button" id="tool-cyc" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
               <button type="button" id="tool-curtain" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
+              <button type="button" id="tool-mask" aria-pressed="false" title="Show or hide the border and the wall above the stage">Masking off</button>
             </div>
             <span class="vp-cue mono" id="vp-cue">Q 1 · Preset</span>
             <div id="labels"></div>
@@ -320,6 +321,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn" id="p-change">Change selected to this type</button>
           <button type="button" class="cbtn warn" id="p-del">Remove selected</button>
           <button type="button" class="cbtn" id="p-bar-add">Add bar</button>
+          <button type="button" class="cbtn" id="p-bar-fly">Fly bar in / out</button>
           <button type="button" class="cbtn warn" id="p-bar-del">Remove bar</button>
           <span class="patch-count" id="p-count"></span>
         </div>
@@ -361,7 +363,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="cuelist">
               <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th><th>Curtain</th></tr></thead><tbody id="cue-body"></tbody></table>
             </div>
-            <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span></div>
+            <div class="fade-row"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
+            <div class="fade-row"><span id="save-state">Your cues, rig and set save in this browser</span></div>
             <div class="go-row">
               <button type="button" class="cbtn" id="b-back">Back</button>
               <button type="button" class="cbtn" id="b-fx" aria-pressed="false">Ballyhoo FX</button>
@@ -374,7 +377,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -548,31 +551,35 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   // ================= Rig =================
   const TRUSS = {
-    foh: { name: 'FOH truss', y: 7, z: 9.5, min: -5.8, max: 5.8, base: 100 },
-    e1: { name: '1st electric', y: 6.6, z: 2.4, min: -6, max: 6, base: 200, elec: true },
-    e2: { name: '2nd electric', y: 6.6, z: 0.6, min: -6, max: 6, base: 300, elec: true },
-    e3: { name: '3rd electric', y: 6.6, z: -1.2, min: -6, max: 6, base: 400, elec: true },
-    e4: { name: '4th electric', y: 6.4, z: -3.4, min: -6, max: 6, base: 500, elec: true },
-    floor: { name: 'Upstage floor', y: 0, z: -4.45, min: -6.5, max: 6.5, base: 600, floor: true }
+    foh: { name: 'FOH truss', y: 9.2, z: 12.5, min: -7.8, max: 7.8, base: 100 },
+    e1: { name: '1st electric', y: 8.8, z: 3.3, min: -8.2, max: 8.2, base: 200, elec: true, fly: 0 },
+    e2: { name: '2nd electric', y: 8.8, z: 0.8, min: -8.2, max: 8.2, base: 300, elec: true, fly: 0 },
+    e3: { name: '3rd electric', y: 8.8, z: -1.8, min: -8.2, max: 8.2, base: 400, elec: true, fly: 0 },
+    e4: { name: '4th electric', y: 8.6, z: -5.0, min: -8.2, max: 8.2, base: 500, elec: true, fly: 0 },
+    floor: { name: 'Upstage floor', y: 0, z: -6.9, min: -9, max: 9, base: 600, floor: true }
   };
   const TYPES = {
-    spot: { label: 'Moving spot', short: 'Spot', plural: 'Spots', group: 'Moving lights', zoom: [8, 40], def: 20, pen: 0.25, power: 3.2, r: 0.13, len: 0.38, haze: 0.06, moving: true },
-    wash: { label: 'Moving wash', short: 'Wash', plural: 'Washes', group: 'Moving lights', zoom: [12, 60], def: 32, pen: 0.75, power: 2.6, r: 0.17, len: 0.38, haze: 0.05, moving: true },
-    beam: { label: 'Moving beam', short: 'Beam', plural: 'Beams', group: 'Moving lights', zoom: [2, 8], def: 4, pen: 0.1, power: 4.5, r: 0.1, len: 0.32, haze: 0.16, moving: true },
-    profile: { label: 'Profile (ellipsoidal)', short: 'Profile', plural: 'Profiles', group: 'Conventional', zoom: [15, 50], def: 26, pen: 0.12, power: 3.0, r: 0.11, len: 0.62, haze: 0.06 },
-    fresnel: { label: 'Fresnel', short: 'Fresnel', plural: 'Fresnels', group: 'Conventional', zoom: [15, 60], def: 40, pen: 0.9, power: 2.4, r: 0.17, len: 0.34, haze: 0.04 },
-    par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 2.2, r: 0.14, len: 0.28, haze: 0.05 }
+    spot: { label: 'Moving spot', short: 'Spot', plural: 'Spots', group: 'Moving lights', zoom: [8, 40], def: 20, pen: 0.25, power: 4.4, r: 0.13, len: 0.38, haze: 0.06, moving: true },
+    wash: { label: 'Moving wash', short: 'Wash', plural: 'Washes', group: 'Moving lights', zoom: [12, 60], def: 32, pen: 0.75, power: 3.6, r: 0.17, len: 0.38, haze: 0.05, moving: true },
+    beam: { label: 'Moving beam', short: 'Beam', plural: 'Beams', group: 'Moving lights', zoom: [2, 8], def: 4, pen: 0.1, power: 6, r: 0.1, len: 0.32, haze: 0.16, moving: true },
+    profile: { label: 'Profile (ellipsoidal)', short: 'Profile', plural: 'Profiles', group: 'Conventional', zoom: [15, 50], def: 26, pen: 0.12, power: 4.1, r: 0.11, len: 0.62, haze: 0.06 },
+    fresnel: { label: 'Fresnel', short: 'Fresnel', plural: 'Fresnels', group: 'Conventional', zoom: [15, 60], def: 40, pen: 0.9, power: 3.3, r: 0.17, len: 0.34, haze: 0.04 },
+    par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 3.0, r: 0.14, len: 0.28, haze: 0.05 }
   };
   const MOVER = ['dim', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
   const MAX_PER_TRUSS = 14, MAX_TOTAL = 60;
   const mk = (id, type, truss, x) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0 });
   let FIX = [], byId = {};
-  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(101 + i, 'spot', 'foh', x)));
-  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(201 + i, 'wash', 'e1', x)));
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(301 + i, 'profile', 'e2', x)));
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e3', x)));
-  [-4.5, -1.5, 1.5, 4.5].forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e4', x)));
-  [-5, -3, -1, 1, 3, 5].forEach((x, i) => FIX.push(mk(601 + i, 'par', 'floor', x)));
+  const X6 = [-6.75, -4.05, -1.35, 1.35, 4.05, 6.75], X4 = [-6, -2, 2, 6];
+  X6.forEach((x, i) => FIX.push(mk(101 + i, 'spot', 'foh', x)));
+  X6.forEach((x, i) => FIX.push(mk(201 + i, 'wash', 'e1', x)));
+  X4.forEach((x, i) => FIX.push(mk(301 + i, 'profile', 'e2', x)));
+  X4.forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e3', x)));
+  X4.forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e4', x)));
+  X6.forEach((x, i) => FIX.push(mk(601 + i, 'par', 'floor', x)));
+  const BAR_FLY = 7;
+  const trussY = T => T.y + (T.fly || 0) * BAR_FLY;
+  const snapBars = () => Object.fromEntries(Object.entries(TRUSS).filter(([, T]) => T.elec).map(([k, T]) => [k, T.fly || 0]));
   FIX.push(mk(901, 'cyc', null, 0));
   function reindex() {
     FIX.sort((a, b) => a.id - b.id);
@@ -629,6 +636,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     crate: { label: 'Crate', group: 'Furniture & props' },
     lamp: { label: 'Lamp post (lit)', group: 'Furniture & props' },
     fire: { label: 'Campfire (lit)', group: 'Furniture & props' },
+    city: { label: 'Painted drop · city skyline', group: 'Flying scenery' },
+    forest: { label: 'Painted drop · forest', group: 'Flying scenery' },
+    scrim: { label: 'Black scrim', group: 'Flying scenery' },
+    border: { label: 'Black border', group: 'Flying scenery' },
+    chandelier: { label: 'Chandelier (lit)', group: 'Flying scenery' },
+    moon: { label: 'Moon (lit)', group: 'Flying scenery' },
+    sign: { label: 'Show sign', group: 'Flying scenery' },
     lead: { label: 'Actor · long coat', group: 'People', actor: true },
     dress: { label: 'Actor · dress', group: 'People', actor: true },
     elder: { label: 'Actor · hat and cane', group: 'People', actor: true },
@@ -636,15 +650,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     dancer: { label: 'Actor · dancer', group: 'People', actor: true },
     child: { label: 'Actor · child', group: 'People', actor: true }
   };
-  const STAGE = { x: 6.3, zMin: -4.4, zMax: 3.4 };
+  const STAGE = { x: 8.6, zMin: -6.9, zMax: 4.4 };
   let SET = [
-    { id: 'p1', kind: 'platform', x: -3.2, z: -3.2, rot: 0 },
-    { id: 'p2', kind: 'bench', x: 0.1, z: -1.7, rot: 0 },
-    { id: 'p3', kind: 'lamp', x: 4.6, z: -2.6, rot: 0 },
+    { id: 'p1', kind: 'platform', x: -4.4, z: -5.0, rot: 0 },
+    { id: 'p2', kind: 'bench', x: 0.1, z: -2.4, rot: 0 },
+    { id: 'p3', kind: 'lamp', x: 6.2, z: -3.8, rot: 0 },
     { id: 'a1', kind: 'lead', x: -2.3, z: 0.9, rot: 0 },
     { id: 'a2', kind: 'dress', x: 0.1, z: -0.6, rot: 0 },
     { id: 'a3', kind: 'elder', x: 2.4, z: 0.6, rot: 0 },
-    { id: 'p4', kind: 'window', x: -0.6, z: -3.9, rot: 0, fly: 1 }
+    { id: 'p4', kind: 'window', x: -0.6, z: -5.8, rot: 0, fly: 1 },
+    { id: 'p5', kind: 'city', x: 0, z: -6.3, rot: 0, fly: 1 }
   ];
   let setSeq = 10, selSet = null, lay = null;
   const actorsNow = () => SET.filter(o => PIECES[o.kind].actor);
@@ -666,29 +681,32 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     Concert: [[-2, 2.2], [0, 2.6], [2, 2.2]],
     'Curtain call': [[-1.5, 2.6], [0, 2.8], [1.5, 2.6]]
   };
+  Object.values(ACT).forEach(a => a.forEach(p => { p[0] *= 1.35; p[1] = p[1] * 1.3 - 0.4; }));
   const CYC_OUT = new Set(['Concert']);
   const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot, fly: o.fly || 0 }]));
   const WINDOW_IN = new Set(['Moonlight', 'Fireside']);
   function layoutFor(act, name) {
     const L = snapLayout();
     if (L.p4) L.p4.fly = WINDOW_IN.has(name) ? 0 : 1;
+    if (L.p5) L.p5.fly = name === 'Dusk' ? 0 : 1;
     ['a1', 'a2', 'a3'].forEach((id, i) => { if (L[id]) { L[id].x = act[i][0]; L[id].z = act[i][1]; L[id].rot = clamp(-act[i][0] * 7, -35, 35); } });
     return L;
   }
   function aimAt(f, fx, P) {
     const T = TRUSS[f.truss], s = T.floor ? -1 : 1;
-    let vx = P[0] - fx, vy = P[1] - (T.y - s * 0.43), vz = P[2] - T.z;
+    let vx = P[0] - fx, vy = P[1] - (trussY(T) - s * 0.43), vz = P[2] - T.z;
     if (T.floor) { vx = -vx; vy = -vy; }
     const h = Math.hypot(vx, vz);
     return { tilt: deg(Math.atan2(h, -vy)), pan: deg(Math.atan2(-vx, -vz)) };
   }
-  const fanPt = (f, x) => TRUSS[f.truss].floor ? [x * 1.1, 4.5, -4.8] : [x * 1.1, 0, f.truss === 'foh' ? 1.5 : TRUSS[f.truss].z + 0.8];
+  const CYCZ = -7.6;
+  const fanPt = (f, x) => TRUSS[f.truss].floor ? [x * 1.1, 5.5, CYCZ] : [x * 1.1, 0, f.truss === 'foh' ? 2.2 : TRUSS[f.truss].z + 1];
   const POS = [
-    { name: 'DSR', sub: 'Down right', aim: () => [-3.5, 0.6, 2.2] },
-    { name: 'DSC', sub: 'Down centre', aim: () => [0, 0.6, 2.2] },
-    { name: 'DSL', sub: 'Down left', aim: () => [3.5, 0.6, 2.2] },
+    { name: 'DSR', sub: 'Down right', aim: () => [-4.8, 0.6, 3.0] },
+    { name: 'DSC', sub: 'Down centre', aim: () => [0, 0.6, 3.0] },
+    { name: 'DSL', sub: 'Down left', aim: () => [4.8, 0.6, 3.0] },
     { name: 'CS', sub: 'Centre', aim: () => [0, 0.6, 0] },
-    { name: 'USC', sub: 'Upstage', aim: () => [0, 0.6, -2.8] },
+    { name: 'USC', sub: 'Upstage', aim: () => [0, 0.6, -4.2] },
     { name: 'Actors', sub: 'Specials', aim: f => liveActor(f.n) },
     { name: 'Fan', sub: 'Straight out', aim: (f, x) => fanPt(f, x) },
     { name: 'Home', sub: 'Pan/tilt 0', home: true }
@@ -717,7 +735,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (at === 'actor2') return act ? [act[1][0], 1.5, act[1][1]] : liveActor(1);
     if (at === 'fan') return fanPt(f, f.x0);
     if (at === 'cs') return [0, 0.6, 0];
-    if (at === 'cyc') return [f.x0 * 1.1, 4.5, -4.8];
+    if (at === 'cyc') return [f.x0 * 1.1, 5.5, CYCZ];
     return at;
   }
   function look(spec, act) {
@@ -746,14 +764,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Sunset', 6, { spot: { dim: 60, k: 2700, zoom: 22, at: 'actors' }, wash: { dim: 50, gel: 'L147', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 80, gel: 'L106', at: 'cyc' }, cyc: { dim: 70, gel: 'L147' } }],
     ['Dusk', 5, { spot: { dim: 35, k: 3200, zoom: 22, at: 'actors' }, wash: { dim: 40, gel: 'L170', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 70, gel: 'L181', at: 'cyc' }, cyc: { dim: 60, gel: 'L170' } }],
     ['Moonlight', 4, { spot: { dim: 30, k: 6500, zoom: 16, at: 'actors' }, wash: { dim: 30, gel: 'L201', zoom: 20, at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L181', at: 'cyc' }, cyc: { dim: 45, gel: 'L181' } }],
-    ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 2.5, 0, 2.5] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' } }],
-    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 2.5, 0, 2.5] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' } }],
+    ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' } }],
+    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' } }],
     ['After the storm', 3, { spot: { dim: 40, k: 4300, zoom: 22, at: 'actors' }, wash: { dim: 30, gel: 'L115', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'L115', at: 'cyc' }, cyc: { dim: 50, gel: 'L115' } }],
     ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
     ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: 'actor2' }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
     ['Dream', 5, { spot: { dim: 40, gel: 'L170', zoom: 30, at: 'actors' }, wash: { dim: 50, gel: 'L128', at: 'fan' }, beam: { dim: 60, gel: 'L170', at: 'actors' }, floor: { dim: 60, gel: 'L170', at: 'cyc' }, cyc: { dim: 55, gel: 'L128' } }],
-    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 3, 3, 9] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
-    ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 2.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
+    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 4, 3, 12] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
+    ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 3.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
   ];
   const PROFILE = {
     Morning: { dim: 40, k: 4300, zoom: 26, at: 'actors' }, Midday: { dim: 60, gel: 'N/C', zoom: 30, at: 'actors' },
@@ -763,15 +781,38 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   LOOKS.forEach(L => { L[2].profile = PROFILE[L[0]] || { at: 'actors' }; });
   let cues = LOOKS.map(([name, fadeT, spec], i) => {
     const act = ACT[name] || ACT.Preset;
-    return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), curtain: true, layout: layoutFor(act, name) };
+    return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), curtain: true, bars: snapBars(), layout: layoutFor(act, name) };
   });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
+  // Saved show: the rig, cues and set are kept in this browser between visits.
+  const SAVE_KEY = 'kld-previs-show-v2';
+  function loadShow() {
+    try {
+      const d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+      if (!d || d.v !== 2 || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) return null;
+      Object.keys(TRUSS).forEach(k => delete TRUSS[k]); Object.assign(TRUSS, d.truss);
+      FIX = d.fix.filter(x => x.type === 'cyc' || (TYPES[x.type] && TRUSS[x.truss])).map(x => mk(x.id, x.type, x.truss, x.x0));
+      reindex();
+      cues = d.cues; SET = d.set; setSeq = d.seq || 50;
+      return d;
+    } catch (e) { return null; }
+  }
+  const saved = loadShow();
 
-  let curIdx = 0;
-  let pb = clone(cues[0].state);
+  let curIdx = saved ? clamp(saved.cur | 0, 0, cues.length - 1) : 0;
+  let pb = clone(cues[curIdx].state);
+  FIX.forEach(f => { pb[f.id] = Object.assign(defaults(f), pb[f.id] || {}); });
+  let saveDirty = false, lastSave = 0;
+  function saveShow() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 2, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0 })), truss: TRUSS, cues, set: SET, seq: setSeq, cur: curIdx, cyc: cycIn, curtain: curtainOpen }));
+      $('save-state').textContent = 'Saved in this browser';
+    } catch (e) { $('save-state').textContent = 'Could not save in this browser'; }
+  }
+  window.addEventListener('pagehide', () => { if (saveDirty) saveShow(); });
   let programmer = {};
   let selection = [];
   let fade = null;
@@ -779,7 +820,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let encPage = 0;
   const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35 };
   let dirty = true, uiDirty = true;
-  const changed = () => { dirty = true; uiDirty = true; };
+  const changed = () => { dirty = true; uiDirty = true; saveDirty = true; };
 
   const val = (id, a) => { const p = programmer[id]; return (p && a in p) ? p[a] : pb[id][a]; };
   const inProg = (id, a) => !!(programmer[id] && a in programmer[id]);
@@ -842,7 +883,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!needSel()) return;
     setAttr(selection, 'dim', 100); setAttr(selection, 'r', 100); setAttr(selection, 'g', 100); setAttr(selection, 'b', 100);
     const movers = selection.filter(id => byId[id].type !== 'cyc');
-    aimIds(movers, f => TRUSS[f.truss].floor ? [0, 4.5, -4.8] : [0, 0.6, 0]);
+    aimIds(movers, f => TRUSS[f.truss].floor ? [0, 5.5, CYCZ] : [0, 0.6, 0]);
     movers.forEach(id => setAttr([id], 'zoom', TYPES[byId[id].type].def));
     fb('Located ' + fmtIds(selection));
   }
@@ -881,7 +922,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!added.length) return;
     selection = [...added];
     setAttr(added, 'dim', 60);
-    aimIds(added, f => TRUSS[f.truss].floor ? [f.x0 * 1.1, 4.5, -4.8] : [0, 0.6, 0]);
+    aimIds(added, f => TRUSS[f.truss].floor ? [f.x0 * 1.1, 5.5, CYCZ] : [0, 0.6, 0]);
     rebuildPatch();
     fb('Added ' + added.length + ' × ' + TYPES[type].label + ' on the ' + T.name + ': ' + fmtIds(added) + '. Store to keep them in a cue');
   }
@@ -904,14 +945,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function addBar() {
     const elecs = Object.values(TRUSS).filter(T => T.elec);
     if (elecs.length >= 8) { fb('The grid holds up to 8 electrics', true); return; }
-    const zs = [3.0, ...elecs.map(T => T.z).sort((a, b) => b - a), -4.2];
+    const zs = [4.1, ...elecs.map(T => T.z).sort((a, b) => b - a), -6.6];
     let best = 0, gap = -1;
     for (let i = 0; i < zs.length - 1; i++) { const g = zs[i] - zs[i + 1]; if (g > gap) { gap = g; best = (zs[i] + zs[i + 1]) / 2; } }
     if (gap < 0.6) { fb('There is no room for another electric over the stage', true); return; }
     let n = 1; while (TRUSS['e' + n]) n++;
     const used = Object.values(TRUSS).map(T => T.base); let base = 700; while (used.includes(base) || base === 900) base += 100;
     const key = 'e' + n;
-    TRUSS[key] = { name: (ORD[n - 1] || n + 'th') + ' electric', y: 6.5, z: Math.round(best * 100) / 100, min: -6, max: 6, base, elec: true };
+    TRUSS[key] = { name: (ORD[n - 1] || n + 'th') + ' electric', y: 8.7, z: Math.round(best * 100) / 100, min: -8.2, max: 8.2, base, elec: true, fly: 0 };
     if (scene3d) scene3d.addBar(key);
     rebuildPatch(); pPos.value = key;
     fb('Added the ' + TRUSS[key].name + ' (' + (best >= 0 ? best.toFixed(1) + ' m downstage' : (-best).toFixed(1) + ' m upstage') + ' of centre). Add lights to it with Add lights');
@@ -952,6 +993,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
     if (c.cyc != null) setCyc(c.cyc, true);
     if (c.curtain != null) setCurtain(c.curtain, true);
+    if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
     changed();
@@ -965,10 +1007,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
+    changed();
+  }
+  let barAnim = null;
+  function startBars(target, dur) {
+    const from = {}, to = {};
+    Object.entries(target).forEach(([k, v]) => { const T = TRUSS[k]; if (!T || !T.elec) return; from[k] = T.fly || 0; to[k] = v; });
+    if (!dur) { Object.entries(to).forEach(([k, v]) => { TRUSS[k].fly = v; }); barAnim = null; changed(); return; }
+    barAnim = { from, to, t0: performance.now(), dur: dur * 1000 };
+  }
+  function stepBars(now) {
+    const k = Math.min(1, (now - barAnim.t0) / barAnim.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    Object.keys(barAnim.to).forEach(key => { const T = TRUSS[key]; if (T) T.fly = barAnim.from[key] + (barAnim.to[key] - barAnim.from[key]) * e; });
+    if (k >= 1) barAnim = null;
     changed();
   }
   function deleteCue(n) {
@@ -1118,6 +1173,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   fillPos(); pPos.value = 'e3';
   pPos.addEventListener('change', () => { dirty = true; });
   $('p-bar-add').addEventListener('click', addBar);
+  $('p-bar-fly').addEventListener('click', () => {
+    const T = TRUSS[pPos.value];
+    if (!T || !T.elec) { fb('Only electrics can fly. Pick one in Position first', true); return; }
+    const out = (T.fly || 0) < 0.5, tg = {}; tg[pPos.value] = out ? 1 : 0;
+    startBars(tg, 5);
+    fb((out ? 'Flying out the ' : 'Flying in the ') + T.name + '. Its lights travel with it. Store to save it in a cue');
+  });
   const sKind = $('s-kind'), sog = {};
   Object.entries(PIECES).forEach(([k, p]) => {
     if (!sog[p.group]) { sog[p.group] = document.createElement('optgroup'); sog[p.group].label = p.group; sKind.appendChild(sog[p.group]); }
@@ -1127,13 +1189,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function addPiece(kind) {
     if (SET.length >= 40) { fb('The stage holds up to 40 pieces', true); return; }
     let best = [0, 1], bs = -Infinity;
-    for (let x = -5; x <= 5; x += 1) for (let z = -3; z <= 2.5; z += 0.5) {
+    for (let x = -7; x <= 7; x += 1) for (let z = -5; z <= 3.5; z += 0.5) {
       const d = SET.length ? Math.min(...SET.map(o => Math.hypot(o.x - x, o.z - z))) : 9;
       const sc = Math.min(d, 3) - Math.hypot(x, z) * 0.12;
       if (sc > bs) { bs = sc; best = [x, z]; }
     }
-    const o = { id: (PIECES[kind].actor ? 'a' : 'p') + (++setSeq), kind, x: best[0], z: best[1], rot: 0, fly: 0 };
+    const flying = PIECES[kind].group === 'Flying scenery';
+    const o = { id: (PIECES[kind].actor ? 'a' : 'p') + (++setSeq), kind, x: flying ? 0 : best[0], z: flying ? (['city', 'forest', 'scrim'].includes(kind) ? -6.2 : -1.5) : best[1], rot: 0, fly: flying ? 1 : 0 };
     SET.push(o); if (scene3d) scene3d.addSet(o);
+    if (flying) { const L = {}; L[o.id] = { x: o.x, z: o.z, rot: 0, fly: 0 }; startLayout(L, 4); }
     selSet = o.id; setTool('set'); changed();
     fb('Added ' + PIECES[kind].label + '. Drag it with the Set tool, then Store so cues remember where it stands');
   }
@@ -1203,6 +1267,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
 
   $('b-go').addEventListener('click', go);
+  let resetArm = null;
+  $('b-reset').addEventListener('click', () => {
+    if (!resetArm) {
+      $('b-reset').textContent = 'Click again to reset';
+      fb('Reset clears your saved cues, rig and set and loads the demo show. Click Reset again to confirm', true);
+      resetArm = setTimeout(() => { resetArm = null; $('b-reset').textContent = 'Reset show'; }, 4000);
+      return;
+    }
+    clearTimeout(resetArm); saveDirty = false;
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    location.reload();
+  });
   $('b-back').addEventListener('click', back);
   $('b-store').addEventListener('click', () => store(null));
   $('b-clear').addEventListener('click', clearKey);
@@ -1298,12 +1374,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     scene.background = new THREE.Color(0x030304);
     const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 120);
 
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 0.2, 9), new THREE.MeshStandardMaterial({ color: 0x1c1b1a, roughness: 0.7 }));
-    deck.position.set(0, -0.1, -0.5); deck.receiveShadow = true; scene.add(deck);
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(20, 0.2, 13), new THREE.MeshStandardMaterial({ color: 0x1c1b1a, roughness: 0.7 }));
+    deck.position.set(0, -0.1, -1.5); deck.receiveShadow = true; scene.add(deck);
     const house = new THREE.Mesh(new THREE.PlaneGeometry(30, 24), new THREE.MeshStandardMaterial({ color: 0x08080a, roughness: 1 }));
-    house.rotation.x = -Math.PI / 2; house.position.set(0, -1.1, 14); scene.add(house);
-    const apronFace = new THREE.Mesh(new THREE.PlaneGeometry(14, 1), new THREE.MeshStandardMaterial({ color: 0x0c0c0d, roughness: 1 }));
-    apronFace.position.set(0, -0.6, 4.0); scene.add(apronFace);
+    house.rotation.x = -Math.PI / 2; house.position.set(0, -1.1, 17); scene.add(house);
+    const apronFace = new THREE.Mesh(new THREE.PlaneGeometry(20, 1), new THREE.MeshStandardMaterial({ color: 0x0c0c0d, roughness: 1 }));
+    apronFace.position.set(0, -0.6, 5.0); scene.add(apronFace);
 
     const cycCanvas = document.createElement('canvas'); cycCanvas.width = 4; cycCanvas.height = 256;
     const cc = cycCanvas.getContext('2d');
@@ -1311,17 +1387,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     cg.addColorStop(0, '#222'); cg.addColorStop(0.55, '#777'); cg.addColorStop(1, '#fff');
     cc.fillStyle = cg; cc.fillRect(0, 0, 4, 256);
     const cycMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: new THREE.CanvasTexture(cycCanvas), emissiveIntensity: 0.6, roughness: 1 });
-    const cyc = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), cycMat);
-    cyc.position.set(0, 4, -4.8); scene.add(cyc);
+    const cyc = new THREE.Mesh(new THREE.PlaneGeometry(22, 10.5), cycMat);
+    cyc.position.set(0, 5.25, CYCZ); scene.add(cyc);
 
     const prosMat = new THREE.MeshStandardMaterial({ color: 0x140b0c, roughness: 0.9 });
-    [[-6.6, 3.6, 1.6, 7.2], [6.6, 3.6, 1.6, 7.2]].forEach(([x, y, w, h]) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 3.6); scene.add(m);
+    [[-9.0, 4.6, 1.8, 9.2], [9.0, 4.6, 1.8, 9.2]].forEach(([x, y, w, h]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 4.6); scene.add(m);
     });
-    const header = new THREE.Mesh(new THREE.BoxGeometry(14.8, 1.4, 0.6), prosMat); header.position.set(0, 6.9, 3.6); scene.add(header);
+    const masking = [];
+    const header = new THREE.Mesh(new THREE.BoxGeometry(19.8, 1.6, 0.6), prosMat); header.position.set(0, 8.4, 4.6); scene.add(header); masking.push(header);
     const houseWall = new THREE.MeshStandardMaterial({ color: 0x0b0809, roughness: 1 });
-    const above = new THREE.Mesh(new THREE.BoxGeometry(34, 12, 0.5), houseWall); above.position.set(0, 13.6, 3.62); scene.add(above);
-    [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(10, 20, 0.5), houseWall); w.position.set(sd * 12.4, 8, 3.62); scene.add(w); });
+    const above = new THREE.Mesh(new THREE.BoxGeometry(44, 14, 0.5), houseWall); above.position.set(0, 16.2, 4.62); scene.add(above); masking.push(above);
+    [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(10, 22, 0.5), houseWall); w.position.set(sd * 14.9, 9, 4.62); scene.add(w); });
 
     const velvet = new THREE.MeshStandardMaterial({ color: 0x5a0c14, roughness: 0.95, side: THREE.DoubleSide });
     function drape(w, h, folds, amp) {
@@ -1331,23 +1408,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       g.computeVertexNormals(); return g;
     }
     [-1, 1].forEach(side => {
-      const leg = new THREE.Mesh(drape(2.2, 6.3, 6, 0.12), velvet);
-      leg.position.set(side * 4.85, 3.15, 3.1); leg.receiveShadow = true; scene.add(leg);
-      const leg2 = new THREE.Mesh(drape(1.8, 6.3, 5, 0.1), new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 1, side: THREE.DoubleSide }));
-      leg2.position.set(side * 5.6, 3.15, 0.2); scene.add(leg2);
+      const leg = new THREE.Mesh(drape(2.6, 8.2, 7, 0.12), velvet);
+      leg.position.set(side * 6.9, 4.1, 4.1); leg.receiveShadow = true; scene.add(leg);
+      const leg2 = new THREE.Mesh(drape(2.2, 8.2, 6, 0.1), new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 1, side: THREE.DoubleSide }));
+      leg2.position.set(side * 7.8, 4.1, -0.5); scene.add(leg2);
+      const leg3 = new THREE.Mesh(drape(2.2, 8.2, 6, 0.1), leg2.material); leg3.position.set(side * 7.8, 4.1, -4.2); scene.add(leg3);
     });
-    const border = new THREE.Mesh(drape(12, 1.0, 22, 0.08), velvet); border.position.set(0, 5.7, 3.1); scene.add(border);
+    const border = new THREE.Mesh(drape(16, 1.2, 28, 0.08), velvet); border.position.set(0, 7.6, 4.1); scene.add(border); masking.push(border);
     // Main curtain (a traveller): two halves that part to the sides
     const grandMat = new THREE.MeshStandardMaterial({ color: 0x6e0f1b, roughness: 0.92, side: THREE.DoubleSide });
-    const halves = [-1, 1].map(sd => { const m = new THREE.Mesh(drape(7.2, 6.4, 18, 0.1), grandMat); m.position.set(sd * 3.6, 3.2, 3.32); m.castShadow = m.receiveShadow = true; scene.add(m); return { m, sd }; });
+    const halves = [-1, 1].map(sd => { const m = new THREE.Mesh(drape(9.4, 8.2, 22, 0.1), grandMat); m.position.set(sd * 4.7, 4.1, 4.32); m.castShadow = m.receiveShadow = true; scene.add(m); return { m, sd }; });
     let curtV = 1, curtT = 1, lastNow = 0;
     function placeCurtain() {
-      const sx = 1 - 0.8 * curtV, w = 7.2 * sx, edge = 5.7 * curtV;
+      const sx = 1 - 0.8 * curtV, w = 9.4 * sx, edge = 7.7 * curtV;
       halves.forEach(({ m, sd }) => { m.scale.set(sx, 1, 1 + 2.2 * curtV); m.position.x = sd * (edge + w / 2); });
     }
     placeCurtain();
     let curtAnim = null;
-    function moveCurtain(open) { curtT = open ? 1 : 0; curtAnim = { from: curtV, t0: performance.now(), dur: 2400 * Math.abs(curtT - curtV) }; if (reduceMotion || !curtAnim.dur) { curtV = curtT; curtAnim = null; placeCurtain(); } dirty = true; }
+    function moveCurtain(open, now) { curtT = open ? 1 : 0; curtAnim = { from: curtV, t0: performance.now(), dur: 2400 * Math.abs(curtT - curtV) }; if (reduceMotion || now || !curtAnim.dur) { curtV = curtT; curtAnim = null; placeCurtain(); } dirty = true; }
 
     // ---- Set pieces and actors ----
     const setObj = {};
@@ -1383,6 +1461,57 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         case 'chair': { const m = M(0x5a3b22); put(B(0.45, 0.05, 0.45, m), 0, 0.45, 0); put(B(0.45, 0.5, 0.05, m), 0, 0.72, -0.2); [[-0.19, -0.19], [0.19, -0.19], [-0.19, 0.19], [0.19, 0.19]].forEach(([x, z]) => put(B(0.04, 0.45, 0.04, m), x, 0.225, z)); break; }
         case 'bench': { const m = M(0x4a3626); put(B(1.6, 0.08, 0.45, m), 0, 0.42, 0); put(B(0.08, 0.38, 0.4, m), -0.7, 0.19, 0); put(B(0.08, 0.38, 0.4, m), 0.7, 0.19, 0); break; }
         case 'crate': put(B(0.7, 0.7, 0.7, M(0x8a6a3e)), 0, 0.35, 0); break;
+        case 'city': case 'forest': {
+          const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512; const x = cv.getContext('2d');
+          let rs = kind === 'city' ? 7 : 3; const rnd = () => { rs = (rs * 16807) % 2147483647; return rs / 2147483647; };
+          if (kind === 'city') {
+            const sk = x.createLinearGradient(0, 0, 0, 512); sk.addColorStop(0, '#0b1230'); sk.addColorStop(0.55, '#3a2a5a'); sk.addColorStop(1, '#c06a4a');
+            x.fillStyle = sk; x.fillRect(0, 0, 1024, 512);
+            for (let bx = -20; bx < 1024;) {
+              const bw = 40 + rnd() * 80, bh = 120 + rnd() * 270; x.fillStyle = '#120f1a'; x.fillRect(bx, 512 - bh, bw, bh);
+              x.fillStyle = 'rgba(255, 214, 120, .85)';
+              for (let wy = 512 - bh + 12; wy < 500; wy += 18) for (let wx = bx + 8; wx < bx + bw - 10; wx += 14) if (rnd() > 0.62) x.fillRect(wx, wy, 6, 9);
+              bx += bw + 4;
+            }
+          } else {
+            const sk = x.createLinearGradient(0, 0, 0, 512); sk.addColorStop(0, '#8fb7cc'); sk.addColorStop(1, '#e6ece6');
+            x.fillStyle = sk; x.fillRect(0, 0, 1024, 512);
+            [['#6f8f7a', 300, 140], ['#3f6a4c', 360, 180], ['#24452f', 430, 220]].forEach(([c, base, hgt]) => {
+              x.fillStyle = c;
+              for (let tx = -40; tx < 1080; tx += 30 + rnd() * 40) { const th = hgt * (0.6 + rnd() * 0.5), tw = 50 + rnd() * 40; x.beginPath(); x.moveTo(tx, base + 40); x.lineTo(tx + tw / 2, base - th); x.lineTo(tx + tw, base + 40); x.fill(); }
+              x.fillRect(0, base + 30, 1024, 512);
+            });
+          }
+          const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+          put(new THREE.Mesh(new THREE.PlaneGeometry(18, 9), M(0xffffff, { map: tex, roughness: 0.95, side: THREE.DoubleSide })), 0, 4.5, 0);
+          put(B(18.4, 0.12, 0.12, M(0x2a2c30)), 0, 9.06, 0);
+          break;
+        }
+        case 'scrim': {
+          const sc = put(new THREE.Mesh(new THREE.PlaneGeometry(18, 9), M(0x0a0a0a, { transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthWrite: false })), 0, 4.5, 0);
+          sc.castShadow = false; put(B(18.4, 0.12, 0.12, M(0x2a2c30)), 0, 9.06, 0);
+          break;
+        }
+        case 'border': put(B(18, 1.6, 0.06, M(0x0b0b0c, { roughness: 1 })), 0, 7.6, 0); break;
+        case 'chandelier': {
+          const gold = M(0xc9a24a, { metalness: 0.7, roughness: 0.35 });
+          put(C(0.012, 0.012, 3, gold, 4), 0, 6.9, 0);
+          const ring = put(new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.04, 8, 32), gold), 0, 5.4, 0); ring.rotation.x = Math.PI / 2;
+          const bulb = M(0xfff1d0, { emissive: 0xffc070, emissiveIntensity: 1.6 });
+          for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; put(SP(0.07, bulb, 10, 8), Math.cos(a) * 0.6, 5.5, Math.sin(a) * 0.6); }
+          put(SP(0.18, gold, 16, 10), 0, 5.2, 0);
+          break;
+        }
+        case 'moon': put(new THREE.Mesh(new THREE.CircleGeometry(0.9, 40), M(0xf4f0e0, { emissive: 0xe8e4d0, emissiveIntensity: 1.1, side: THREE.DoubleSide })), 0, 6.4, 0); put(C(0.008, 0.008, 2.6, M(0x222222), 4), 0, 8.6, 0); break;
+        case 'sign': {
+          const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 256; const x = cv.getContext('2d');
+          x.fillStyle = '#1a1214'; x.fillRect(0, 0, 1024, 256); x.strokeStyle = '#e9c46a'; x.lineWidth = 10; x.strokeRect(14, 14, 996, 228);
+          x.fillStyle = '#e9c46a'; x.font = 'bold 110px Georgia, serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('TONIGHT', 512, 132);
+          const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+          put(new THREE.Mesh(new THREE.PlaneGeometry(5, 1.25), M(0xffffff, { map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.35, side: THREE.DoubleSide })), 0, 6.6, 0);
+          const ln = M(0x222222); put(C(0.008, 0.008, 2.2, ln, 4), -2.2, 8.3, 0); put(C(0.008, 0.008, 2.2, ln, 4), 2.2, 8.3, 0);
+          break;
+        }
         case 'lamp': {
           const m = M(0x1c1d20, { metalness: 0.5, roughness: 0.4 });
           put(B(0.3, 0.1, 0.3, m), 0, 0.05, 0); put(C(0.04, 0.05, 2.8, m, 10), 0, 1.45, 0); put(B(0.28, 0.06, 0.28, m), 0, 2.88, 0);
@@ -1484,17 +1613,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const t = 38 + Math.floor(Math.random() * 18);
       bc.fillStyle = `rgb(${t + 14},${t},${t - 6})`; bc.fillRect(x + 2, y + 2, 60, 12);
     }
-    const brickTex = new THREE.CanvasTexture(brick); brickTex.wrapS = brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(6, 3.5); brickTex.encoding = THREE.sRGBEncoding;
-    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.95 }));
-    backWall.position.set(0, 4.5, -5.4); backWall.receiveShadow = true; scene.add(backWall);
-    let cycY = 4, cycTarget = 4;
-    function flyCyc(isIn) { cycTarget = isIn ? 4 : 15; if (reduceMotion) cycY = cycTarget; dirty = true; }
+    const brickTex = new THREE.CanvasTexture(brick); brickTex.wrapS = brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(8, 4.5); brickTex.encoding = THREE.sRGBEncoding;
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(22, 12), new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.95 }));
+    backWall.position.set(0, 6, -8.3); backWall.receiveShadow = true; scene.add(backWall);
+    let cycY = 5.25, cycTarget = 5.25;
+    function flyCyc(isIn, now) { cycTarget = isIn ? 5.25 : 19; if (reduceMotion || now) cycY = cycTarget; dirty = true; }
+    function showMasking(on) { masking.forEach(m => { m.visible = on; }); dirty = true; }
+    showMasking(false);
     const busy = () => Math.abs(cycY - cycTarget) > 0.005 || !!curtAnim;
 
     // A fixed pool of real lights is shared by the brightest fixtures, so the rig can grow without overloading the graphics card.
     const POOL = 14, pool = [];
     for (let i = 0; i < POOL; i++) {
-      const s = new THREE.SpotLight(0xffffff, 0, 34, 0.3, 0.3, 1.1);
+      const s = new THREE.SpotLight(0xffffff, 0, 46, 0.3, 0.3, 1.1);
       if (i < 4) { s.castShadow = true; s.shadow.mapSize.set(1024, 1024); s.shadow.bias = -0.0006; s.shadow.camera.near = 0.5; }
       scene.add(s, s.target); pool.push(s);
     }
@@ -1551,7 +1682,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
       const cone = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
       cone.position.y = -ty.len / 2; tilt.add(cone);
-      obj[f.id] = { root, pan, tilt, cone, lens, baseMat, emit, aim, len: 14 };
+      obj[f.id] = { root, pan, tilt, cone, lens, baseMat, emit, aim, len: 18 };
       dirty = true;
     }
     function removeFixture(id) {
@@ -1567,13 +1698,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const movers = selection.filter(id => byId[id] && byId[id].type !== 'cyc');
       if (!movers.length) { fb('Select lights, then click the stage to aim them', true); return; }
       const P = hit(e, deckPlane);
-      if (!P || Math.abs(P.x) > 7 || P.z < -4.8 || P.z > 4) return;
+      if (!P || Math.abs(P.x) > 9.5 || P.z < -7.6 || P.z > 5) return;
       aimIds(movers, () => [P.x, 0, P.z]);
       fb('Aimed ' + fmtIds(movers) + ' at X ' + P.x.toFixed(1) + ' m, Z ' + P.z.toFixed(1) + ' m');
     }
 
-    let az = 0.15, el = 0.1, dist = 18, baseDist = 18, zoomF = 1;
-    const lookAt = new THREE.Vector3(0, 3.9, -0.3);
+    let az = 0.15, el = 0.16, dist = 25, baseDist = 25, zoomF = 1;
+    const LOOKY = 5.2;
+    const lookAt = new THREE.Vector3(0, LOOKY, -1.2);
     function placeCam() {
       camera.position.set(lookAt.x + dist * Math.sin(az) * Math.cos(el), lookAt.y + dist * Math.sin(el), lookAt.z + dist * Math.cos(az) * Math.cos(el));
       camera.lookAt(lookAt);
@@ -1608,10 +1740,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     vp.addEventListener('pointermove', e => {
       if (pan) {
         const k = dist * 0.0011, dx = e.clientX - pan.x, dy = e.clientY - pan.y;
-        lookAt.x = clamp(lookAt.x - Math.cos(az) * dx * k, -7, 7);
-        lookAt.z = clamp(lookAt.z + Math.sin(az) * dx * k, -4.5, 4);
-        panY = clamp(panY + dy * k, -3.5, 3.5);
-        lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6 + panY;
+        lookAt.x = clamp(lookAt.x - Math.cos(az) * dx * k, -10, 10);
+        lookAt.z = clamp(lookAt.z + Math.sin(az) * dx * k, -8, 6);
+        panY = clamp(panY + dy * k, -4.5, 6);
+        lookAt.y = LOOKY - (1 - Math.min(zoomF, 1)) * 3.6 + panY;
         pan = { x: e.clientX, y: e.clientY }; dirty = true; return;
       }
       if (dragSet) {
@@ -1621,8 +1753,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       }
       if (aiming) { aimHere(e); return; }
       if (!orbit) return;
-      az = clamp(az - (e.clientX - orbit.x) * 0.005, -0.8, 0.8);
-      el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 0.6);
+      az = clamp(az - (e.clientX - orbit.x) * 0.005, -1.5, 1.5);
+      el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 1.35);
       orbit = { x: e.clientX, y: e.clientY }; dirty = true;
     });
     const end = () => { orbit = null; aiming = false; dragSet = null; pan = null; };
@@ -1632,19 +1764,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       zoomF = clamp(zoomF * Math.exp(step * 0.0008), 0.35, 1.6);
       dist = baseDist * zoomF;
       // Lower the look point as you zoom in, so close-ups frame the actors rather than the rig.
-      lookAt.y = 3.9 - (1 - Math.min(zoomF, 1)) * 2.6 + panY;
+      lookAt.y = LOOKY - (1 - Math.min(zoomF, 1)) * 3.6 + panY;
       dirty = true;
     }, { passive: false });
     vp.addEventListener('dblclick', e => {
       if (e.target.closest('.vp-tools') || (toolMode !== 'move' && toolMode !== 'pan')) return;
-      zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, 3.9, -0.3); az = 0.15; el = 0.1; dirty = true;
+      zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, LOOKY, -1.2); az = 0.15; el = 0.16; dirty = true;
     });
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
     function resize() {
       const w = vp.clientWidth, h = vp.clientHeight;
       renderer.setSize(w, h, false); camera.aspect = w / h;
-      baseDist = w / h < 1.1 ? 26 : 18; dist = baseDist * zoomF;
+      baseDist = w / h < 1.1 ? 34 : 25; dist = baseDist * zoomF;
       camera.updateProjectionMatrix(); dirty = true;
     }
     new ResizeObserver(resize).observe(vp);
@@ -1653,7 +1785,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     function render(now) {
       SET.forEach(o => {
         const so = setObj[o.id]; if (!so) return;
-        so.g.position.set(o.x, (o.fly || 0) * 9.5, o.z); so.g.rotation.y = rad(o.rot);
+        so.g.position.set(o.x, (o.fly || 0) * 13, o.z); so.g.rotation.y = rad(o.rot);
         const on = selSet === o.id;
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
@@ -1665,7 +1797,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const ty = TYPES[f.type];
         let pan = val(f.id, 'pan'), tilt = val(f.id, 'tilt');
         if (fx && ty.moving) { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
-        o.root.position.x = val(f.id, 'x');
+        o.root.position.x = val(f.id, 'x'); o.root.position.y = trussY(TRUSS[f.truss]);
         o.pan.rotation.y = rad(pan); o.tilt.rotation.x = rad(tilt);
         const zoom = val(f.id, 'zoom');
         const rr = Math.tan(rad(zoom / 2)) * o.len;
@@ -1697,15 +1829,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       Object.entries(bars).forEach(([key, b]) => {
         const T = TRUSS[key]; if (!T) return;
         const on = key === $('p-pos').value;
+        b.g.position.y = (T.fly || 0) * BAR_FLY;
         b.mat.emissive.setHex(on ? 0x6a3e0c : 0x000000);
-        v3.set(T.max + 0.45, T.floor ? 0.15 : T.y, T.z).project(camera);
+        v3.set(T.max + 0.45, T.floor ? 0.15 : trussY(T), T.z).project(camera);
         const off = !on || v3.z > 1 || v3.x > 1.05;
         b.el.hidden = off;
         if (!off) b.el.style.transform = `translate(${((v3.x + 1) / 2 * w).toFixed(1)}px, ${((1 - v3.y) / 2 * h).toFixed(1)}px) translate(0, -50%)`;
       });
       FIX.forEach(f => {
         const lb = labels[f.id]; if (!lb) return;
-        if (f.type === 'cyc') v3.set(0, cycY + 3.4, -4.8);
+        if (f.type === 'cyc') v3.set(0, cycY + 5.6, CYCZ);
         else obj[f.id].root.getWorldPosition(v3).add(up.set(0, TRUSS[f.truss].floor ? 0.85 : 0.32, 0));
         v3.project(camera);
         const off = v3.z > 1;
@@ -1715,7 +1848,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, busy, addSet, removeSet };
+    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -1741,26 +1874,34 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     }[mode];
   }
   let curtainOpen = true;
-  function setCurtain(v, quiet) {
+  function setCurtain(v, quiet, now) {
     if (v === curtainOpen) return;
     curtainOpen = v;
     $('tool-curtain').setAttribute('aria-pressed', curtainOpen); $('tool-curtain').textContent = curtainOpen ? 'Curtain open' : 'Curtain shut';
-    if (scene3d) scene3d.moveCurtain(curtainOpen);
+    if (scene3d) scene3d.moveCurtain(curtainOpen, now);
     if (!quiet) fb(curtainOpen ? 'Opening the main curtain. Store to save it in a cue' : 'Closing the main curtain. Store to save it in a cue');
     uiDirty = true;
   }
   $('tool-curtain').addEventListener('click', () => setCurtain(!curtainOpen));
   $('tool-pan').addEventListener('click', () => setTool('pan'));
   let cycIn = true;
-  function setCyc(v, quiet) {
+  function setCyc(v, quiet, now) {
     if (v === cycIn) return;
     cycIn = v;
     $('tool-cyc').setAttribute('aria-pressed', cycIn); $('tool-cyc').textContent = cycIn ? 'Cyc in' : 'Cyc out';
-    if (scene3d) scene3d.flyCyc(cycIn);
+    if (scene3d) scene3d.flyCyc(cycIn, now);
     if (!quiet) fb(cycIn ? 'Flying the cyc in. Store to save it in a cue' : 'Flying the cyc out. Store to save it in a cue');
     uiDirty = true;
   }
   $('tool-cyc').addEventListener('click', () => setCyc(!cycIn));
+  let maskOn = false;
+  $('tool-mask').addEventListener('click', () => {
+    maskOn = !maskOn;
+    $('tool-mask').setAttribute('aria-pressed', maskOn); $('tool-mask').textContent = maskOn ? 'Masking on' : 'Masking off';
+    if (scene3d) scene3d.showMasking(maskOn);
+    fb(maskOn ? 'Showing the masking, as the audience sees it' : 'Masking hidden, so you can see the bars and the fly space');
+  });
+  if (saved) { setCyc(saved.cyc !== false, true, true); setCurtain(saved.curtain !== false, true, true); }
   $('tool-move').addEventListener('click', () => setTool('move'));
   $('tool-aim').addEventListener('click', () => setTool('aim'));
   $('tool-set').addEventListener('click', () => setTool('set'));
@@ -1768,6 +1909,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function loop(now) {
     if (fade) stepFade(now);
     if (lay) stepLayout(now);
+    if (barAnim) stepBars(now);
+    if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
     if (scene3d && (dirty || fx || scene3d.busy())) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
