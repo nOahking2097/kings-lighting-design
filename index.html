@@ -307,7 +307,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           </div>
           <div class="sheet" aria-label="Fixture sheet">
             <table class="ctable">
-              <thead><tr><th>Fix</th><th>Type</th><th>Dim</th><th>Pan</th><th>Tilt</th><th>Zoom</th><th>Col</th><th>X</th></tr></thead>
+              <thead><tr><th>Fix</th><th>Type</th><th>Dim</th><th>Strb</th><th>Pan</th><th>Tilt</th><th>Zoom</th><th>Col</th><th>X</th></tr></thead>
               <tbody id="sheet-body"></tbody>
             </table>
           </div>
@@ -377,7 +377,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help">Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help">Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>101 Thru 103 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -564,9 +564,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     beam: { label: 'Moving beam', short: 'Beam', plural: 'Beams', group: 'Moving lights', zoom: [2, 8], def: 4, pen: 0.1, power: 6, r: 0.1, len: 0.32, haze: 0.16, moving: true },
     profile: { label: 'Profile (ellipsoidal)', short: 'Profile', plural: 'Profiles', group: 'Conventional', zoom: [15, 50], def: 26, pen: 0.12, power: 4.1, r: 0.11, len: 0.62, haze: 0.06 },
     fresnel: { label: 'Fresnel', short: 'Fresnel', plural: 'Fresnels', group: 'Conventional', zoom: [15, 60], def: 40, pen: 0.9, power: 3.3, r: 0.17, len: 0.34, haze: 0.04 },
-    par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 3.0, r: 0.14, len: 0.28, haze: 0.05 }
+    par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 3.0, r: 0.14, len: 0.28, haze: 0.05 },
+    strobe: { label: 'LED strobe', short: 'Strobe', plural: 'Strobes', group: 'Effects', zoom: [60, 100], def: 90, pen: 0.9, power: 8, r: 0.22, len: 0.2, haze: 0.03, box: true },
+    laser: { label: 'Laser (beam fan)', short: 'Laser', plural: 'Lasers', group: 'Effects', zoom: [0, 60], def: 30, pen: 0, power: 0, r: 0.09, len: 0.26, haze: 0.5, laser: true, moving: true }
   };
-  const MOVER = ['dim', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
+  const MOVER = ['dim', 'strobe', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
   const MAX_PER_TRUSS = 14, MAX_TOTAL = 60;
   const mk = (id, type, truss, x) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0 });
   let FIX = [], byId = {};
@@ -577,6 +579,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   X4.forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e3', x)));
   X4.forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e4', x)));
   X6.forEach((x, i) => FIX.push(mk(601 + i, 'par', 'floor', x)));
+  [-7.6, 7.6].forEach((x, i) => FIX.push(mk(305 + i, 'strobe', 'e2', x)));
+  [-3, 3].forEach((x, i) => FIX.push(mk(607 + i, 'laser', 'floor', x)));
   const BAR_FLY = 7;
   const trussY = T => T.y + (T.fly || 0) * BAR_FLY;
   const snapBars = () => Object.fromEntries(Object.entries(TRUSS).filter(([, T]) => T.elec).map(([k, T]) => [k, T.fly || 0]));
@@ -595,13 +599,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     dim: { label: 'Dim', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     pan: { label: 'Pan', min: -270, max: 270, step: 1, fmt: v => Math.round(v) + '°' },
     tilt: { label: 'Tilt', min: -135, max: 135, step: 1, fmt: v => Math.round(v) + '°' },
-    zoom: { label: 'Zoom', min: 2, max: 60, step: 0.5, fmt: v => (v < 10 ? v.toFixed(1) : Math.round(v)) + '°' },
+    strobe: { label: 'Strobe', min: 0, max: 25, step: 0.5, fmt: v => v < 0.25 ? 'Open' : v.toFixed(1) + ' Hz' },
+    zoom: { label: 'Zoom', min: 0, max: 100, step: 0.5, fmt: v => (v < 10 ? v.toFixed(1) : Math.round(v)) + '°' },
     r: { label: 'Red', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     g: { label: 'Green', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
     b: { label: 'Blue', min: 0, max: 100, step: 1, fmt: v => Math.round(v) + '%' },
-    x: { label: 'Truss X', min: -6.5, max: 6.5, step: 0.05, fmt: v => v.toFixed(2) + ' m' }
+    x: { label: 'Truss X', min: -9, max: 9, step: 0.05, fmt: v => v.toFixed(2) + ' m' }
   };
-  const PAGES = [['Dimmer', ['dim']], ['Position', ['pan', 'tilt']], ['Beam', ['zoom']], ['Color', ['r', 'g', 'b']], ['Move', ['x']]];
+  const PAGES = [['Dimmer', ['dim']], ['Position', ['pan', 'tilt']], ['Beam', ['zoom']], ['Shutter', ['strobe']], ['Color', ['r', 'g', 'b']], ['Move', ['x']]];
 
   const GELS = [
     { name: 'N/C', sub: 'Open white', hex: '#ffffff' },
@@ -725,10 +730,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   // ================= Show data =================
   function defaults(f) {
     const d = { dim: 0, r: 100, g: 100, b: 100 };
-    if (f.type !== 'cyc') Object.assign(d, { pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
+    if (f.type !== 'cyc') Object.assign(d, { strobe: 0, pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
     return d;
   }
-  const role = f => f.type === 'cyc' ? 'cyc' : (TRUSS[f.truss].floor || f.truss === 'e4') ? 'floor' : f.type;
+  const role = f => f.type === 'cyc' ? 'cyc' : (f.type === 'laser' || f.type === 'strobe') ? f.type : (TRUSS[f.truss].floor || f.truss === 'e4') ? 'floor' : f.type;
   function resolveAt(f, at, act) {
     if (typeof at === 'function') at = at(f);
     if (at === 'actors') return act ? [act[f.n % 3][0], 1.5, act[f.n % 3][1]] : liveActor(f.n);
@@ -749,6 +754,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (p.zoom != null && f.type !== 'cyc') d.zoom = clamp(p.zoom, ...TYPES[f.type].zoom);
         if (p.gel) Object.assign(d, gel(p.gel));
         if (p.k) Object.assign(d, kcol(p.k));
+        if (p.strobe != null && f.type !== 'cyc') d.strobe = p.strobe;
         if (p.at && f.type !== 'cyc') Object.assign(d, aimAt(f, f.x0, resolveAt(f, p.at, act)));
       }
       s[f.id] = d;
@@ -764,13 +770,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Sunset', 6, { spot: { dim: 60, k: 2700, zoom: 22, at: 'actors' }, wash: { dim: 50, gel: 'L147', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 80, gel: 'L106', at: 'cyc' }, cyc: { dim: 70, gel: 'L147' } }],
     ['Dusk', 5, { spot: { dim: 35, k: 3200, zoom: 22, at: 'actors' }, wash: { dim: 40, gel: 'L170', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 70, gel: 'L181', at: 'cyc' }, cyc: { dim: 60, gel: 'L170' } }],
     ['Moonlight', 4, { spot: { dim: 30, k: 6500, zoom: 16, at: 'actors' }, wash: { dim: 30, gel: 'L201', zoom: 20, at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L181', at: 'cyc' }, cyc: { dim: 45, gel: 'L181' } }],
-    ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' } }],
-    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' } }],
+    ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' }, strobe: { dim: 70, strobe: 3, gel: 'L201', at: 'cs' } }],
+    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' }, strobe: { dim: 100, strobe: 12, at: 'cs' } }],
     ['After the storm', 3, { spot: { dim: 40, k: 4300, zoom: 22, at: 'actors' }, wash: { dim: 30, gel: 'L115', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'L115', at: 'cyc' }, cyc: { dim: 50, gel: 'L115' } }],
     ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
     ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: 'actor2' }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
     ['Dream', 5, { spot: { dim: 40, gel: 'L170', zoom: 30, at: 'actors' }, wash: { dim: 50, gel: 'L128', at: 'fan' }, beam: { dim: 60, gel: 'L170', at: 'actors' }, floor: { dim: 60, gel: 'L170', at: 'cyc' }, cyc: { dim: 55, gel: 'L128' } }],
-    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 4, 3, 12] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' } }],
+    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 4, 3, 12] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' }, laser: f => ({ dim: 100, gel: f.n % 2 ? 'L128' : 'L139', zoom: 44, at: [f.x0 * 2, 4, 12] }), strobe: { dim: 80, strobe: 6, at: 'cs' } }],
     ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 3.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
   ];
   const PROFILE = {
@@ -804,7 +810,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   let curIdx = saved ? clamp(saved.cur | 0, 0, cues.length - 1) : 0;
   let pb = clone(cues[curIdx].state);
-  FIX.forEach(f => { pb[f.id] = Object.assign(defaults(f), pb[f.id] || {}); });
+  FIX.forEach(f => { pb[f.id] = Object.assign(defaults(f), pb[f.id] || {}); cues.forEach(c => { c.state[f.id] = Object.assign(defaults(f), c.state[f.id] || {}); }); });
   let saveDirty = false, lastSave = 0;
   function saveShow() {
     try {
@@ -1159,7 +1165,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const og = {};
   Object.entries(TYPES).forEach(([k, t]) => {
     if (!og[t.group]) { og[t.group] = document.createElement('optgroup'); og[t.group].label = t.group; pType.appendChild(og[t.group]); }
-    const o = document.createElement('option'); o.value = k; o.textContent = t.label + ' · ' + t.zoom[0] + '–' + t.zoom[1] + '°';
+    const o = document.createElement('option'); o.value = k; o.textContent = t.label + (t.laser ? ' · fan 0–60°' : ' · ' + t.zoom[0] + '–' + t.zoom[1] + '°');
     og[t.group].appendChild(o);
   });
   pType.value = 'beam';
@@ -1291,7 +1297,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const body = $('sheet-body'); body.innerHTML = ''; sheetRows = {};
     FIX.forEach(f => {
       const tr = document.createElement('tr');
-      tr.innerHTML = '<td></td><td></td><td data-a="dim"></td><td data-a="pan"></td><td data-a="tilt"></td><td data-a="zoom"></td><td data-a="col"></td><td data-a="x"></td>';
+      tr.innerHTML = '<td></td><td></td><td data-a="dim"></td><td data-a="strobe"></td><td data-a="pan"></td><td data-a="tilt"></td><td data-a="zoom"></td><td data-a="col"></td><td data-a="x"></td>';
       tr.cells[0].textContent = f.id; tr.cells[1].textContent = typeName(f);
       tr.addEventListener('click', e => { select([f.id], e.shiftKey || e.ctrlKey || e.metaKey ? 'toggle' : 'replace'); fb('Selected ' + (selection.length ? fmtIds(selection) : 'nothing')); });
       body.appendChild(tr); sheetRows[f.id] = tr;
@@ -1319,7 +1325,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         }
         if (!f.attrs.includes(a)) { td.textContent = '—'; td.className = 'na'; return; }
         const v = val(f.id, a);
-        td.textContent = a === 'dim' ? (v >= 99.5 ? 'FL' : Math.round(v)) : a === 'x' ? v.toFixed(1) : a === 'zoom' && v < 10 ? v.toFixed(1) : Math.round(v);
+        td.textContent = a === 'strobe' ? (v < 0.25 ? '—' : v.toFixed(0)) : a === 'dim' ? (v >= 99.5 ? 'FL' : Math.round(v)) : a === 'x' ? v.toFixed(1) : a === 'zoom' && v < 10 ? v.toFixed(1) : Math.round(v);
         td.className = inProg(f.id, a) ? 'prog' : '';
       });
     });
@@ -1673,16 +1679,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       [-1, 1].forEach(s => { const arm = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.34, 0.1), armMat); arm.position.set(s * (ty.r + 0.06), -0.17, 0); pan.add(arm); });
       const tilt = new THREE.Group(); tilt.position.y = -0.3; pan.add(tilt);
       const top = f.type === 'beam' ? ty.r * 1.3 : f.type === 'profile' ? ty.r * 1.15 : f.type === 'par' ? ty.r : ty.r * 0.9;
-      const head = new THREE.Mesh(new THREE.CylinderGeometry(top, ty.r, ty.len, 20), new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 }));
+      const headMat = new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 });
+      const head = new THREE.Mesh(ty.box || ty.laser ? new THREE.BoxGeometry(ty.box ? 0.5 : 0.2, ty.len, ty.box ? 0.22 : 0.2) : new THREE.CylinderGeometry(top, ty.r, ty.len, 20), headMat);
       tilt.add(head);
-      const lens = new THREE.Mesh(new THREE.CircleGeometry(ty.r * 0.82, 24), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      const lens = new THREE.Mesh(ty.box ? new THREE.PlaneGeometry(0.44, 0.16) : new THREE.CircleGeometry(ty.laser ? 0.03 : ty.r * 0.82, 24), new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }));
       lens.rotation.x = Math.PI / 2; lens.position.y = -ty.len / 2 - 0.002; tilt.add(lens);
       const emit = new THREE.Object3D(); emit.position.y = -ty.len / 2; tilt.add(emit);
       const aim = new THREE.Object3D(); aim.position.y = -10; tilt.add(aim);
       const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
       const cone = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
       cone.position.y = -ty.len / 2; tilt.add(cone);
-      obj[f.id] = { root, pan, tilt, cone, lens, baseMat, emit, aim, len: 18 };
+      let fan = null; const beams = [];
+      if (ty.laser) {
+        cone.visible = false;
+        fan = new THREE.Group(); fan.position.y = -ty.len / 2; tilt.add(fan);
+        const lm = new THREE.MeshBasicMaterial({ color: 0x00ff66, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false });
+        const bg = new THREE.CylinderGeometry(0.012, 0.03, 24, 6, 1, true); bg.translate(0, -12, 0);
+        for (let i = 0; i < 9; i++) { const pv = new THREE.Group(); const m = new THREE.Mesh(bg, lm); pv.add(m); fan.add(pv); beams.push(pv); }
+        fan.userData.mat = lm;
+      }
+      obj[f.id] = { root, pan, tilt, cone, lens, baseMat, emit, aim, len: 18, fan, beams };
       dirty = true;
     }
     function removeFixture(id) {
@@ -1782,6 +1798,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     new ResizeObserver(resize).observe(vp);
 
     const v3 = new THREE.Vector3(), up = new THREE.Vector3();
+    let strobing = false;
     function render(now) {
       SET.forEach(o => {
         const so = setObj[o.id]; if (!so) return;
@@ -1789,9 +1806,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const on = selSet === o.id;
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
-      const lit = [];
+      const lit = []; strobing = false;
       FIX.forEach(f => {
-        const d = outDim(f) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
+        let d = outDim(f) / 100; const r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
+        if (f.type !== 'cyc' && d > 0.002) {
+          const hz = val(f.id, 'strobe') || 0;
+          if (hz >= 0.25) {
+            // Safe preview: never more than 3 flashes a second, and no flashing at all with reduced motion.
+            if (reduceMotion) d *= 0.5;
+            else { strobing = true; const rate = Math.min(hz, 3); d *= ((now / 1000 * rate + f.n * 0.13) % 1) < 0.22 ? 1 : 0; }
+          }
+        }
         if (f.type === 'cyc') { cycMat.emissive.setRGB(r, g, b); cycMat.emissiveIntensity = 0.03 + 0.95 * d; return; }
         const o = obj[f.id]; if (!o) return;
         const ty = TYPES[f.type];
@@ -1804,10 +1829,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         o.cone.scale.set(rr, o.len, rr);
         o.cone.material.color.setRGB(r, g, b);
         o.cone.material.opacity = masters.haze / 100 * d * ty.haze;
-        o.cone.visible = o.cone.material.opacity > 0.002;
+        o.cone.visible = !ty.laser && o.cone.material.opacity > 0.002;
+        if (ty.laser) {
+          const spread = rad(zoom), n = o.beams.length;
+          o.beams.forEach((pv, i) => { pv.rotation.z = n > 1 ? -spread / 2 + spread * i / (n - 1) : 0; });
+          o.fan.rotation.y = fx ? now / 1000 * 1.4 + f.n : 0;
+          o.fan.userData.mat.color.setRGB(r, g, b);
+          o.fan.userData.mat.opacity = d * (0.18 + 0.7 * masters.haze / 100);
+          o.fan.visible = d > 0.002;
+        }
         o.lens.material.color.setRGB(0.07 + r * d, 0.07 + g * d, 0.07 + b * d);
         o.baseMat.emissive.setHex(selection.includes(f.id) ? 0x8a5410 : 0x000000);
-        if (d > 0.002) lit.push({ f, o, d, r, g, b, zoom, pri: d * ty.power * (TRUSS[f.truss].floor ? 0.3 : 1) });
+        if (d > 0.002 && ty.power > 0) lit.push({ f, o, d, r, g, b, zoom, pri: d * ty.power * (TRUSS[f.truss].floor ? 0.3 : 1) });
       });
       scene.updateMatrixWorld();
       lit.sort((a, b) => b.pri - a.pri);
@@ -1848,7 +1881,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
+    return { render, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -1911,7 +1944,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (lay) stepLayout(now);
     if (barAnim) stepBars(now);
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
-    if (scene3d && (dirty || fx || scene3d.busy())) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.isStrobing())) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
