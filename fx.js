@@ -21,7 +21,9 @@
     ['type:profile', 'Profiles'], ['type:fresnel', 'Fresnels'], ['type:par', 'LED PARs'],
     ['type:strobe', 'Strobes'], ['type:laser', 'Lasers'],
     ['truss:foh', 'FOH truss'], ['truss:e1', '1st electric'], ['truss:e2', '2nd electric'],
-    ['truss:e3', '3rd electric'], ['truss:e4', '4th electric'], ['truss:floor', 'Upstage floor']
+    ['truss:e3', '3rd electric'], ['truss:e4', '4th electric'], ['truss:e5', '5th electric'],
+    ['truss:e6', '6th electric'], ['truss:e7', '7th electric'], ['truss:e8', '8th electric'],
+    ['truss:floor', 'Upstage floor']
   ];
   const DEFAULTS = [
     { id: 'fx-chase', name: 'Dimmer chase', kind: 'dimmer', form: 'square', target: 'type:par', speed: 1, size: 100, spread: 360, dir: 'ltr', a: '#ffffff', b: '#2b5cff' },
@@ -31,7 +33,10 @@
     { id: 'fx-sweep', name: 'Beam sweep', kind: 'position', form: 'pan', target: 'type:beam', speed: 0.25, size: 35, spread: 180, dir: 'out', a: '#ffffff', b: '#2b5cff' },
     { id: 'fx-bounce', name: 'Colour bounce', kind: 'color', form: 'ab', target: 'all', speed: 0.5, size: 100, spread: 180, dir: 'ltr', a: '#ff3c9a', b: '#00a8a8' },
     { id: 'fx-sparkle', name: 'Sparkle', kind: 'dimmer', form: 'sparkle', target: 'type:par', speed: 2, size: 100, spread: 360, dir: 'random', a: '#ffffff', b: '#2b5cff' },
-    { id: 'fx-breathe', name: 'Zoom breathe', kind: 'zoom', form: 'sine', target: 'type:spot', speed: 0.3, size: 60, spread: 0, dir: 'ltr', a: '#ffffff', b: '#2b5cff' }
+    { id: 'fx-breathe', name: 'Zoom breathe', kind: 'zoom', form: 'sine', target: 'type:spot', speed: 0.3, size: 60, spread: 0, dir: 'ltr', a: '#ffffff', b: '#2b5cff' },
+    { id: 'fx-rave-colour', name: 'Rave rainbow', kind: 'color', form: 'rainbow', target: 'type:wash', speed: 0.6, size: 100, spread: 360, dir: 'out', a: '#ffffff', b: '#2b5cff' },
+    { id: 'fx-rave-tilt', name: 'Rave beam wave', kind: 'position', form: 'eight', target: 'type:beam', speed: 0.45, size: 28, spread: 360, dir: 'ltr', a: '#ffffff', b: '#2b5cff' },
+    { id: 'fx-rave-chase', name: 'Blinder chase', kind: 'dimmer', form: 'pulse', target: 'truss:e8', speed: 2.5, size: 100, spread: 360, dir: 'random', a: '#ffffff', b: '#2b5cff' }
   ];
   // Dimmer flashing is capped at 3 cycles a second so the preview never flashes faster than is safe.
   const SAFE_HZ = 3;
@@ -91,14 +96,22 @@
     const [k, v] = def.target.split(':');
     return k === 'type' ? f.type === v : f.truss === v;
   }
+  const SEEN = 'kld-fx-seen-v1';
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (Array.isArray(d) && d.every(x => x && x.id && x.kind)) return d;
+      if (Array.isArray(d) && d.every(x => x && x.id && x.kind)) {
+        // Starter effects added in a later version join a saved library once; ones you deleted stay deleted.
+        const seen = JSON.parse(localStorage.getItem(SEEN) || '["fx-chase","fx-wave","fx-rainbow","fx-circle","fx-sweep","fx-bounce","fx-sparkle","fx-breathe"]');
+        const add = DEFAULTS.filter(x => !seen.includes(x.id) && !d.some(y => y.id === x.id));
+        if (add.length) { d.push(...JSON.parse(JSON.stringify(add))); localStorage.setItem(KEY, JSON.stringify(d)); }
+        localStorage.setItem(SEEN, JSON.stringify(DEFAULTS.map(x => x.id)));
+        return d;
+      }
     } catch (e) {}
     return JSON.parse(JSON.stringify(DEFAULTS));
   }
-  function save(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+  function save(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); localStorage.setItem(SEEN, JSON.stringify(DEFAULTS.map(x => x.id))); return true; } catch (e) { return false; } }
   function targetLabel(t) { const x = TARGETS.find(y => y[0] === t); return x ? x[1] : t; }
   function formLabel(def) { const k = KINDS[def.kind]; const x = k && k.forms.find(y => y[0] === def.form); return x ? x[1] : def.form; }
 

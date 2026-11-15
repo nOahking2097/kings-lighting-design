@@ -162,7 +162,7 @@ a { color: inherit; }
 .fade-row input { width: 64px; font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 4px 6px; color-scheme: dark; }
 .go-row { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr; gap: 4px; }
 .go-row .cbtn { padding: 12px 6px; font-size: 13px; }
-.faders { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.faders { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .fader { display: grid; justify-items: center; gap: 6px; }
 .fader input { writing-mode: vertical-lr; direction: rtl; width: 24px; height: 104px; accent-color: var(--sel); margin: 0; }
 .fader .v { font: 11px var(--f-mono); color: var(--stage-fg); font-variant-numeric: tabular-nums; }
@@ -327,6 +327,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" id="tool-cyc" class="edit-tool" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
               <button type="button" id="tool-curtain" class="edit-tool" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
               <button type="button" id="tool-mask" aria-pressed="false" title="Show or hide the border and the wall above the stage">Masking off</button>
+              <button type="button" id="tool-view" title="Jump the camera to the stage, the back of the house, or straight down">View: Stage</button>
               <button type="button" id="tool-fs" title="Fill the screen with the stage (Esc to leave)">Full screen</button>
             </div>
             <div class="vp-play" role="group" aria-label="Playback"><button type="button" id="fs-back">Back</button><button type="button" class="go" id="fs-go">Go</button></div>
@@ -408,7 +409,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -585,9 +586,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const TRUSS = {
     foh: { name: 'FOH truss', y: 9.2, z: 12.5, min: -7.8, max: 7.8, base: 100 },
     e1: { name: '1st electric', y: 8.8, z: 3.3, min: -8.2, max: 8.2, base: 200, elec: true, fly: 0 },
-    e2: { name: '2nd electric', y: 8.8, z: 0.8, min: -8.2, max: 8.2, base: 300, elec: true, fly: 0 },
-    e3: { name: '3rd electric', y: 8.8, z: -1.8, min: -8.2, max: 8.2, base: 400, elec: true, fly: 0 },
-    e4: { name: '4th electric', y: 8.6, z: -5.0, min: -8.2, max: 8.2, base: 500, elec: true, fly: 0 },
+    e2: { name: '2nd electric', y: 8.8, z: 2.05, min: -8.2, max: 8.2, base: 250, elec: true, fly: 0 },
+    e3: { name: '3rd electric', y: 8.8, z: 0.8, min: -8.2, max: 8.2, base: 300, elec: true, fly: 0 },
+    e4: { name: '4th electric', y: 8.8, z: -0.5, min: -8.2, max: 8.2, base: 350, elec: true, fly: 0 },
+    e5: { name: '5th electric', y: 8.8, z: -1.8, min: -8.2, max: 8.2, base: 400, elec: true, fly: 0 },
+    e6: { name: '6th electric', y: 8.7, z: -3.4, min: -8.2, max: 8.2, base: 450, elec: true, fly: 0 },
+    e7: { name: '7th electric', y: 8.6, z: -5.0, min: -8.2, max: 8.2, base: 500, elec: true, fly: 0 },
+    e8: { name: '8th electric', y: 8.4, z: -6.7, min: -8.2, max: 8.2, base: 550, elec: true, fly: 0 },
     floor: { name: 'Upstage floor', y: 0, z: -6.9, min: -9, max: 9, base: 600, floor: true }
   };
   const TYPES = {
@@ -602,16 +607,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   };
   const MOVER = ['dim', 'strobe', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
   const MAX_PER_TRUSS = 40, MAX_TOTAL = 200;
-  const mk = (id, type, truss, x) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0 });
+  const mk = (id, type, truss, x, rave) => ({ id, type, truss, x0: x, attrs: type === 'cyc' ? ['dim', 'r', 'g', 'b'] : MOVER, n: 0, rave: !!rave });
   let FIX = [], byId = {};
   const X6 = [-6.75, -4.05, -1.35, 1.35, 4.05, 6.75], X4 = [-6, -2, 2, 6];
   X6.forEach((x, i) => FIX.push(mk(101 + i, 'spot', 'foh', x)));
   X6.forEach((x, i) => FIX.push(mk(201 + i, 'wash', 'e1', x)));
-  X4.forEach((x, i) => FIX.push(mk(301 + i, 'profile', 'e2', x)));
-  X4.forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e3', x)));
-  X4.forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e4', x)));
+  X4.forEach((x, i) => FIX.push(mk(301 + i, 'profile', 'e3', x)));
+  X4.forEach((x, i) => FIX.push(mk(401 + i, 'beam', 'e5', x)));
+  X4.forEach((x, i) => FIX.push(mk(501 + i, 'par', 'e7', x)));
   X6.forEach((x, i) => FIX.push(mk(601 + i, 'par', 'floor', x)));
-  [-7.6, 7.6].forEach((x, i) => FIX.push(mk(305 + i, 'strobe', 'e2', x)));
+  [-7.6, 7.6].forEach((x, i) => FIX.push(mk(305 + i, 'strobe', 'e3', x)));
+  // Rave rig: crossing beams, a wash and strobe bar, overhead lasers with beam pillars, and audience blinders
+  const X8 = [-7, -5, -3, -1, 1, 3, 5, 7];
+  X8.forEach((x, i) => FIX.push(mk(251 + i, 'beam', 'e2', x, true)));
+  X6.forEach((x, i) => FIX.push(mk(351 + i, 'wash', 'e4', x, true)));
+  [-7.6, -2.7, 2.7, 7.6].forEach((x, i) => FIX.push(mk(357 + i, 'strobe', 'e4', x, true)));
+  [-6, -2, 2, 6].forEach((x, i) => FIX.push(mk(451 + i, 'laser', 'e6', x, true)));
+  [-7, -4, 4, 7].forEach((x, i) => FIX.push(mk(455 + i, 'beam', 'e6', x, true)));
+  X6.forEach((x, i) => FIX.push(mk(551 + i, 'par', 'e8', x, true)));
   [-3, 3].forEach((x, i) => FIX.push(mk(607 + i, 'laser', 'floor', x)));
   const BAR_FLY = 7;
   const trussY = T => T.y + (T.fly || 0) * BAR_FLY;
@@ -718,11 +731,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     Fireside: [[-0.9, 0.3], [0.9, 0.3], [0, 1.3]],
     Solo: [[-4.5, -2.4], [0, 1.6], [4.5, -1.8]],
     Dream: [[-2, 0], [0, -1], [2, 0]],
-    Concert: [[-2, 2.2], [0, 2.6], [2, 2.2]],
+    Rave: [[-2, 2.2], [0, 2.6], [2, 2.2]],
     'Curtain call': [[-1.5, 2.6], [0, 2.8], [1.5, 2.6]]
   };
   Object.values(ACT).forEach(a => a.forEach(p => { p[0] *= 1.35; p[1] = p[1] * 1.3 - 0.4; }));
-  const CYC_OUT = new Set(['Concert']);
+  const CYC_OUT = new Set(['Rave']);
   const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot, fly: o.fly || 0 }]));
   const WINDOW_IN = new Set(['Moonlight', 'Fireside']);
   function layoutFor(act, name) {
@@ -768,7 +781,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (f.type !== 'cyc') Object.assign(d, { strobe: 0, pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
     return d;
   }
-  const role = f => f.type === 'cyc' ? 'cyc' : (f.type === 'laser' || f.type === 'strobe') ? f.type : (TRUSS[f.truss].floor || f.truss === 'e4') ? 'floor' : f.type;
+  const role = f => f.type === 'cyc' ? 'cyc' : f.rave ? 'rave-' + f.type : (f.type === 'laser' || f.type === 'strobe') ? f.type : (TRUSS[f.truss].floor || f.truss === 'e7') ? 'floor' : f.type;
   function resolveAt(f, at, act) {
     if (typeof at === 'function') at = at(f);
     if (at === 'actors') return act ? [act[f.n % 3][0], 1.5, act[f.n % 3][1]] : liveActor(f.n);
@@ -811,7 +824,20 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
     ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: 'actor2' }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
     ['Dream', 5, { spot: { dim: 40, gel: 'L170', zoom: 30, at: 'actors' }, wash: { dim: 50, gel: 'L128', at: 'fan' }, beam: { dim: 60, gel: 'L170', at: 'actors' }, floor: { dim: 60, gel: 'L170', at: 'cyc' }, cyc: { dim: 55, gel: 'L128' } }],
-    ['Concert', 1, { spot: { dim: 60, gel: 'L101', zoom: 20, at: 'actors' }, wash: f => ({ dim: 70, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }), beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 4, 3, 12] }), floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }), cyc: { dim: 60, gel: 'R80' }, laser: f => ({ dim: 100, gel: f.n % 2 ? 'L128' : 'L139', zoom: 44, at: [f.x0 * 2, 4, 12] }), strobe: { dim: 80, strobe: 6, at: 'cs' } }],
+    ['Rave', 1, {
+      spot: { dim: 35, gel: 'L128', zoom: 16, at: 'actors' },
+      wash: f => ({ dim: 60, gel: f.n % 2 ? 'L128' : 'R80', at: 'cs' }),
+      beam: f => ({ dim: 100, gel: f.n % 2 ? 'L115' : 'L128', at: [(f.n - 1.5) * 4, 3, 12] }),
+      floor: f => ({ dim: 100, gel: f.n % 2 ? 'R80' : 'L128', at: 'cyc' }),
+      cyc: { dim: 0 },
+      laser: f => ({ dim: 100, gel: f.n % 2 ? 'L128' : 'L139', zoom: 44, at: [f.x0 * 2, 4, 12] }),
+      strobe: { dim: 100, strobe: 12, at: 'cs' },
+      'rave-beam': f => f.truss === 'e2' ? { dim: 100, gel: f.n % 2 ? 'L139' : 'L170', at: [-f.x0 * 1.6, 2, 13] } : { dim: 80, gel: 'L115', at: [f.x0, 0, -3.1] },
+      'rave-wash': f => ({ dim: 90, gel: f.n % 2 ? 'L128' : 'L115', zoom: 18, at: [f.x0 * 0.7, 0, 1.5] }),
+      'rave-strobe': { dim: 100, strobe: 12, at: [0, 0, 1] },
+      'rave-laser': f => ({ dim: 100, gel: f.n % 2 ? 'L139' : 'L106', zoom: 50, at: [f.x0 * 1.5, 2, 12] }),
+      'rave-par': f => ({ dim: 75, gel: 'N/C', zoom: 40, at: [f.x0 * 1.4, 1.6, 14] })
+    }],
     ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 3.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
   ];
   const PROFILE = {
@@ -826,11 +852,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
   const FX = window.KLD_FX;
   let fxLib = FX ? FX.load() : [];
-  const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Concert: ['fx-bounce', 'fx-sweep'] };
-  cues.forEach(c => { c.fx = FX_IN[c.name] || []; });
+  const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Rave: ['fx-rave-colour', 'fx-rave-tilt', 'fx-rave-chase'] };
+  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
@@ -869,7 +895,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let fade = null;
   let fx = false;
   let encPage = 0;
-  const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35 };
+  const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35, house: cues[curIdx].house != null ? cues[curIdx].house : 0 };
+  let houseAnim = null;
   let dirty = true, uiDirty = true;
   const changed = () => { dirty = true; uiDirty = true; saveDirty = true; };
 
@@ -1047,6 +1074,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (c.cyc != null) setCyc(c.cyc, true);
     if (c.curtain != null) setCurtain(c.curtain, true);
     if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
+    if (c.house != null) { const dur = instant || c.fade <= 0 ? 0 : Math.max(c.fade, 3); if (!dur) { masters.house = c.house; houseAnim = null; syncHouse(); } else houseAnim = { from: masters.house, to: c.house, t0: performance.now(), dur: dur * 1000 }; }
     if (c.fx) { fxActive = new Set(c.fx.filter(id => fxLib.some(x => x.id === id))); buildFxPool(); }
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
@@ -1062,8 +1090,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -1080,6 +1108,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     Object.keys(barAnim.to).forEach(key => { const T = TRUSS[key]; if (T) T.fly = barAnim.from[key] + (barAnim.to[key] - barAnim.from[key]) * e; });
     if (k >= 1) barAnim = null;
     changed();
+  }
+  function syncHouse() {
+    const inp = $('fd-house'); if (!inp) return;
+    inp.value = Math.round(masters.house); inp.parentNode.querySelector('.v').textContent = Math.round(masters.house);
   }
   function deleteCue(n) {
     if (!isAdmin) return;
@@ -1333,12 +1365,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
 
   // Faders
-  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['over', 'Elecs'], ['floor', 'Floor'], ['haze', 'Haze']].forEach(([k, label]) => {
+  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['over', 'Elecs'], ['floor', 'Floor'], ['haze', 'Haze'], ['house', 'House']].forEach(([k, label]) => {
     const w = document.createElement('div'); w.className = 'fader';
     w.innerHTML = '<span class="v"></span><input type="range" min="0" max="100" step="1"><label></label>';
     const inp = w.querySelector('input'), v = w.querySelector('.v'), l = w.querySelector('label');
     inp.id = 'fd-' + k; l.htmlFor = inp.id; l.textContent = label; inp.value = masters[k]; v.textContent = masters[k];
-    inp.addEventListener('input', () => { masters[k] = +inp.value; v.textContent = inp.value; changed(); });
+    inp.addEventListener('input', () => { if (k === 'house') houseAnim = null; masters[k] = +inp.value; v.textContent = inp.value; changed(); });
     $('faders').appendChild(w);
   });
 
@@ -1653,7 +1685,52 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     }
     SET.forEach(addSet);
 
-    scene.add(new THREE.HemisphereLight(0x6070a0, 0x050505, 0.07));
+    const hemi = new THREE.HemisphereLight(0x6070a0, 0x050505, 0.07); scene.add(hemi);
+
+    // ---- Audience: raked rows of seats with people, and house lights in the ceiling ----
+    const seatSpots = [];
+    for (let row = 0; row < 12; row++) {
+      const z = 7 + row * 1.0, y = -1.1 + row * 0.24;
+      for (let x = -8.4; x <= 8.41; x += 0.6) {
+        if (Math.abs(x) < 0.5 || Math.abs(Math.abs(x) - 4.8) < 0.3) continue; // aisles
+        seatSpots.push([x, y, z]);
+      }
+    }
+    const nS = seatSpots.length;
+    const seatMat = new THREE.MeshLambertMaterial({ color: 0x4a1018, emissive: 0x2a1a10, emissiveIntensity: 0 });
+    const seatB = new THREE.InstancedMesh(new THREE.BoxGeometry(0.5, 0.42, 0.48), seatMat, nS);
+    const seatK = new THREE.InstancedMesh(new THREE.BoxGeometry(0.5, 0.6, 0.08), seatMat, nS);
+    const m4 = new THREE.Matrix4();
+    seatSpots.forEach(([x, y, z], i) => { m4.makeTranslation(x, y + 0.21, z); seatB.setMatrixAt(i, m4); m4.makeTranslation(x, y + 0.6, z + 0.24); seatK.setMatrixAt(i, m4); });
+    seatB.receiveShadow = seatK.receiveShadow = true; scene.add(seatB, seatK);
+    const people = seatSpots.filter((_, i) => ((i * 2654435761) >>> 0) % 100 < 86);
+    const bodyM = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.17, 0.22, 0.62, 10), new THREE.MeshLambertMaterial({ emissive: 0x3a2c1e, emissiveIntensity: 0 }), people.length);
+    const headM = new THREE.InstancedMesh(new THREE.SphereGeometry(0.11, 12, 8), new THREE.MeshLambertMaterial({ emissive: 0x4a3626, emissiveIntensity: 0 }), people.length);
+    const CLOTH = [0x2b3a55, 0x5a2a2a, 0x2e4a3a, 0x3a3a3e, 0x6a5a40, 0x1f1f24, 0x4a3a5a, 0x7a6a5a], SKINS = [0xc89a7c, 0x8d5a3b, 0xe0b597, 0x5c3a24, 0xb07a55];
+    const col = new THREE.Color();
+    people.forEach(([x, y, z], i) => {
+      const h = 0.92 + ((i * 7919) % 13) / 100;
+      m4.makeTranslation(x, y + 0.42 + 0.31 * h, z - 0.02); bodyM.setMatrixAt(i, m4);
+      m4.makeTranslation(x + (((i * 31) % 7) - 3) * 0.01, y + 0.42 + 0.62 * h + 0.13, z - 0.04); headM.setMatrixAt(i, m4);
+      bodyM.setColorAt(i, col.setHex(CLOTH[(i * 5) % CLOTH.length])); headM.setColorAt(i, col.setHex(SKINS[(i * 3) % SKINS.length]));
+    });
+    bodyM.receiveShadow = headM.receiveShadow = true; scene.add(bodyM, headM);
+    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x0d0c0e, roughness: 1 }));
+    ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, 13.5, 15); scene.add(ceiling);
+    const canMat = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0xffd9a8, emissiveIntensity: 0.05 });
+    const cans = new THREE.InstancedMesh(new THREE.CircleGeometry(0.22, 16), canMat, 24);
+    let ci = 0; const rot = new THREE.Matrix4().makeRotationX(Math.PI / 2);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) { m4.makeTranslation(-8.75 + c * 3.5, 13.45, 7 + r * 4).multiply(rot); cans.setMatrixAt(ci++, m4); }
+    scene.add(cans);
+    // House light is drawn as a warm glow on the audience and ceiling rather than extra real lights, which keeps the stage fast.
+    const houseMats = [seatMat, bodyM.material, headM.material];
+    function applyHouse() {
+      const h = masters.house / 100;
+      houseMats.forEach(m => { m.emissiveIntensity = 0.9 * h; });
+      house.material.color.setHex(0x1a1214); house.material.emissive.setHex(0x24140f); house.material.emissiveIntensity = 0.55 * h;
+      canMat.emissiveIntensity = 0.05 + 1.6 * h;
+      hemi.intensity = 0.07 + 0.1 * h;
+    }
 
     const pipeMat = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: 0.6, roughness: 0.4 });
     const bars = {};
@@ -1854,6 +1931,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       lookAt.y = LOOKY - (1 - Math.min(zoomF, 1)) * 3.6 + panY;
       dirty = true;
     }, { passive: false });
+    const VIEWS = { Stage: [0.15, 0.16, 1, 0, LOOKY, -1.2], House: [0.0, 0.3, 1.4, 0, 3.0, 2.5], Top: [0.0, 1.3, 1.3, 0, 0, 3] };
+    function setView(name) {
+      const v = VIEWS[name]; if (!v) return;
+      [az, el, zoomF] = v; dist = baseDist * zoomF; panY = 0; lookAt.set(v[3], v[4], v[5]); dirty = true;
+    }
     vp.addEventListener('dblclick', e => {
       if (e.target.closest('.vp-tools') || (toolMode !== 'move' && toolMode !== 'pan')) return;
       zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, LOOKY, -1.2); az = 0.15; el = 0.16; dirty = true;
@@ -1878,6 +1960,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
       const lit = []; strobing = false;
+      applyHouse();
       const fxOut = {}, tSec = reduceMotion ? 0.35 : now / 1000;
       fxLib.forEach(def => {
         if (!fxActive.has(def.id)) return;
@@ -1963,7 +2046,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
+    return { render, setView, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -2079,6 +2162,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     fsLabel();
   }
   $('tool-fs').addEventListener('click', toggleFull);
+  const VIEW_ORDER = ['Stage', 'House', 'Top']; let viewI = 0;
+  $('tool-view').addEventListener('click', () => {
+    viewI = (viewI + 1) % VIEW_ORDER.length;
+    if (scene3d) scene3d.setView(VIEW_ORDER[viewI]);
+    $('tool-view').textContent = 'View: ' + VIEW_ORDER[viewI];
+  });
   document.addEventListener('fullscreenchange', fsLabel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && vp.classList.contains('vp-max')) { vp.classList.remove('vp-max'); document.body.style.overflow = ''; fsLabel(); } });
   $('fs-go').addEventListener('click', go);
@@ -2088,6 +2177,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (fade) stepFade(now);
     if (lay) stepLayout(now);
     if (barAnim) stepBars(now);
+    if (houseAnim) {
+      const k = Math.min(1, (now - houseAnim.t0) / houseAnim.dur);
+      masters.house = houseAnim.from + (houseAnim.to - houseAnim.from) * k;
+      if (k >= 1) houseAnim = null;
+      syncHouse(); changed();
+    }
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
     if (scene3d && (dirty || fx || scene3d.busy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
