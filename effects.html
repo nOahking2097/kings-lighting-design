@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Light Effects · Kings Lighting Design</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the same dark stage band as the console, holding a live preview rig; the effect designer and library sit beneath on the page ground. */
+:root {
+  --bg: #EDEFF2; --fg: #14171C; --muted: #586070; --line: #CDD2DA; --surface: #E2E5EA;
+  --accent: #B8681A; --accent-ink: #FFFFFF; --err: #B4352A;
+  --stage: #0A0C10; --stage-fg: #E9EBEF; --stage-muted: #8A91A0; --stage-line: #242833;
+  --f-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0F1116; --fg: #E6E8EC; --muted: #8E95A3; --line: #262A33; --surface: #171A21; --accent: #F0A24A; --accent-ink: #14171C; --err: #FF8A7A; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0F1116; --fg: #E6E8EC; --muted: #8E95A3; --line: #262A33; --surface: #171A21; --accent: #F0A24A; --accent-ink: #14171C; --err: #FF8A7A; color-scheme: dark; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 16px; line-height: 1.6; }
+h1, h2, h3 { font-family: var(--f-display); letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.top { background: var(--stage); color: var(--stage-fg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; }
+.nav { display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; }
+.nav a { text-decoration: none; color: var(--stage-muted); }
+.nav a:hover, .nav a[aria-current="page"] { color: var(--stage-fg); }
+
+.stage { background: var(--stage); color: var(--stage-fg); padding-bottom: 40px; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: end; padding-block: 36px 24px; }
+.hero h1 { font-size: clamp(2.3rem, 5.5vw, 4.2rem); line-height: .98; font-weight: 800; }
+.hero p { color: var(--stage-muted); max-width: 48ch; font-size: 17px; }
+.preview { position: relative; border: 1px solid var(--stage-line); border-radius: 6px; overflow: hidden; background: #050608; }
+.preview canvas { display: block; width: 100%; height: clamp(260px, 42vh, 420px); }
+.pv-bar { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font: 12px var(--f-mono); color: var(--stage-muted); pointer-events: none; }
+.pv-bar b { color: var(--stage-fg); font-weight: 500; }
+
+section.band { padding-block: 56px; border-bottom: 1px solid var(--line); }
+.grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.05; font-weight: 800; margin-top: 6px; }
+.lede { color: var(--muted); margin-top: 10px; max-width: 58ch; }
+
+.auth { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); margin-bottom: 20px; }
+.auth b { font: 500 12px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.auth input { flex: 1 1 170px; max-width: 240px; }
+.auth .msg { font-size: 13px; color: var(--muted); flex-basis: 100%; }
+.auth .msg.err { color: var(--err); }
+
+form.designer { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label, .field .lbl { font-size: 13px; font-weight: 500; display: flex; justify-content: space-between; gap: 8px; }
+.field output { font: 12.5px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+input[type="text"], input[type="email"], input[type="password"], select { font: inherit; font-size: 15px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 9px 11px; width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+input[type="color"] { width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); padding: 3px; }
+.btns { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { font: 600 14px var(--f-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 4px; padding: 10px 16px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.warn { background: transparent; color: var(--err); border: 1px solid var(--line); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.status { font-size: 13px; color: var(--muted); }
+.status.err { color: var(--err); }
+.locked .lock-me { opacity: .45; }
+
+.lib { display: grid; gap: 8px; }
+.fx-row { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+.fx-row:hover { border-color: var(--muted); }
+.fx-row[aria-current="true"] { border-color: var(--accent); box-shadow: inset 3px 0 var(--accent); }
+.fx-row canvas { width: 120px; height: 36px; border-radius: 3px; background: #050608; display: block; }
+.fx-row b { display: block; font-weight: 600; }
+.fx-row small { color: var(--muted); font-size: 13px; }
+.fx-row .mono { font: 12px var(--f-mono); color: var(--muted); white-space: nowrap; }
+
+.terms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-top: 28px; }
+.terms dt { font: 500 12px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.terms dd { margin: 0; color: var(--muted); font-size: 15px; }
+.howto { margin-top: 28px; padding: 18px; border: 1px solid var(--line); border-radius: 6px; display: grid; gap: 6px; }
+.howto ol { margin: 0; padding-left: 20px; color: var(--muted); display: grid; gap: 4px; }
+footer { padding-block: 28px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 860px) {
+  .hero, .grid { grid-template-columns: 1fr; gap: 20px; }
+  .terms { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  form.designer { grid-template-columns: 1fr; }
+  .terms { grid-template-columns: 1fr; }
+  .fx-row { grid-template-columns: 90px minmax(0, 1fr); }
+  .fx-row canvas { width: 90px; }
+  .fx-row .mono { grid-column: 1 / -1; }
+  .nav { gap: 14px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./">Kings Lighting Design</a>
+    <nav class="nav" aria-label="Site">
+      <a href="./#top">Console</a>
+      <a href="effects.html" aria-current="page">Effects</a>
+      <a href="./#services">Services</a>
+      <a href="./#brief">Book us</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="stage">
+    <div class="wrap">
+      <div class="hero">
+        <h1>Light effects</h1>
+        <p>Build moving looks for the rig: chases, waves, rainbows, colour bounces, ballyhoo circles and beam sweeps. Each effect saves to your library and shows up in the console's <b>Effects</b> pool, ready to run on the 3D stage and store in a cue.</p>
+      </div>
+      <div class="preview">
+        <canvas id="pv" aria-label="Live preview of the effect on a row of twelve lights"></canvas>
+        <div class="pv-bar"><span>Preview · <b id="pv-name">Dimmer chase</b></span><span id="pv-meta"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap grid">
+      <div id="designer-wrap" class="locked">
+        <p class="eyebrow">Designer</p>
+        <h2>Shape an effect</h2>
+        <p class="lede">Pick what the effect changes, the lights it runs on, and how fast and how far it travels across the rig. The preview updates as you go.</p>
+        <form class="auth" id="auth" novalidate style="margin-top:20px">
+          <b id="auth-h">Viewing only</b>
+          <span id="auth-fields" style="display:contents">
+            <label class="sr-only" for="a-email">Admin email</label><input id="a-email" type="email" autocomplete="username" placeholder="Admin email">
+            <label class="sr-only" for="a-pass">Password</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="Password">
+            <button type="submit" class="btn ghost">Admin sign in</button>
+          </span>
+          <button type="button" class="btn ghost" id="a-out" hidden>Lock</button>
+          <span class="msg" id="a-msg" role="status">Anyone can try effects in the preview. Sign in to save them to the library.</span>
+        </form>
+        <form class="designer" id="designer" novalidate>
+          <div class="field full"><label for="f-name">Name</label><input type="text" id="f-name" maxlength="28"></div>
+          <div class="field"><label for="f-kind">Changes</label><select id="f-kind"></select></div>
+          <div class="field"><label for="f-form">Pattern</label><select id="f-form"></select></div>
+          <div class="field"><label for="f-target">Runs on</label><select id="f-target"></select></div>
+          <div class="field"><label for="f-dir">Direction</label><select id="f-dir"></select></div>
+          <div class="field"><label for="f-speed">Speed <output id="o-speed"></output></label><input type="range" id="f-speed" min="0.05" max="3" step="0.05"></div>
+          <div class="field"><label for="f-size"><span id="l-size">Level</span> <output id="o-size"></output></label><input type="range" id="f-size" min="0" max="100" step="1"></div>
+          <div class="field full"><label for="f-spread">Phase spread <output id="o-spread"></output></label><input type="range" id="f-spread" min="0" max="360" step="15"></div>
+          <div class="field" id="c-a"><label for="f-a">Colour A</label><input type="color" id="f-a"></div>
+          <div class="field" id="c-b"><label for="f-b">Colour B</label><input type="color" id="f-b"></div>
+          <div class="btns">
+            <button type="submit" class="btn lock-me" id="b-save">Save effect</button>
+            <button type="button" class="btn ghost lock-me" id="b-new">Save as new</button>
+            <button type="button" class="btn warn lock-me" id="b-del">Delete</button>
+            <span class="status" id="status" role="status"></span>
+          </div>
+        </form>
+      </div>
+      <div>
+        <p class="eyebrow">Library</p>
+        <h2>Your effects</h2>
+        <p class="lede">Click an effect to load it into the designer. Every effect here appears in the console's Effects pool on this browser.</p>
+        <div class="lib" id="lib" style="margin-top:20px"></div>
+        <div class="btns" style="margin-top:12px">
+          <button type="button" class="btn ghost lock-me" id="b-reset">Restore the starter effects</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow">How effects work</p>
+      <h2>Four controls shape every effect</h2>
+      <dl class="terms">
+        <div><dt>Speed</dt><dd>How many times a second the pattern repeats. 1.0 is one cycle a second, or 60 BPM. Flashing patterns are capped at 3 a second in the preview, for safety.</dd></div>
+        <div><dt>Level / size</dt><dd>How far the effect pushes each light: brightness for dimmer effects, degrees of travel for movement, colour strength for colour, and beam change for zoom.</dd></div>
+        <div><dt>Phase spread</dt><dd>How far apart the lights are in the pattern. At 0° every light moves together; at 360° the pattern travels once across the whole group, like a wave.</dd></div>
+        <div><dt>Direction</dt><dd>The order the pattern travels: left to right, right to left, from the centre out, from the outside in, or a random order.</dd></div>
+      </dl>
+      <div class="howto">
+        <b>Running an effect on the stage</b>
+        <ol>
+          <li>Save the effect here (signed in as admin).</li>
+          <li>Open the <a href="./#top">console</a>, sign in, and click the effect in the <b>Effects</b> pool to start or stop it.</li>
+          <li>Press <b>Store</b> to save the running effects with the cue. Going to that cue starts them again.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap">Kings Lighting Design · Egg Harbor Township, New Jersey</div></footer>
+
+<script src="fx.js"></script>
+<script>
+(function () {
+  const FX = window.KLD_FX;
+  const $ = id => document.getElementById(id);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lib = FX.load();
+  let cur = clone(lib[0] || FX.DEFAULTS[0]);
+  let isAdmin = false;
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  // ---- form ----
+  Object.entries(FX.KINDS).forEach(([k, v]) => $('f-kind').add(new Option(v.label, k)));
+  FX.TARGETS.forEach(([k, v]) => $('f-target').add(new Option(v, k)));
+  FX.DIRS.forEach(([k, v]) => $('f-dir').add(new Option(v, k)));
+  function fillForms() {
+    const sel = $('f-form'); sel.innerHTML = '';
+    FX.KINDS[cur.kind].forms.forEach(([k, v]) => sel.add(new Option(v, k)));
+    if (!FX.KINDS[cur.kind].forms.some(f => f[0] === cur.form)) cur.form = FX.KINDS[cur.kind].forms[0][0];
+    sel.value = cur.form;
+  }
+  function toForm() {
+    $('f-name').value = cur.name; $('f-kind').value = cur.kind; fillForms();
+    $('f-target').value = cur.target; $('f-dir').value = cur.dir;
+    $('f-speed').value = cur.speed; $('f-size').value = cur.size; $('f-spread').value = cur.spread;
+    $('f-a').value = cur.a || '#ffffff'; $('f-b').value = cur.b || '#2b5cff';
+    labels();
+  }
+  function labels() {
+    const K = FX.KINDS[cur.kind];
+    $('f-size').max = K.sizeMax; if (+cur.size > K.sizeMax) { cur.size = K.sizeMax; $('f-size').value = K.sizeMax; }
+    $('l-size').textContent = K.sizeLabel;
+    $('o-size').textContent = Math.round(cur.size) + K.sizeUnit;
+    const flashy = cur.kind === 'dimmer' && cur.form !== 'sine' && cur.speed > FX.SAFE_HZ;
+    $('o-speed').textContent = (+cur.speed).toFixed(2) + ' / s · ' + Math.round(cur.speed * 60) + ' BPM' + (flashy ? ' (preview capped at 3)' : '');
+    $('o-spread').textContent = cur.spread + '°';
+    const ab = cur.kind === 'color' && cur.form === 'ab';
+    $('c-a').hidden = !ab; $('c-b').hidden = !ab;
+    $('pv-name').textContent = cur.name || 'Untitled effect';
+    $('pv-meta').textContent = FX.formLabel(cur) + ' · ' + FX.targetLabel(cur.target);
+  }
+  function fromForm() {
+    cur.name = $('f-name').value.trim() || 'Untitled effect';
+    if (cur.kind !== $('f-kind').value) { cur.kind = $('f-kind').value; fillForms(); }
+    cur.form = $('f-form').value; cur.target = $('f-target').value; cur.dir = $('f-dir').value;
+    cur.speed = +$('f-speed').value; cur.size = +$('f-size').value; cur.spread = +$('f-spread').value;
+    cur.a = $('f-a').value; cur.b = $('f-b').value;
+    labels(); renderLib();
+  }
+  function kick() { if (reduce) requestAnimationFrame(frame); }
+  $('designer').addEventListener('input', () => { fromForm(); kick(); });
+  $('designer').addEventListener('change', () => { fromForm(); kick(); });
+
+  function status(msg, err) { const s = $('status'); s.textContent = msg; s.classList.toggle('err', !!err); }
+  function needAdmin() { if (!isAdmin) { status('Sign in as admin to change the library.', true); return false; } return true; }
+  $('designer').addEventListener('submit', e => {
+    e.preventDefault(); if (!needAdmin()) return;
+    const i = lib.findIndex(x => x.id === cur.id);
+    if (i >= 0) lib[i] = clone(cur); else lib.push(clone(cur));
+    status(FX.save(lib) ? 'Saved “' + cur.name + '”. It is in the console’s Effects pool.' : 'This browser would not save. Check that site data is allowed.', false);
+    renderLib();
+  });
+  $('b-new').addEventListener('click', () => {
+    if (!needAdmin()) return;
+    cur = clone(cur); cur.id = 'fx-' + Date.now().toString(36);
+    if (lib.some(x => x.name === cur.name)) cur.name = (cur.name + ' 2').slice(0, 28);
+    $('f-name').value = cur.name;
+    lib.push(clone(cur)); FX.save(lib); renderLib(); status('Saved as a new effect, “' + cur.name + '”.');
+  });
+  let delArm = null;
+  $('b-del').addEventListener('click', () => {
+    if (!needAdmin()) return;
+    if (!lib.some(x => x.id === cur.id)) { status('This effect is not in the library yet.', true); return; }
+    if (!delArm) { $('b-del').textContent = 'Click again to delete'; delArm = setTimeout(() => { delArm = null; $('b-del').textContent = 'Delete'; }, 3500); return; }
+    clearTimeout(delArm); delArm = null; $('b-del').textContent = 'Delete';
+    const name = cur.name; lib = lib.filter(x => x.id !== cur.id); FX.save(lib);
+    cur = clone(lib[0] || FX.DEFAULTS[0]); toForm(); renderLib(); status('Deleted “' + name + '”.');
+  });
+  let resetArm = null;
+  $('b-reset').addEventListener('click', () => {
+    if (!needAdmin()) return;
+    if (!resetArm) { $('b-reset').textContent = 'Click again: this replaces your library'; resetArm = setTimeout(() => { resetArm = null; $('b-reset').textContent = 'Restore the starter effects'; }, 3500); return; }
+    clearTimeout(resetArm); resetArm = null; $('b-reset').textContent = 'Restore the starter effects';
+    lib = clone(FX.DEFAULTS); FX.save(lib); cur = clone(lib[0]); toForm(); renderLib(); status('The starter effects are back.');
+  });
+
+  // ---- admin ----
+  function applyLock() {
+    $('designer-wrap').classList.toggle('locked', !isAdmin);
+    document.querySelectorAll('.lock-me').forEach(b => { b.disabled = !isAdmin; });
+    $('auth-fields').style.display = isAdmin ? 'none' : 'contents';
+    $('a-out').hidden = !isAdmin; $('auth-h').textContent = isAdmin ? 'Admin' : 'Viewing only';
+  }
+  $('auth').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('a-msg');
+    if (!window.crypto || !crypto.subtle) { msg.textContent = 'This browser cannot check the password here. Open the site over https.'; msg.classList.add('err'); return; }
+    if ((await FX.digest($('a-email').value, $('a-pass').value)) === FX.ADMIN_HASH) {
+      isAdmin = true; $('a-pass').value = ''; try { localStorage.setItem(FX.ADMIN_KEY, FX.ADMIN_HASH); } catch (err) {}
+      msg.textContent = 'Signed in on this device.'; msg.classList.remove('err'); applyLock();
+    } else { msg.textContent = 'That email and password do not match. Check both and try again.'; msg.classList.add('err'); }
+  });
+  $('a-out').addEventListener('click', () => { isAdmin = false; try { localStorage.removeItem(FX.ADMIN_KEY); } catch (err) {} $('a-msg').textContent = 'Locked.'; applyLock(); });
+  try { if (localStorage.getItem(FX.ADMIN_KEY) === FX.ADMIN_HASH) { isAdmin = true; $('a-msg').textContent = 'Signed in on this device.'; } } catch (err) {}
+  applyLock();
+
+  // ---- library ----
+  const minis = [];
+  function renderLib() {
+    const box = $('lib'); box.innerHTML = ''; minis.length = 0;
+    lib.forEach(def => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'fx-row';
+      b.setAttribute('aria-current', def.id === cur.id);
+      const cv = document.createElement('canvas'); cv.width = 240; cv.height = 72; cv.setAttribute('aria-hidden', 'true');
+      const txt = document.createElement('span'); txt.innerHTML = '<b></b><small></small>';
+      txt.firstChild.textContent = def.name; txt.lastChild.textContent = FX.formLabel(def) + ' · ' + FX.targetLabel(def.target);
+      const m = document.createElement('span'); m.className = 'mono'; m.textContent = (+def.speed).toFixed(2) + '/s · ' + def.spread + '°';
+      b.append(cv, txt, m);
+      b.addEventListener('click', () => { cur = clone(def); toForm(); renderLib(); status(''); kick(); });
+      box.appendChild(b); minis.push({ cv, def: def.id === cur.id ? cur : def });
+    });
+  }
+
+  // ---- preview: a truss of twelve lights over a stage floor ----
+  const pv = $('pv'), N = 12;
+  function lightState(def, i, n, t) {
+    const s = { dim: 70, r: 1, g: 1, b: 1, pan: 0, tilt: 0, zoom: 0.35 };
+    if (def.kind === 'color' || def.kind === 'position' || def.kind === 'zoom') s.dim = 85;
+    const o = FX.evalFx(def, i, n, t);
+    if (o.dim != null) s.dim = o.dim;
+    if (o.r != null) { s.r = o.r; s.g = o.g; s.b = o.b; }
+    if (o.pan != null) { s.pan = o.pan; s.tilt = o.tilt; }
+    if (o.zoomT != null) s.zoom = 0.15 + 0.6 * o.zoomT;
+    if (def.kind === 'dimmer' && def.form === 'sparkle') { s.r = 1; s.g = 0.97; s.b = 0.9; }
+    return s;
+  }
+  function drawRig(ctx, W, H, def, t, mini) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#050608'; ctx.fillRect(0, 0, W, H);
+    const floorY = H * (mini ? 0.92 : 0.86), trussY = H * (mini ? 0.12 : 0.13);
+    if (!mini) {
+      ctx.fillStyle = '#0c0d10'; ctx.fillRect(0, floorY, W, H - floorY);
+      ctx.strokeStyle = '#2a2c30'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(W * 0.04, trussY - 8); ctx.lineTo(W * 0.96, trussY - 8); ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < N; i++) {
+      const s = lightState(def, i, N, t);
+      const x = W * (0.08 + 0.84 * i / (N - 1));
+      const lvl = Math.max(0, Math.min(1, s.dim / 100));
+      const col = `${Math.round(s.r * 255)},${Math.round(s.g * 255)},${Math.round(s.b * 255)}`;
+      const len = floorY - trussY;
+      const fx = x + Math.tan(s.pan * Math.PI / 180) * len;
+      const ly = floorY - Math.max(0, Math.sin(s.tilt * Math.PI / 180)) * len * 0.5;
+      const half = (mini ? 0.18 : 0.28) * len * s.zoom;
+      if (lvl > 0.01) {
+        const g = ctx.createLinearGradient(x, trussY, fx, ly);
+        g.addColorStop(0, `rgba(${col},${0.55 * lvl})`); g.addColorStop(1, `rgba(${col},${0.08 * lvl})`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x - 2, trussY); ctx.lineTo(x + 2, trussY); ctx.lineTo(fx + half, ly); ctx.lineTo(fx - half, ly); ctx.fill();
+        if (!mini) {
+          const pg = ctx.createRadialGradient(fx, ly, 0, fx, ly, half * 1.4);
+          pg.addColorStop(0, `rgba(${col},${0.5 * lvl})`); pg.addColorStop(1, `rgba(${col},0)`);
+          ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(fx, ly, half * 1.4, half * 0.35, 0, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = '#1b1d22'; ctx.fillRect(x - (mini ? 3 : 7), trussY - (mini ? 4 : 10), mini ? 6 : 14, mini ? 6 : 14);
+      ctx.fillStyle = `rgba(${col},${0.15 + 0.85 * lvl})`; ctx.beginPath(); ctx.arc(x, trussY + (mini ? 2 : 4), mini ? 2 : 4, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'lighter';
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  function size() {
+    const r = pv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+    pv.width = Math.round(r.width * d); pv.height = Math.round(r.height * d);
+  }
+  new ResizeObserver(size).observe(pv); size();
+  const t0 = performance.now();
+  function frame(now) {
+    const t = reduce ? 0.35 : (now - t0) / 1000;
+    drawRig(pv.getContext('2d'), pv.width, pv.height, cur, t, false);
+    minis.forEach(m => drawRig(m.cv.getContext('2d'), m.cv.width, m.cv.height, m.def, t, true));
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  toForm(); renderLib(); requestAnimationFrame(frame);
+  if (reduce) { $('pv-meta').textContent += ' · animation paused (reduced motion)'; }
+  window.addEventListener('storage', e => { if (e.key === FX.KEY) { lib = FX.load(); renderLib(); } });
+})();
+</script>
+</body>
+</html>

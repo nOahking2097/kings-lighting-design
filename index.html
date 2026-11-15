@@ -130,6 +130,8 @@ a { color: inherit; }
 .c-sec:last-child { border-right: 0; }
 .c-h { font: 500 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--stage-muted); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .c-h span { letter-spacing: .02em; text-transform: none; }
+.c-link { color: var(--sel); text-transform: none; letter-spacing: .02em; }
+.tile.fx-on { border-color: var(--sel); color: var(--sel); background: rgba(240, 162, 74, .1); }
 .pool { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .tile { font: 500 11px var(--f-mono); color: var(--stage-fg); background: var(--c-tile); border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px; min-height: 46px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; line-height: 1.2; overflow: hidden; }
 .tile small { color: var(--stage-muted); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -286,6 +288,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <div class="wrap">
     <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kings Lighting Design</a>
     <nav class="nav" aria-label="Sections">
+      <a href="effects.html">Effects</a>
       <a href="#services">Services</a>
       <a href="#work">Productions</a>
       <a href="#process">Process</a>
@@ -373,6 +376,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="pool" id="pool-pos"></div>
             <div class="c-h">Color presets</div>
             <div class="pool" id="pool-color"></div>
+            <div class="c-h">Effects <a href="effects.html" class="c-link">Edit effects</a></div>
+            <div class="pool" id="pool-fx"></div>
           </div>
           <div class="c-sec edit">
             <div class="c-h">Programmer <span id="sel-info">No selection</span></div>
@@ -558,6 +563,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="fx.js"></script>
 <script>
 (function () {
   const $ = id => document.getElementById(id);
@@ -818,9 +824,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const act = ACT[name] || ACT.Preset;
     return { num: i + 1, name, fade: fadeT, state: look(spec, act), cyc: !CYC_OUT.has(name), curtain: true, bars: snapBars(), layout: layoutFor(act, name) };
   });
+  const FX = window.KLD_FX;
+  let fxLib = FX ? FX.load() : [];
+  const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Concert: ['fx-bounce', 'fx-sweep'] };
+  cues.forEach(c => { c.fx = FX_IN[c.name] || []; });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
@@ -843,6 +853,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const saved = loadShow();
 
   let curIdx = saved ? clamp(saved.cur | 0, 0, cues.length - 1) : 0;
+  let fxActive = new Set(cues[curIdx].fx || []);
   let pb = clone(cues[curIdx].state);
   FIX.forEach(f => { pb[f.id] = Object.assign(defaults(f), pb[f.id] || {}); cues.forEach(c => { c.state[f.id] = Object.assign(defaults(f), c.state[f.id] || {}); }); });
   let saveDirty = false, lastSave = 0;
@@ -864,8 +875,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   const val = (id, a) => { const p = programmer[id]; return (p && a in p) ? p[a] : pb[id][a]; };
   const inProg = (id, a) => !!(programmer[id] && a in programmer[id]);
-  function outDim(f) {
-    const d = inProg(f.id, 'dim') ? programmer[f.id].dim : pb[f.id].dim * masters.seq / 100;
+  function outDim(f, over) {
+    const d = over != null ? over : inProg(f.id, 'dim') ? programmer[f.id].dim : pb[f.id].dim * masters.seq / 100;
     const gm = f.truss === 'foh' ? masters.foh : (TRUSS[f.truss] && TRUSS[f.truss].elec) ? masters.over : masters.floor;
     return d * gm / 100 * masters.gm / 100;
   }
@@ -1036,6 +1047,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (c.cyc != null) setCyc(c.cyc, true);
     if (c.curtain != null) setCurtain(c.curtain, true);
     if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
+    if (c.fx) { fxActive = new Set(c.fx.filter(id => fxLib.some(x => x.id === id))); buildFxPool(); }
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
     changed();
@@ -1050,8 +1062,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -1182,6 +1194,25 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     return b;
   }
   let groupTiles = [];
+  let fxReady = false;
+  function buildFxPool() {
+    const box = $('pool-fx'); if (!box) return;
+    box.innerHTML = '';
+    if (!fxLib.length) { const p = document.createElement('small'); p.textContent = 'No effects yet. Make some on the Effects page.'; p.style.color = 'var(--stage-muted)'; box.appendChild(p); return; }
+    fxLib.forEach(def => {
+      const b = tile(def.name, FX.targetLabel(def.target));
+      b.classList.toggle('fx-on', fxActive.has(def.id)); b.setAttribute('aria-pressed', fxActive.has(def.id));
+      b.addEventListener('click', () => {
+        if (!isAdmin) { fb('Sign in as admin to run effects', true); return; }
+        if (fxActive.has(def.id)) { fxActive.delete(def.id); fb(def.name + ' stopped'); }
+        else { fxActive.add(def.id); fb(def.name + ' running on ' + FX.targetLabel(def.target).toLowerCase() + '. Store to keep it in a cue'); }
+        buildFxPool(); changed();
+      });
+      box.appendChild(b);
+    });
+    if (fxReady) applyLock();
+  }
+  window.addEventListener('storage', e => { if (FX && e.key === FX.KEY) { fxLib = FX.load(); fxActive.forEach(id => { if (!fxLib.some(x => x.id === id)) fxActive.delete(id); }); buildFxPool(); changed(); } });
   function buildGroupPool() {
     GROUPS = buildGroups();
     $('pool-groups').innerHTML = '';
@@ -1847,8 +1878,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
       const lit = []; strobing = false;
+      const fxOut = {}, tSec = reduceMotion ? 0.35 : now / 1000;
+      fxLib.forEach(def => {
+        if (!fxActive.has(def.id)) return;
+        const tg = FIX.filter(f => FX.matches(def, f) && (f.type !== 'cyc' || def.kind === 'dimmer' || def.kind === 'color'))
+          .sort((a, b) => (a.type === 'cyc' ? 0 : val(a.id, 'x')) - (b.type === 'cyc' ? 0 : val(b.id, 'x')) || a.id - b.id);
+        tg.forEach((f, i) => { fxOut[f.id] = Object.assign(fxOut[f.id] || {}, FX.evalFx(def, i, tg.length, tSec)); });
+      });
       FIX.forEach(f => {
-        let d = outDim(f) / 100; const r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
+        const fo = fxOut[f.id] || {};
+        let d = outDim(f, fo.dim) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
+        if (fo.r != null) { r = fo.r; g = fo.g; b = fo.b; }
         if (f.type !== 'cyc' && d > 0.002) {
           const hz = val(f.id, 'strobe') || 0;
           if (hz >= 0.25) {
@@ -1862,9 +1902,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const ty = TYPES[f.type];
         let pan = val(f.id, 'pan'), tilt = val(f.id, 'tilt');
         if (fx && ty.moving) { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
+        if (fo.pan != null) { pan += fo.pan; tilt += fo.tilt; }
         o.root.position.x = val(f.id, 'x'); o.root.position.y = trussY(TRUSS[f.truss]);
         o.pan.rotation.y = rad(pan); o.tilt.rotation.x = rad(tilt);
-        const zoom = val(f.id, 'zoom');
+        let zoom = val(f.id, 'zoom');
+        if (fo.zoomT != null) { const hi = ty.zoom[1]; zoom = zoom + (hi - zoom) * fo.zoomT; }
         const rr = Math.tan(rad(zoom / 2)) * o.len;
         o.cone.scale.set(rr, o.len, rr);
         o.cone.material.color.setRGB(r, g, b);
@@ -2020,6 +2062,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
   try { if (localStorage.getItem(ADMIN_KEY) === ADMIN_HASH) { isAdmin = true; $('a-msg').textContent = 'Signed in on this device.'; } } catch (err) {}
   applyLock();
+  fxReady = true; buildFxPool();
 
   // ---- Full screen (falls back to filling the browser window where full screen is not allowed) ----
   function isFull() { return document.fullscreenElement === vp || vp.classList.contains('vp-max'); }
@@ -2046,7 +2089,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (lay) stepLayout(now);
     if (barAnim) stepBars(now);
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
-    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.isStrobing())) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
