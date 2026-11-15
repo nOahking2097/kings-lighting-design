@@ -93,6 +93,14 @@ a { color: inherit; }
 .sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: clamp(560px, 80vh, 960px); }
 .viewport:fullscreen { min-height: 0; width: 100%; height: 100%; }
 .viewport.vp-max { position: fixed; inset: 0; z-index: 60; min-height: 0; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.pip { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: min(440px, calc(100vw - 24px)); z-index: 40; background: #050608; border: 1px solid #2E3340; border-radius: 6px; overflow: hidden; box-shadow: 0 12px 32px rgba(0, 0, 0, .45); }
+.pip-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 8px; background: #0D1016; border-bottom: 1px solid #242833; }
+.pip-cue { font: 12px var(--f-mono); color: #E9EBEF; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pip-btns { display: flex; gap: 4px; flex: none; }
+.pip-btns button { font: 500 12px var(--f-mono); color: #E9EBEF; background: #161A22; border: 1px solid #262B36; border-radius: 3px; padding: 4px 9px; cursor: pointer; }
+.pip-btns .go { background: #1E7A49; border-color: #2EA061; color: #FFFFFF; }
+.pip-stage { position: relative; aspect-ratio: 16 / 10; max-width: 100%; }
+.pip-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .vp-play { position: absolute; right: 12px; top: 12px; display: none; gap: 4px; z-index: 3; }
 .viewport:fullscreen .vp-play, .viewport.vp-max .vp-play { display: flex; }
 .vp-play button { font: 600 13px var(--f-mono); color: var(--stage-fg); background: rgba(5, 6, 8, .78); border: 1px solid var(--stage-line); border-radius: 4px; padding: 8px 14px; cursor: pointer; }
@@ -107,7 +115,7 @@ a { color: inherit; }
 .patch { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--stage-line); }
 .patch-h { font: 500 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--sel); margin-right: 4px; }
 .patch label { font: 11px var(--f-mono); color: var(--stage-muted); }
-.console .patch select { font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 8px; max-width: 100%; color-scheme: dark; }
+.console .patch select, .console #s-crowd { font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 8px; max-width: 100%; color-scheme: dark; }
 .patch-count { margin-left: auto; font: 11px var(--f-mono); color: var(--stage-muted); }
 .ctable { width: 100%; border-collapse: collapse; font: 12px var(--f-mono); font-variant-numeric: tabular-nums; color: var(--stage-fg); }
 .ctable th { position: sticky; top: 0; background: var(--c-panel); color: var(--stage-muted); font-weight: 500; text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--stage-line); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; z-index: 1; }
@@ -362,6 +370,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn" id="s-rot">Rotate 45°</button>
           <button type="button" class="cbtn" id="s-fly">Fly in / out</button>
           <button type="button" class="cbtn warn" id="s-del">Remove piece</button>
+          <label for="s-crowd">Audience</label><select id="s-crowd"><option value="seated">Seated</option><option value="cheer">Cheering</option><option value="applause">Applause</option></select>
           <span class="patch-count" id="s-info"></span>
         </div>
         <div class="cmdline edit">
@@ -409,7 +418,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -559,6 +568,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   </section>
 </main>
 
+<aside class="pip" id="pip" hidden aria-label="Floating 3D stage">
+  <div class="pip-bar"><span class="pip-cue" id="pip-cue"></span><span class="pip-btns"><button type="button" id="pip-back">Back</button><button type="button" class="go" id="pip-go">Go</button><button type="button" id="pip-up" title="Scroll back to the console">Console</button><button type="button" id="pip-x" title="Hide the floating stage" aria-label="Hide the floating stage">✕</button></span></div>
+  <div class="pip-stage" id="pip-stage"></div>
+</aside>
 <footer>
   <div class="wrap"><span>Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span></div>
 </footer>
@@ -853,10 +866,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const FX = window.KLD_FX;
   let fxLib = FX ? FX.load() : [];
   const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Rave: ['fx-rave-colour', 'fx-rave-tilt', 'fx-rave-chase'] };
-  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; });
+  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; c.crowd = c.name === 'Rave' ? 'cheer' : c.name === 'Curtain call' ? 'applause' : 'seated'; });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
@@ -897,6 +910,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let encPage = 0;
   const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35, house: cues[curIdx].house != null ? cues[curIdx].house : 0 };
   let houseAnim = null;
+  let crowdMode = cues[curIdx].crowd || 'seated';
+  const CROWD = { seated: 'seated', cheer: 'cheering', applause: 'applauding' };
+  function setCrowd(m, quiet) {
+    if (!CROWD[m]) return;
+    crowdMode = m; const sel = $('s-crowd'); if (sel) sel.value = m;
+    if (!quiet) fb('The audience is now ' + CROWD[m] + '. Store to keep it in a cue');
+    changed();
+  }
   let dirty = true, uiDirty = true;
   const changed = () => { dirty = true; uiDirty = true; saveDirty = true; };
 
@@ -1074,6 +1095,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (c.cyc != null) setCyc(c.cyc, true);
     if (c.curtain != null) setCurtain(c.curtain, true);
     if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
+    if (c.crowd) setCrowd(c.crowd, true);
     if (c.house != null) { const dur = instant || c.fade <= 0 ? 0 : Math.max(c.fade, 3); if (!dur) { masters.house = c.house; houseAnim = null; syncHouse(); } else houseAnim = { from: masters.house, to: c.house, t0: performance.now(), dur: dur * 1000 }; }
     if (c.fx) { fxActive = new Set(c.fx.filter(id => fxLib.some(x => x.id === id))); buildFxPool(); }
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
@@ -1090,8 +1112,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.crowd = crowdMode; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, crowd: crowdMode, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -1310,6 +1332,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     fb('Added ' + PIECES[kind].label + '. Drag it with the Set tool, then Store so cues remember where it stands');
   }
   $('s-add').addEventListener('click', () => addPiece(sKind.value));
+  $('s-crowd').value = crowdMode;
+  $('s-crowd').addEventListener('change', () => setCrowd($('s-crowd').value));
   $('s-rot').addEventListener('click', () => {
     const o = SET.find(x => x.id === selSet);
     if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
@@ -1461,6 +1485,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
     $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
     const c = cues[curIdx];
+    if ($('pip-cue')) $('pip-cue').textContent = c ? 'Q ' + c.num + ' · ' + c.name : '';
     $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (Object.keys(programmer).length ? ' + programmer' : '');
   }
 
@@ -1715,6 +1740,41 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       bodyM.setColorAt(i, col.setHex(CLOTH[(i * 5) % CLOTH.length])); headM.setColorAt(i, col.setHex(SKINS[(i * 3) % SKINS.length]));
     });
     bodyM.receiveShadow = headM.receiveShadow = true; scene.add(bodyM, headM);
+    const armGeo = new THREE.CylinderGeometry(0.035, 0.03, 0.5, 6); armGeo.translate(0, -0.25, 0);
+    const armM = new THREE.InstancedMesh(armGeo, bodyM.material, people.length * 2);
+    people.forEach((p, i) => { const c = col.setHex(CLOTH[(i * 5) % CLOTH.length]); armM.setColorAt(i * 2, c); armM.setColorAt(i * 2 + 1, c); });
+    armM.frustumCulled = bodyM.frustumCulled = headM.frustumCulled = false;
+    scene.add(armM);
+    const dummy = new THREE.Object3D();
+    let stand = 0, crowdT = 0, lastCrowd = -1;
+    function crowdBusy() { const tgt = crowdMode === 'seated' ? 0 : 1; return Math.abs(stand - tgt) > 0.01 || (crowdMode !== 'seated' && !reduceMotion); }
+    function updateCrowd(now) {
+      const tgt = crowdMode === 'seated' ? 0 : 1;
+      const dt = Math.min(0.1, Math.max(0, (now - (crowdT || now)) / 1000)); crowdT = now;
+      stand = reduceMotion ? tgt : stand + clamp(tgt - stand, -dt * 1.5, dt * 1.5);
+      const t = reduceMotion ? 0.4 : now / 1000, moving = crowdMode !== 'seated';
+      if (!moving && stand === 0 && lastCrowd === 0) return;
+      lastCrowd = moving || stand > 0 ? 1 : 0;
+      people.forEach(([x, y, z], i) => {
+        const h = 0.92 + ((i * 7919) % 13) / 100, ph = ((i * 2654435761) >>> 0) % 628 / 100;
+        const bounce = crowdMode === 'cheer' ? Math.abs(Math.sin(t * 5.2 + ph)) * 0.22 * stand : 0;
+        const lift = 0.38 * stand + bounce;
+        const by = y + 0.42 + 0.31 * h + lift;
+        m4.makeTranslation(x, by, z - 0.02); bodyM.setMatrixAt(i, m4);
+        m4.makeTranslation(x + (((i * 31) % 7) - 3) * 0.01, y + 0.42 + 0.62 * h + 0.13 + lift, z - 0.04); headM.setMatrixAt(i, m4);
+        const sy = by + 0.31 * h - 0.06;
+        [-1, 1].forEach((sd, k) => {
+          let rz = 0, rx = 0, vis = stand;
+          if (crowdMode === 'cheer') rz = sd * (2.5 + 0.35 * Math.sin(t * 6 + ph + k));
+          else if (crowdMode === 'applause') { rx = 1.25; rz = sd * (-0.3 + 0.18 * Math.abs(Math.sin(t * 7 + ph))); }
+          else { rx = 0.3; rz = sd * 0.15; }
+          dummy.position.set(x + sd * 0.2, sy, z - 0.02); dummy.rotation.set(rx, 0, rz); dummy.scale.setScalar(Math.max(0.0001, vis)); dummy.updateMatrix();
+          armM.setMatrixAt(i * 2 + k, dummy.matrix);
+        });
+      });
+      bodyM.instanceMatrix.needsUpdate = headM.instanceMatrix.needsUpdate = armM.instanceMatrix.needsUpdate = true;
+    }
+    updateCrowd(performance.now());
     const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x0d0c0e, roughness: 1 }));
     ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, 13.5, 15); scene.add(ceiling);
     const canMat = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0xffd9a8, emissiveIntensity: 0.05 });
@@ -1942,13 +2002,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     });
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
+    let host = vp;
+    function moveTo(el) { host = el; el.prepend(renderer.domElement); resize(); }
     function resize() {
-      const w = vp.clientWidth, h = vp.clientHeight;
+      const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
       renderer.setSize(w, h, false); camera.aspect = w / h;
       baseDist = w / h < 1.1 ? 34 : 25; dist = baseDist * zoomF;
       camera.updateProjectionMatrix(); dirty = true;
     }
-    new ResizeObserver(resize).observe(vp);
+    const ro = new ResizeObserver(resize); ro.observe(vp); ro.observe($('pip-stage'));
 
     const v3 = new THREE.Vector3(), up = new THREE.Vector3();
     let strobing = false;
@@ -1960,7 +2022,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
       const lit = []; strobing = false;
-      applyHouse();
+      applyHouse(); updateCrowd(now);
       const fxOut = {}, tSec = reduceMotion ? 0.35 : now / 1000;
       fxLib.forEach(def => {
         if (!fxActive.has(def.id)) return;
@@ -2046,7 +2108,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, setView, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
+    return { render, setView, crowdBusy, moveTo, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -2171,6 +2233,20 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   document.addEventListener('fullscreenchange', fsLabel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && vp.classList.contains('vp-max')) { vp.classList.remove('vp-max'); document.body.style.overflow = ''; fsLabel(); } });
   $('fs-go').addEventListener('click', go);
+  // ---- Floating stage: keeps the 3D view on screen while you scroll the console and the page ----
+  let pipOn = false, pipClosed = false;
+  function setPip(on) {
+    if (!scene3d || on === pipOn) return;
+    pipOn = on; $('pip').hidden = !on;
+    scene3d.moveTo(on ? $('pip-stage') : vp);
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([en]) => { setPip(!en.isIntersecting && !pipClosed && !isFull()); if (en.isIntersecting) pipClosed = false; }, { threshold: 0.12 }).observe(vp);
+  }
+  $('pip-go').addEventListener('click', go);
+  $('pip-back').addEventListener('click', back);
+  $('pip-x').addEventListener('click', () => { pipClosed = true; setPip(false); });
+  $('pip-up').addEventListener('click', () => { vp.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); });
   $('fs-back').addEventListener('click', back);
 
   function loop(now) {
@@ -2184,7 +2260,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       syncHouse(); changed();
     }
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
-    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.crowdBusy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
