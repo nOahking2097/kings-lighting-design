@@ -420,7 +420,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> sweeps every light over the crowd in shifting colour (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -914,13 +914,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let houseAnim = null;
   let crowdMode = cues[curIdx].crowd || 'seated';
   const CROWD = { seated: 'seated', cheer: 'cheering', applause: 'applauding' };
-  let raveMode = !!cues[curIdx].rave;
+  let raveMode = !!cues[curIdx].rave, raveBeat0 = performance.now();
+  let snd = null, soundOn = false;
+  const BPM = 128, BEAT_MS = 60000 / BPM;
   function setRave(v, quiet) {
+    if (v && !raveMode) { raveBeat0 = performance.now(); if (snd) snd.lastBeat = -1; }
     raveMode = !!v;
     const b = $('tool-rave'); if (b) { b.setAttribute('aria-pressed', raveMode); b.textContent = raveMode ? 'Rave mode on' : 'Rave mode'; }
     if (!quiet) {
       if (raveMode && crowdMode === 'seated') setCrowd('cheer', true);
-      fb(raveMode ? 'Rave mode: every light is sweeping the crowd. Store to keep it in a cue' : 'Rave mode off. The lights return to the cue');
+      fb(raveMode ? 'Rave mode: every light moves over the crowd on a ' + BPM + ' BPM beat. Turn on Crowd sound to hear it. Store to keep it in a cue' : 'Rave mode off. The lights return to the cue');
     }
     changed();
   }
@@ -1760,6 +1763,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     scene.add(armM);
     const dummy = new THREE.Object3D();
     let stand = 0, crowdT = 0, lastCrowd = -1, raveK = 0, raveT = 0;
+    const hash2 = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
     const hsv3 = hh => { const i = Math.floor(hh * 6), fr = hh * 6 - i; return [[1, fr, 0], [1 - fr, 1, 0], [0, 1, fr], [0, 1 - fr, 1], [fr, 0, 1], [1, 0, 1 - fr]][((i % 6) + 6) % 6]; };
     function raveBusy() { return (raveMode && !reduceMotion) || Math.abs(raveK - (raveMode ? 1 : 0)) > 0.001; }
     function crowdBusy() { const tgt = crowdMode === 'seated' ? 0 : 1; return Math.abs(stand - tgt) > 0.01 || (crowdMode !== 'seated' && !reduceMotion); }
@@ -2053,10 +2057,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         let raveAim = null;
         if (raveK > 0.001 && f.type !== 'cyc') {
           // Rave mode: every light comes up and sweeps the crowd in shifting colour.
-          const k = raveK, ph = f.id * 0.618;
-          d += (outDim(f, f.type === 'strobe' ? Math.max(val(f.id, 'dim'), 100) : 95) / 100 - d) * k;
-          if (f.type !== 'strobe') { const c = hsv3((tSec * 0.12 + f.id * 0.07) % 1); r += (c[0] - r) * k; g += (c[1] - g) * k; b += (c[2] - b) * k; }
-          raveAim = [Math.sin(tSec * 0.5 + ph) * 7.5, 0.8, 12 + Math.cos(tSec * 0.37 + ph * 1.3) * 5];
+          // Moves are locked to a 128 BPM beat: each light steps to a new spot on every beat, pulses, and changes colour every bar.
+          const k = raveK, bt = reduceMotion ? 0.7 : (now - raveBeat0) / BEAT_MS, bi = Math.floor(bt), fr = bt - bi;
+          const ease = fr < 0.55 ? (1 - Math.cos(Math.PI * fr / 0.55)) / 2 : 1;
+          const grp = (f.truss || '').length * 7 + (f.truss || 'x').charCodeAt(f.truss ? f.truss.length - 1 : 0), side = f.x0 >= 0 ? 1 : -1;
+          const spot = q => [side * (1.5 + hash2(q, grp) * 6.5) * (hash2(q, grp + 3) > 0.3 ? 1 : -1) + f.x0 * 0.25, 0.8, 7.5 + hash2(q + 11, grp) * 10];
+          const A = spot(bi - 1), B = spot(bi);
+          raveAim = A.map((v, j) => v + (B[j] - v) * ease);
+          const pulse = reduceMotion ? 1 : 0.6 + 0.4 * Math.pow(1 - fr, 2);
+          d += (outDim(f, f.type === 'strobe' ? Math.max(val(f.id, 'dim'), 100) : 95) * pulse / 100 - d) * k;
+          if (f.type !== 'strobe') { const c = hsv3((Math.floor(bt / 4) * 0.19 + f.n * 0.06 + grp * 0.011) % 1); r += (c[0] - r) * k; g += (c[1] - g) * k; b += (c[2] - b) * k; }
         }
         if (f.type !== 'cyc' && d > 0.002) {
           const hz = val(f.id, 'strobe') || 0;
@@ -2256,7 +2266,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   setRave(raveMode, true);
 
   // ---- Crowd sound: made live with Web Audio (no sound files); off until you switch it on ----
-  let snd = null, soundOn = false;
   function makeSound() {
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
     const ctx = new AC();
@@ -2273,7 +2282,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     };
     const roar = bed(1100, 0.45, 3800), roar2 = bed(650, 0.7, 2400), murmur = bed(420, 1.2, 1100);
     const lfo = ctx.createOscillator(); lfo.frequency.value = 0.13; const lg = ctx.createGain(); lg.gain.value = 0; lfo.connect(lg); lg.connect(roar.gain); lfo.start();
-    return { ctx, buf, master, roar, roar2, murmur, lg, nextWoo: 0, nextClap: 0 };
+    return { ctx, buf, master, roar, roar2, murmur, lg, nextWoo: 0, nextClap: 0, lastBeat: -1 };
   }
   function woo(t) {
     const c = snd.ctx, o = c.createOscillator(), vib = c.createOscillator(), vg = c.createGain(), lp = c.createBiquadFilter(), g = c.createGain();
@@ -2284,6 +2293,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.035 + Math.random() * 0.03, t + 0.07); g.gain.linearRampToValueAtTime(0, t + dur);
     o.connect(lp); lp.connect(g); g.connect(snd.master);
     o.start(t); vib.start(t); o.stop(t + dur + 0.05); vib.stop(t + dur + 0.05);
+  }
+  function kick(t) {
+    const c = snd.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.85, t + 0.005); g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    o.connect(g); g.connect(snd.master); o.start(t); o.stop(t + 0.35);
+  }
+  function hat(t) {
+    const c = snd.ctx, src = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = snd.buf; hp.type = 'highpass'; hp.frequency.value = 7000;
+    g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    src.connect(hp); hp.connect(g); g.connect(snd.master); src.start(t, Math.random() * 1.8, 0.06);
   }
   function clap(t) {
     const c = snd.ctx, src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
@@ -2301,6 +2322,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     snd.lg.gain.setTargetAtTime(cheer ? 0.2 : 0, now, 0.5);
     snd.murmur.gain.setTargetAtTime(crowdMode === 'seated' ? 0.12 * masters.house / 100 : 0.06, now, 1);
     const horizon = now + 0.15;
+    if (raveMode) {
+      // Schedule the beat on the same clock the lights use, so sound and movement land together.
+      const pNow = performance.now(), base = now - pNow / 1000;
+      let q = Math.max(snd.lastBeat + 1, Math.ceil((pNow - raveBeat0) / BEAT_MS * 2));
+      for (; ; q++) {
+        const tp = raveBeat0 + q * BEAT_MS / 2, ta = base + tp / 1000;
+        if (ta > horizon) break;
+        if (ta >= now - 0.01) { if (q % 2 === 0) kick(Math.max(ta, now)); else hat(Math.max(ta, now)); }
+        snd.lastBeat = q;
+      }
+    } else snd.lastBeat = -1;
     if (cheer) { if (snd.nextWoo < now) snd.nextWoo = now + 0.02; while (snd.nextWoo < horizon) { woo(snd.nextWoo); snd.nextWoo += 0.2 + Math.random() * (raveMode ? 0.5 : 0.9); } }
     const rate = applause ? 36 : cheer ? 5 : 0;
     if (rate) { if (snd.nextClap < now) snd.nextClap = now + 0.01; while (snd.nextClap < horizon) { clap(snd.nextClap); snd.nextClap += (0.4 + Math.random() * 1.2) / rate; } }
