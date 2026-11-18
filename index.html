@@ -335,6 +335,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" id="tool-cyc" class="edit-tool" aria-pressed="true" title="Fly the cyclorama in or out">Cyc in</button>
               <button type="button" id="tool-curtain" class="edit-tool" aria-pressed="true" title="Open or close the main curtain">Curtain open</button>
               <button type="button" id="tool-mask" aria-pressed="false" title="Show or hide the border and the wall above the stage">Masking off</button>
+              <button type="button" id="tool-rave" class="edit-tool" aria-pressed="false" title="Sweep every light over the crowd">Rave mode</button>
+              <button type="button" id="tool-sound" aria-pressed="false" title="Turn the crowd sound on or off">Crowd sound off</button>
               <button type="button" id="tool-view" title="Jump the camera to the stage, the back of the house, or straight down">View: Stage</button>
               <button type="button" id="tool-fs" title="Fill the screen with the stage (Esc to leave)">Full screen</button>
             </div>
@@ -418,7 +420,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> sweeps every light over the crowd in shifting colour (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -774,7 +776,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { name: 'CS', sub: 'Centre', aim: () => [0, 0.6, 0] },
     { name: 'USC', sub: 'Upstage', aim: () => [0, 0.6, -4.2] },
     { name: 'Actors', sub: 'Specials', aim: f => liveActor(f.n) },
-    { name: 'Fan', sub: 'Straight out', aim: (f, x) => fanPt(f, x) },
+    { name: 'Crowd', sub: 'Over the audience', aim: f => [((f.n % 5) - 2) * 3.2, 0.8, 9 + (f.n % 3) * 3.5] },
     { name: 'Home', sub: 'Pan/tilt 0', home: true }
   ];
   function buildGroups() {
@@ -866,10 +868,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const FX = window.KLD_FX;
   let fxLib = FX ? FX.load() : [];
   const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Rave: ['fx-rave-colour', 'fx-rave-tilt', 'fx-rave-chase'] };
-  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; c.crowd = c.name === 'Rave' ? 'cheer' : c.name === 'Curtain call' ? 'applause' : 'seated'; });
+  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; c.crowd = c.name === 'Rave' ? 'cheer' : c.name === 'Curtain call' ? 'applause' : 'seated'; c.rave = c.name === 'Rave'; });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', rave: false, layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
@@ -912,6 +914,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let houseAnim = null;
   let crowdMode = cues[curIdx].crowd || 'seated';
   const CROWD = { seated: 'seated', cheer: 'cheering', applause: 'applauding' };
+  let raveMode = !!cues[curIdx].rave;
+  function setRave(v, quiet) {
+    raveMode = !!v;
+    const b = $('tool-rave'); if (b) { b.setAttribute('aria-pressed', raveMode); b.textContent = raveMode ? 'Rave mode on' : 'Rave mode'; }
+    if (!quiet) {
+      if (raveMode && crowdMode === 'seated') setCrowd('cheer', true);
+      fb(raveMode ? 'Rave mode: every light is sweeping the crowd. Store to keep it in a cue' : 'Rave mode off. The lights return to the cue');
+    }
+    changed();
+  }
   function setCrowd(m, quiet) {
     if (!CROWD[m]) return;
     crowdMode = m; const sel = $('s-crowd'); if (sel) sel.value = m;
@@ -1096,6 +1108,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (c.curtain != null) setCurtain(c.curtain, true);
     if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
     if (c.crowd) setCrowd(c.crowd, true);
+    setRave(!!c.rave, true);
     if (c.house != null) { const dur = instant || c.fade <= 0 ? 0 : Math.max(c.fade, 3); if (!dur) { masters.house = c.house; houseAnim = null; syncHouse(); } else houseAnim = { from: masters.house, to: c.house, t0: performance.now(), dur: dur * 1000 }; }
     if (c.fx) { fxActive = new Set(c.fx.filter(id => fxLib.some(x => x.id === id))); buildFxPool(); }
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
@@ -1112,8 +1125,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.crowd = crowdMode; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, crowd: crowdMode, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.crowd = crowdMode; c.rave = raveMode; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, crowd: crowdMode, rave: raveMode, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -1486,7 +1499,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
     const c = cues[curIdx];
     if ($('pip-cue')) $('pip-cue').textContent = c ? 'Q ' + c.num + ' · ' + c.name : '';
-    $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (Object.keys(programmer).length ? ' + programmer' : '');
+    $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (raveMode ? ' · rave mode' : '') + (Object.keys(programmer).length ? ' + programmer' : '');
   }
 
   // ================= 3D stage =================
@@ -1746,7 +1759,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     armM.frustumCulled = bodyM.frustumCulled = headM.frustumCulled = false;
     scene.add(armM);
     const dummy = new THREE.Object3D();
-    let stand = 0, crowdT = 0, lastCrowd = -1;
+    let stand = 0, crowdT = 0, lastCrowd = -1, raveK = 0, raveT = 0;
+    const hsv3 = hh => { const i = Math.floor(hh * 6), fr = hh * 6 - i; return [[1, fr, 0], [1 - fr, 1, 0], [0, 1, fr], [0, 1 - fr, 1], [fr, 0, 1], [1, 0, 1 - fr]][((i % 6) + 6) % 6]; };
+    function raveBusy() { return (raveMode && !reduceMotion) || Math.abs(raveK - (raveMode ? 1 : 0)) > 0.001; }
     function crowdBusy() { const tgt = crowdMode === 'seated' ? 0 : 1; return Math.abs(stand - tgt) > 0.01 || (crowdMode !== 'seated' && !reduceMotion); }
     function updateCrowd(now) {
       const tgt = crowdMode === 'seated' ? 0 : 1;
@@ -1922,7 +1937,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const movers = selection.filter(id => byId[id] && byId[id].type !== 'cyc');
       if (!movers.length) { fb('Select lights, then click the stage to aim them', true); return; }
       const P = hit(e, deckPlane);
-      if (!P || Math.abs(P.x) > 9.5 || P.z < -7.6 || P.z > 5) return;
+      if (!P || Math.abs(P.x) > 10.5 || P.z < -7.6 || P.z > 19) return;
       aimIds(movers, () => [P.x, 0, P.z]);
       fb('Aimed ' + fmtIds(movers) + ' at X ' + P.x.toFixed(1) + ' m, Z ' + P.z.toFixed(1) + ' m');
     }
@@ -2023,6 +2038,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
       const lit = []; strobing = false;
       applyHouse(); updateCrowd(now);
+      { const dt = Math.min(0.1, Math.max(0, (now - (raveT || now)) / 1000)); raveT = now; const tg = raveMode ? 1 : 0; raveK = reduceMotion ? tg : raveK + clamp(tg - raveK, -dt / 1.5, dt / 1.5); }
       const fxOut = {}, tSec = reduceMotion ? 0.35 : now / 1000;
       fxLib.forEach(def => {
         if (!fxActive.has(def.id)) return;
@@ -2034,6 +2050,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const fo = fxOut[f.id] || {};
         let d = outDim(f, fo.dim) / 100, r = val(f.id, 'r') / 100, g = val(f.id, 'g') / 100, b = val(f.id, 'b') / 100;
         if (fo.r != null) { r = fo.r; g = fo.g; b = fo.b; }
+        let raveAim = null;
+        if (raveK > 0.001 && f.type !== 'cyc') {
+          // Rave mode: every light comes up and sweeps the crowd in shifting colour.
+          const k = raveK, ph = f.id * 0.618;
+          d += (outDim(f, f.type === 'strobe' ? Math.max(val(f.id, 'dim'), 100) : 95) / 100 - d) * k;
+          if (f.type !== 'strobe') { const c = hsv3((tSec * 0.12 + f.id * 0.07) % 1); r += (c[0] - r) * k; g += (c[1] - g) * k; b += (c[2] - b) * k; }
+          raveAim = [Math.sin(tSec * 0.5 + ph) * 7.5, 0.8, 12 + Math.cos(tSec * 0.37 + ph * 1.3) * 5];
+        }
         if (f.type !== 'cyc' && d > 0.002) {
           const hz = val(f.id, 'strobe') || 0;
           if (hz >= 0.25) {
@@ -2047,6 +2071,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const ty = TYPES[f.type];
         let pan = val(f.id, 'pan'), tilt = val(f.id, 'tilt');
         if (fx && ty.moving) { const ph = now / 1000 * 1.6 + f.n * Math.PI / 2; pan += Math.sin(ph) * 22; tilt += Math.cos(ph) * 12; }
+        if (raveAim) {
+          const a = aimAt(f, val(f.id, 'x'), raveAim);
+          pan += ((((a.pan - pan) % 360) + 540) % 360 - 180) * raveK; tilt += (a.tilt - tilt) * raveK;
+        }
         if (fo.pan != null) { pan += fo.pan; tilt += fo.tilt; }
         o.root.position.x = val(f.id, 'x'); o.root.position.y = trussY(TRUSS[f.truss]);
         o.pan.rotation.y = rad(pan); o.tilt.rotation.x = rad(tilt);
@@ -2060,7 +2088,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (ty.laser) {
           const spread = rad(zoom), n = o.beams.length;
           o.beams.forEach((pv, i) => { pv.rotation.z = n > 1 ? -spread / 2 + spread * i / (n - 1) : 0; });
-          o.fan.rotation.y = fx ? now / 1000 * 1.4 + f.n : 0;
+          o.fan.rotation.y = fx || raveK > 0.5 ? tSec * 1.4 + f.n : 0;
           o.fan.userData.mat.color.setRGB(r, g, b);
           o.fan.userData.mat.opacity = d * (0.18 + 0.7 * masters.haze / 100);
           o.fan.visible = d > 0.002;
@@ -2108,7 +2136,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, setView, crowdBusy, moveTo, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
+    return { render, setView, crowdBusy, raveBusy, moveTo, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -2224,6 +2252,71 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     fsLabel();
   }
   $('tool-fs').addEventListener('click', toggleFull);
+  $('tool-rave').addEventListener('click', () => setRave(!raveMode));
+  setRave(raveMode, true);
+
+  // ---- Crowd sound: made live with Web Audio (no sound files); off until you switch it on ----
+  let snd = null, soundOn = false;
+  function makeSound() {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    const ctx = new AC();
+    const len = ctx.sampleRate * 2, buf = ctx.createBuffer(1, len, ctx.sampleRate), dd = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) dd[i] = Math.random() * 2 - 1;
+    const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    const bed = (freq, q, lp) => {
+      const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = freq; f1.Q.value = q;
+      const f2 = ctx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = lp;
+      const g = ctx.createGain(); g.gain.value = 0;
+      src.connect(f1); f1.connect(f2); f2.connect(g); g.connect(master); src.start(ctx.currentTime, Math.random() * 1.5);
+      return g;
+    };
+    const roar = bed(1100, 0.45, 3800), roar2 = bed(650, 0.7, 2400), murmur = bed(420, 1.2, 1100);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.13; const lg = ctx.createGain(); lg.gain.value = 0; lfo.connect(lg); lg.connect(roar.gain); lfo.start();
+    return { ctx, buf, master, roar, roar2, murmur, lg, nextWoo: 0, nextClap: 0 };
+  }
+  function woo(t) {
+    const c = snd.ctx, o = c.createOscillator(), vib = c.createOscillator(), vg = c.createGain(), lp = c.createBiquadFilter(), g = c.createGain();
+    const f0 = 520 + Math.random() * 520, dur = 0.5 + Math.random() * 0.5;
+    o.type = 'triangle'; o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f0 * 1.55, t + dur * 0.35); o.frequency.linearRampToValueAtTime(f0 * 1.15, t + dur);
+    vib.frequency.value = 5 + Math.random() * 3; vg.gain.value = 12; vib.connect(vg); vg.connect(o.frequency);
+    lp.type = 'lowpass'; lp.frequency.value = 2400;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.035 + Math.random() * 0.03, t + 0.07); g.gain.linearRampToValueAtTime(0, t + dur);
+    o.connect(lp); lp.connect(g); g.connect(snd.master);
+    o.start(t); vib.start(t); o.stop(t + dur + 0.05); vib.stop(t + dur + 0.05);
+  }
+  function clap(t) {
+    const c = snd.ctx, src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = snd.buf; bp.type = 'bandpass'; bp.frequency.value = 1100 + Math.random() * 900; bp.Q.value = 0.9;
+    const v = 0.08 + Math.random() * 0.12;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    src.connect(bp); bp.connect(g); g.connect(snd.master);
+    src.start(t, Math.random() * 1.8, 0.06);
+  }
+  function soundTick() {
+    if (!snd || !soundOn) return;
+    const now = snd.ctx.currentTime, cheer = crowdMode === 'cheer', applause = crowdMode === 'applause';
+    const roarT = cheer ? (raveMode ? 0.55 : 0.4) : applause ? 0.14 : 0;
+    snd.roar.gain.setTargetAtTime(roarT, now, 0.6); snd.roar2.gain.setTargetAtTime(roarT * 0.7, now, 0.8);
+    snd.lg.gain.setTargetAtTime(cheer ? 0.2 : 0, now, 0.5);
+    snd.murmur.gain.setTargetAtTime(crowdMode === 'seated' ? 0.12 * masters.house / 100 : 0.06, now, 1);
+    const horizon = now + 0.15;
+    if (cheer) { if (snd.nextWoo < now) snd.nextWoo = now + 0.02; while (snd.nextWoo < horizon) { woo(snd.nextWoo); snd.nextWoo += 0.2 + Math.random() * (raveMode ? 0.5 : 0.9); } }
+    const rate = applause ? 36 : cheer ? 5 : 0;
+    if (rate) { if (snd.nextClap < now) snd.nextClap = now + 0.01; while (snd.nextClap < horizon) { clap(snd.nextClap); snd.nextClap += (0.4 + Math.random() * 1.2) / rate; } }
+  }
+  setInterval(soundTick, 90);
+  $('tool-sound').addEventListener('click', () => {
+    if (!snd) snd = makeSound();
+    if (!snd) { fb('This browser cannot play sound', true); return; }
+    soundOn = !soundOn;
+    const t = snd.ctx.currentTime;
+    if (soundOn) { snd.ctx.resume(); snd.master.gain.setTargetAtTime(0.8, t, 0.3); }
+    else snd.master.gain.setTargetAtTime(0, t, 0.15);
+    $('tool-sound').setAttribute('aria-pressed', soundOn); $('tool-sound').textContent = soundOn ? 'Crowd sound on' : 'Crowd sound off';
+    fb(soundOn ? 'Crowd sound on. The crowd murmurs when seated, roars when cheering and claps for applause' : 'Crowd sound off');
+  });
+  document.addEventListener('visibilitychange', () => { if (!snd) return; if (document.hidden) snd.ctx.suspend(); else if (soundOn) snd.ctx.resume(); });
   const VIEW_ORDER = ['Stage', 'House', 'Top']; let viewI = 0;
   $('tool-view').addEventListener('click', () => {
     viewI = (viewI + 1) % VIEW_ORDER.length;
@@ -2260,7 +2353,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       syncHouse(); changed();
     }
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
-    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.crowdBusy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.crowdBusy() || scene3d.raveBusy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
