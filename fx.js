@@ -116,7 +116,7 @@
   function formLabel(def) { const k = KINDS[def.kind]; const x = k && k.forms.find(y => y[0] === def.form); return x ? x[1] : def.form; }
 
   // Admin sign-in shared by the console and the Effects page (a convenience lock; the check runs in the browser).
-  const ADMIN_HASH = '597e54ab42ebbbf76dc90a59fa2f849aee3dd9734d058b31460d16036a3a580e';
+  const ADMIN_HASH = '552172236d355551c44d06b7dfd19873e250a895f5fa1940dde8b2800afbb52e';
   const ADMIN_KEY = 'kld-admin-v1';
   async function digest(email, pass) {
     const data = new TextEncoder().encode('kld-admin|' + email.trim().toLowerCase() + '|' + pass);
