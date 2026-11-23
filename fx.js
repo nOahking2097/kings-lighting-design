@@ -19,7 +19,7 @@
     ['all', 'All lights'],
     ['type:spot', 'Moving spots'], ['type:wash', 'Moving washes'], ['type:beam', 'Moving beams'],
     ['type:profile', 'Profiles'], ['type:fresnel', 'Fresnels'], ['type:par', 'LED PARs'],
-    ['type:strobe', 'Strobes'], ['type:laser', 'Lasers'],
+    ['type:strobe', 'Strobes'], ['type:laser', 'Lasers'], ['type:blinder', 'Blinders'],
     ['truss:foh', 'FOH truss'], ['truss:e1', '1st electric'], ['truss:e2', '2nd electric'],
     ['truss:e3', '3rd electric'], ['truss:e4', '4th electric'], ['truss:e5', '5th electric'],
     ['truss:e6', '6th electric'], ['truss:e7', '7th electric'], ['truss:e8', '8th electric'],

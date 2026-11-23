@@ -162,6 +162,8 @@ a { color: inherit; }
 .cbtn.warn { color: var(--err); }
 .cbtn.go { background: var(--go); border-color: var(--go-edge); color: #FFFFFF; font-weight: 600; }
 .cbtn.go:hover { filter: brightness(1.12); }
+#b-blind { width: 100%; padding: 10px 8px; }
+#b-blind[aria-pressed="true"] { background: #F3D9A8; color: #17110A; border-color: #F3D9A8; }
 .cuelist { max-height: 260px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
 .cuelist tr.cur td { color: var(--sel); }
 .cuelist tr.cur td:first-child::before { content: "▶ "; }
@@ -413,6 +415,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" class="cbtn edit" id="b-fx" aria-pressed="false">Ballyhoo FX</button>
               <button type="button" class="cbtn go" id="b-go">Go</button>
             </div>
+            <button type="button" class="cbtn edit" id="b-blind" title="Every blinder at full while you hold it">Blinder hit (hold)</button>
             <div class="faders edit" id="faders"></div>
           </div>
           <div class="c-sec edit">
@@ -420,7 +423,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -618,6 +621,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     fresnel: { label: 'Fresnel', short: 'Fresnel', plural: 'Fresnels', group: 'Conventional', zoom: [15, 60], def: 40, pen: 0.9, power: 3.3, r: 0.17, len: 0.34, haze: 0.04 },
     par: { label: 'LED PAR', short: 'PAR', plural: 'PARs', group: 'LED', zoom: [15, 40], def: 25, pen: 0.6, power: 3.0, r: 0.14, len: 0.28, haze: 0.05 },
     strobe: { label: 'LED strobe', short: 'Strobe', plural: 'Strobes', group: 'Effects', zoom: [60, 100], def: 90, pen: 0.9, power: 8, r: 0.22, len: 0.2, haze: 0.03, box: true },
+    blinder: { label: 'Blinder (4-lite)', short: 'Blinder', plural: 'Blinders', group: 'Effects', zoom: [40, 80], def: 60, pen: 0.85, power: 7, r: 0.2, len: 0.22, haze: 0.04, blinder: true },
     laser: { label: 'Laser (beam fan)', short: 'Laser', plural: 'Lasers', group: 'Effects', zoom: [0, 60], def: 30, pen: 0, power: 0, r: 0.09, len: 0.26, haze: 0.5, laser: true, moving: true }
   };
   const MOVER = ['dim', 'strobe', 'pan', 'tilt', 'zoom', 'r', 'g', 'b', 'x'];
@@ -639,7 +643,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   [-7.6, -2.7, 2.7, 7.6].forEach((x, i) => FIX.push(mk(357 + i, 'strobe', 'e4', x, true)));
   [-6, -2, 2, 6].forEach((x, i) => FIX.push(mk(451 + i, 'laser', 'e6', x, true)));
   [-7, -4, 4, 7].forEach((x, i) => FIX.push(mk(455 + i, 'beam', 'e6', x, true)));
-  X6.forEach((x, i) => FIX.push(mk(551 + i, 'par', 'e8', x, true)));
+  X6.forEach((x, i) => FIX.push(mk(551 + i, 'blinder', 'e8', x, true)));
   [-3, 3].forEach((x, i) => FIX.push(mk(607 + i, 'laser', 'floor', x)));
   const BAR_FLY = 7;
   const trussY = T => T.y + (T.fly || 0) * BAR_FLY;
@@ -794,6 +798,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function defaults(f) {
     const d = { dim: 0, r: 100, g: 100, b: 100 };
     if (f.type !== 'cyc') Object.assign(d, { strobe: 0, pan: 0, tilt: 0, zoom: TYPES[f.type].def, x: f.x0 });
+    if (f.type === 'blinder') Object.assign(d, kcol(3000));
     return d;
   }
   const role = f => f.type === 'cyc' ? 'cyc' : f.rave ? 'rave-' + f.type : (f.type === 'laser' || f.type === 'strobe') ? f.type : (TRUSS[f.truss].floor || f.truss === 'e7') ? 'floor' : f.type;
@@ -834,7 +839,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     ['Dusk', 5, { spot: { dim: 35, k: 3200, zoom: 22, at: 'actors' }, wash: { dim: 40, gel: 'L170', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 70, gel: 'L181', at: 'cyc' }, cyc: { dim: 60, gel: 'L170' } }],
     ['Moonlight', 4, { spot: { dim: 30, k: 6500, zoom: 16, at: 'actors' }, wash: { dim: 30, gel: 'L201', zoom: 20, at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L181', at: 'cyc' }, cyc: { dim: 45, gel: 'L181' } }],
     ['Storm', 2, { spot: { dim: 35, k: 6500, zoom: 14, at: 'actors' }, wash: { dim: 90, gel: 'L201', zoom: 14, at: 'actors' }, beam: { dim: 100, gel: 'L201', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 85, gel: 'L181', at: 'cyc' }, cyc: { dim: 90, gel: 'L181' }, strobe: { dim: 70, strobe: 3, gel: 'L201', at: 'cs' } }],
-    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' }, strobe: { dim: 100, strobe: 12, at: 'cs' } }],
+    ['Lightning', 0, { spot: { dim: 100, k: 6500, zoom: 40, at: 'cs' }, wash: { dim: 100, gel: 'N/C', zoom: 60, at: 'cs' }, beam: { dim: 100, gel: 'N/C', at: f => [(f.n - 1.5) * 3.4, 0, 3.2] }, floor: { dim: 100, gel: 'N/C', at: 'cyc' }, cyc: { dim: 100, gel: 'N/C' }, strobe: { dim: 100, strobe: 12, at: 'cs' }, 'rave-blinder': f => ({ dim: 100, k: 3200, at: [f.x0 * 1.4, 1.6, 13] }) }],
     ['After the storm', 3, { spot: { dim: 40, k: 4300, zoom: 22, at: 'actors' }, wash: { dim: 30, gel: 'L115', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 40, gel: 'L115', at: 'cyc' }, cyc: { dim: 50, gel: 'L115' } }],
     ['Fireside', 4, { spot: f => ({ dim: f.n === 5 ? 0 : 70, k: 2200, zoom: 18, at: 'actors' }), wash: { dim: 45, gel: 'L147', zoom: 36, at: 'cs' }, beam: { at: 'cs' }, floor: { dim: 35, gel: 'L106', at: 'cyc' }, cyc: { dim: 25, gel: 'L106' } }],
     ['Solo', 3, { spot: f => ({ dim: f.n === 2 || f.n === 3 ? 85 : 0, k: 3200, zoom: 10, at: 'actor2' }), wash: { at: 'fan' }, beam: { at: 'cs' }, floor: { at: 'cyc' }, cyc: { dim: 8, gel: 'L181' } }],
@@ -851,9 +856,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       'rave-wash': f => ({ dim: 90, gel: f.n % 2 ? 'L128' : 'L115', zoom: 18, at: [f.x0 * 0.7, 0, 1.5] }),
       'rave-strobe': { dim: 100, strobe: 12, at: [0, 0, 1] },
       'rave-laser': f => ({ dim: 100, gel: f.n % 2 ? 'L139' : 'L106', zoom: 50, at: [f.x0 * 1.5, 2, 12] }),
-      'rave-par': f => ({ dim: 75, gel: 'N/C', zoom: 40, at: [f.x0 * 1.4, 1.6, 14] })
+      'rave-blinder': f => ({ dim: 75, k: 3000, zoom: 60, at: [f.x0 * 1.4, 1.6, 14] })
     }],
-    ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 3.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' } }]
+    ['Curtain call', 3, { spot: { dim: 100, k: 3200, zoom: 30, at: f => [f.x0 * 0.8, 1, 3.2] }, wash: { dim: 80, gel: 'L204', at: 'fan' }, beam: { at: 'cs' }, floor: { dim: 50, gel: 'L204', at: 'cyc' }, cyc: { dim: 60, gel: 'L204' }, 'rave-blinder': f => ({ dim: 55, k: 2900, at: [f.x0 * 1.4, 1.6, 13] }) }]
   ];
   const PROFILE = {
     Morning: { dim: 40, k: 4300, zoom: 26, at: 'actors' }, Midday: { dim: 60, gel: 'N/C', zoom: 30, at: 'actors' },
@@ -914,7 +919,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let houseAnim = null;
   let crowdMode = cues[curIdx].crowd || 'seated';
   const CROWD = { seated: 'seated', cheer: 'cheering', applause: 'applauding' };
-  let raveMode = !!cues[curIdx].rave, raveBeat0 = performance.now();
+  let raveMode = !!cues[curIdx].rave, raveBeat0 = performance.now(), blindHit = false;
+  const BLIND_RGB = kcol(3000);
   let snd = null, soundOn = false;
   const BPM = 128, BEAT_MS = 60000 / BPM;
   function setRave(v, quiet) {
@@ -1415,6 +1421,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
 
   $('b-go').addEventListener('click', go);
+  const blind = on => {
+    if (on && !isAdmin) return;
+    if (blindHit === on) return;
+    blindHit = on; $('b-blind').setAttribute('aria-pressed', on);
+    if (on) fb(FIX.some(f => f.type === 'blinder') ? 'Blinders at full' : 'There are no blinders in the rig. Add some with Patch', !FIX.some(f => f.type === 'blinder'));
+    changed();
+  };
+  $('b-blind').addEventListener('pointerdown', e => { e.preventDefault(); $('b-blind').setPointerCapture(e.pointerId); blind(true); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => $('b-blind').addEventListener(ev, () => blind(false)));
+  $('b-blind').addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); blind(true); } });
+  $('b-blind').addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') blind(false); });
   let resetArm = null;
   $('b-reset').addEventListener('click', () => {
     if (!resetArm) {
@@ -1907,10 +1924,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const tilt = new THREE.Group(); tilt.position.y = -0.3; pan.add(tilt);
       const top = f.type === 'beam' ? ty.r * 1.3 : f.type === 'profile' ? ty.r * 1.15 : f.type === 'par' ? ty.r : ty.r * 0.9;
       const headMat = new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.45 });
-      const head = new THREE.Mesh(ty.box || ty.laser ? new THREE.BoxGeometry(ty.box ? 0.5 : 0.2, ty.len, ty.box ? 0.22 : 0.2) : new THREE.CylinderGeometry(top, ty.r, ty.len, 20), headMat);
+      const head = new THREE.Mesh(ty.blinder ? new THREE.BoxGeometry(0.56, ty.len, 0.56) : ty.box || ty.laser ? new THREE.BoxGeometry(ty.box ? 0.5 : 0.2, ty.len, ty.box ? 0.22 : 0.2) : new THREE.CylinderGeometry(top, ty.r, ty.len, 20), headMat);
       tilt.add(head);
       const lens = new THREE.Mesh(ty.box ? new THREE.PlaneGeometry(0.44, 0.16) : new THREE.CircleGeometry(ty.laser ? 0.03 : ty.r * 0.82, 24), new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }));
       lens.rotation.x = Math.PI / 2; lens.position.y = -ty.len / 2 - 0.002; tilt.add(lens);
+      if (ty.blinder) {
+        // Four round cells, like a classic 4-lite audience blinder; they share one material so they light together.
+        lens.geometry.dispose(); lens.geometry = new THREE.CircleGeometry(0.105, 24); lens.position.set(-0.13, -ty.len / 2 - 0.002, -0.13);
+        [[0.13, -0.13], [-0.13, 0.13], [0.13, 0.13]].forEach(([x, z]) => { const c = new THREE.Mesh(lens.geometry, lens.material); c.rotation.x = Math.PI / 2; c.position.set(x, -ty.len / 2 - 0.002, z); tilt.add(c); });
+      }
       const emit = new THREE.Object3D(); emit.position.y = -ty.len / 2; tilt.add(emit);
       const aim = new THREE.Object3D(); aim.position.y = -10; tilt.add(aim);
       const geo = new THREE.ConeGeometry(1, 1, 40, 1, true); geo.translate(0, -0.5, 0);
@@ -2062,12 +2084,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           const ease = fr < 0.55 ? (1 - Math.cos(Math.PI * fr / 0.55)) / 2 : 1;
           const grp = (f.truss || '').length * 7 + (f.truss || 'x').charCodeAt(f.truss ? f.truss.length - 1 : 0), side = f.x0 >= 0 ? 1 : -1;
           const spot = q => [side * (1.5 + hash2(q, grp) * 6.5) * (hash2(q, grp + 3) > 0.3 ? 1 : -1) + f.x0 * 0.25, 0.8, 7.5 + hash2(q + 11, grp) * 10];
+          if (f.type === 'blinder') {
+            const hit = reduceMotion ? 0.6 : (((bi % 4) + 4) % 4 === 0 ? Math.pow(1 - fr, 1.5) : 0);
+            d += (outDim(f, 100 * hit) / 100 - d) * k;
+          } else {
           const A = spot(bi - 1), B = spot(bi);
           raveAim = A.map((v, j) => v + (B[j] - v) * ease);
           const pulse = reduceMotion ? 1 : 0.6 + 0.4 * Math.pow(1 - fr, 2);
           d += (outDim(f, f.type === 'strobe' ? Math.max(val(f.id, 'dim'), 100) : 95) * pulse / 100 - d) * k;
-          if (f.type !== 'strobe') { const c = hsv3((Math.floor(bt / 4) * 0.19 + f.n * 0.06 + grp * 0.011) % 1); r += (c[0] - r) * k; g += (c[1] - g) * k; b += (c[2] - b) * k; }
+          }
+          if (f.type !== 'strobe' && f.type !== 'blinder') { const c = hsv3((Math.floor(bt / 4) * 0.19 + f.n * 0.06 + grp * 0.011) % 1); r += (c[0] - r) * k; g += (c[1] - g) * k; b += (c[2] - b) * k; }
         }
+        if (blindHit && f.type === 'blinder') { d = outDim(f, 100) / 100; r = BLIND_RGB.r / 100; g = BLIND_RGB.g / 100; b = BLIND_RGB.b / 100; }
         if (f.type !== 'cyc' && d > 0.002) {
           const hz = val(f.id, 'strobe') || 0;
           if (hz >= 0.25) {
