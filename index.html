@@ -172,7 +172,7 @@ a { color: inherit; }
 .fade-row input { width: 64px; font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 4px 6px; color-scheme: dark; }
 .go-row { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr; gap: 4px; }
 .go-row .cbtn { padding: 12px 6px; font-size: 13px; }
-.faders { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.faders { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
 .fader { display: grid; justify-items: center; gap: 6px; }
 .fader input { writing-mode: vertical-lr; direction: rtl; width: 24px; height: 104px; accent-color: var(--sel); margin: 0; }
 .fader .v { font: 11px var(--f-mono); color: var(--stage-fg); font-variant-numeric: tabular-nums; }
@@ -339,6 +339,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" id="tool-mask" aria-pressed="false" title="Show or hide the border and the wall above the stage">Masking off</button>
               <button type="button" id="tool-rave" class="edit-tool" aria-pressed="false" title="Sweep every light over the crowd">Rave mode</button>
               <button type="button" id="tool-sound" aria-pressed="false" title="Turn the crowd sound on or off">Crowd sound off</button>
+              <button type="button" id="tool-confetti" title="Fire the confetti cannons">Confetti</button>
               <button type="button" id="tool-view" title="Jump the camera to the stage, the back of the house, or straight down">View: Stage</button>
               <button type="button" id="tool-fs" title="Fill the screen with the stage (Esc to leave)">Full screen</button>
             </div>
@@ -374,6 +375,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <button type="button" class="cbtn" id="s-rot">Rotate 45°</button>
           <button type="button" class="cbtn" id="s-fly">Fly in / out</button>
           <button type="button" class="cbtn warn" id="s-del">Remove piece</button>
+          <label for="s-venue">Venue</label><select id="s-venue"><option value="church">Mega church</option><option value="theater">Theater</option></select>
+          <button type="button" class="cbtn" id="s-venue-go" hidden>Switch venue</button>
           <label for="s-crowd">Audience</label><select id="s-crowd"><option value="seated">Seated</option><option value="cheer">Cheering</option><option value="applause">Applause</option></select>
           <span class="patch-count" id="s-info"></span>
         </div>
@@ -408,7 +411,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="cuelist">
               <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th><th>Curtain</th></tr></thead><tbody id="cue-body"></tbody></table>
             </div>
-            <div class="fade-row edit"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
+            <div class="fade-row edit"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="q-confetti"> Confetti on this cue</label><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
             <div class="fade-row"><span id="save-state">Your cues, rig and set save in this browser</span></div>
             <div class="go-row">
               <button type="button" class="cbtn" id="b-back">Back</button>
@@ -423,7 +426,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The <b>Venue</b> menu switches between the mega church (thrust stage, LED wall, side screens, worship band and choir, arena seating) and the theater. The <b>Fog</b> fader runs two fog machines whose fog takes the colour of the lights and makes beams show; <b>Confetti</b> fires the cannons, and a cue can fire them too. <b>View: Performer</b> puts you on stage looking out at the crowd. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -590,6 +593,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
   const clone = o => JSON.parse(JSON.stringify(o));
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const VENUE = (() => { try { return localStorage.getItem('kld-venue') || 'church'; } catch (e) { return 'church'; } })();
+  const CHURCH = VENUE === 'church';
 
   function kelvinRGB(k) {
     const t = k / 100; let r, g, b;
@@ -715,6 +720,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     chandelier: { label: 'Chandelier (lit)', group: 'Flying scenery' },
     moon: { label: 'Moon (lit)', group: 'Flying scenery' },
     sign: { label: 'Show sign', group: 'Flying scenery' },
+    drums: { label: 'Drum kit on riser (with drummer)', group: 'Worship stage' },
+    keys: { label: 'Keyboard (with player)', group: 'Worship stage' },
+    amp: { label: 'Guitar amp', group: 'Worship stage' },
+    mic: { label: 'Mic stand', group: 'Worship stage' },
+    choir: { label: 'Choir risers (with choir)', group: 'Worship stage' },
+    cross: { label: 'Lit cross', group: 'Flying scenery' },
+    singer: { label: 'Worship leader with mic', group: 'People', actor: true },
+    guitar: { label: 'Guitarist', group: 'People', actor: true },
     lead: { label: 'Actor · long coat', group: 'People', actor: true },
     dress: { label: 'Actor · dress', group: 'People', actor: true },
     elder: { label: 'Actor · hat and cane', group: 'People', actor: true },
@@ -723,7 +736,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     child: { label: 'Actor · child', group: 'People', actor: true }
   };
   const STAGE = { x: 8.6, zMin: -6.9, zMax: 4.4 };
-  let SET = [
+  let SET = CHURCH ? [
+    { id: 'p1', kind: 'drums', x: 0, z: -4.2, rot: 0 },
+    { id: 'p2', kind: 'keys', x: -5.4, z: -3.4, rot: 20 },
+    { id: 'p3', kind: 'choir', x: 0, z: -6.5, rot: 0 },
+    { id: 'p6', kind: 'amp', x: 5.2, z: -3.6, rot: -15 },
+    { id: 'p7', kind: 'mic', x: 0, z: 2.6, rot: 0 },
+    { id: 'p8', kind: 'mic', x: -3.4, z: 1.6, rot: 10 },
+    { id: 'p9', kind: 'mic', x: 3.4, z: 1.6, rot: -10 },
+    { id: 'p10', kind: 'cross', x: 0, z: -7.2, rot: 0 },
+    { id: 'a1', kind: 'guitar', x: -3.4, z: 1.2, rot: 0 },
+    { id: 'a2', kind: 'singer', x: 0, z: 2.2, rot: 0 },
+    { id: 'a3', kind: 'guitar', x: 3.4, z: 1.2, rot: 0 }
+  ] : [
     { id: 'p1', kind: 'platform', x: -4.4, z: -5.0, rot: 0 },
     { id: 'p2', kind: 'bench', x: 0.1, z: -2.4, rot: 0 },
     { id: 'p3', kind: 'lamp', x: 6.2, z: -3.8, rot: 0 },
@@ -733,7 +758,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { id: 'p4', kind: 'window', x: -0.6, z: -5.8, rot: 0, fly: 1 },
     { id: 'p5', kind: 'city', x: 0, z: -6.3, rot: 0, fly: 1 }
   ];
-  let setSeq = 10, selSet = null, lay = null;
+  let setSeq = 20, selSet = null, lay = null;
   const actorsNow = () => SET.filter(o => PIECES[o.kind].actor);
   function liveActor(i) { const A = actorsNow(); if (!A.length) return [0, 1.5, 0]; const a = A[i % A.length]; return [a.x, 1.5, a.z]; }
   const ACT = {
@@ -754,6 +779,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     'Curtain call': [[-1.5, 2.6], [0, 2.8], [1.5, 2.6]]
   };
   Object.values(ACT).forEach(a => a.forEach(p => { p[0] *= 1.35; p[1] = p[1] * 1.3 - 0.4; }));
+  if (CHURCH) {
+    // The worship band stays at its mics for most looks, steps out onto the thrust for the Rave and the curtain call.
+    Object.keys(ACT).forEach(k => { ACT[k] = [[-3.4, 1.2], [0, 2.2], [3.4, 1.2]]; });
+    ACT.Rave = [[-4.2, 3.6], [0, 7.2], [4.2, 3.6]];
+    ACT['Curtain call'] = [[-2.4, 6.4], [0, 7.4], [2.4, 6.4]];
+  }
   const CYC_OUT = new Set(['Rave']);
   const snapLayout = () => Object.fromEntries(SET.map(o => [o.id, { x: o.x, z: o.z, rot: o.rot, fly: o.fly || 0 }]));
   const WINDOW_IN = new Set(['Moonlight', 'Fireside']);
@@ -873,10 +904,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const FX = window.KLD_FX;
   let fxLib = FX ? FX.load() : [];
   const FX_IN = { Storm: ['fx-sparkle'], Dream: ['fx-wave'], Rave: ['fx-rave-colour', 'fx-rave-tilt', 'fx-rave-chase'] };
-  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; c.crowd = c.name === 'Rave' ? 'cheer' : c.name === 'Curtain call' ? 'applause' : 'seated'; c.rave = c.name === 'Rave'; });
+  cues.forEach(c => { c.fx = FX_IN[c.name] || []; c.house = c.name === 'Preset' ? 100 : c.name === 'Curtain call' ? 40 : 0; c.crowd = c.name === 'Rave' ? 'cheer' : c.name === 'Curtain call' ? 'applause' : 'seated'; c.rave = c.name === 'Rave'; c.fog = { Rave: 55, Dream: 75, Storm: 40, Moonlight: 35, Lightning: 40 }[c.name] || 0; c.confetti = c.name === 'Rave' || c.name === 'Curtain call'; });
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
-  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', rave: false, layout: clone(lastQ.layout) });
+  cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', rave: false, fog: 0, confetti: false, layout: clone(lastQ.layout) });
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
@@ -915,10 +946,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   let fade = null;
   let fx = false;
   let encPage = 0;
-  const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35, house: cues[curIdx].house != null ? cues[curIdx].house : 0 };
+  const masters = { gm: 100, seq: 100, foh: 100, over: 100, floor: 100, haze: 35, house: cues[curIdx].house != null ? cues[curIdx].house : 0, fog: cues[curIdx].fog || 0 };
   let houseAnim = null;
   let crowdMode = cues[curIdx].crowd || 'seated';
   const CROWD = { seated: 'seated', cheer: 'cheering', applause: 'applauding' };
+  let viewI = 0;
   let raveMode = !!cues[curIdx].rave, raveBeat0 = performance.now(), blindHit = false;
   const BLIND_RGB = kcol(3000);
   let snd = null, soundOn = false;
@@ -1118,6 +1150,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (c.bars) startBars(c.bars, instant || c.fade <= 0 ? 0 : Math.max(c.fade, 2));
     if (c.crowd) setCrowd(c.crowd, true);
     setRave(!!c.rave, true);
+    if (c.fog != null) { masters.fog = c.fog; syncFader('fog'); }
+    $('q-confetti').checked = !!c.confetti;
+    if (c.confetti && scene3d) { scene3d.fireConfetti(); cannon(); }
     if (c.house != null) { const dur = instant || c.fade <= 0 ? 0 : Math.max(c.fade, 3); if (!dur) { masters.house = c.house; houseAnim = null; syncHouse(); } else houseAnim = { from: masters.house, to: c.house, t0: performance.now(), dur: dur * 1000 }; }
     if (c.fx) { fxActive = new Set(c.fx.filter(id => fxLib.some(x => x.id === id))); buildFxPool(); }
     if (c.layout) startLayout(c.layout, instant ? 0 : c.fade);
@@ -1134,8 +1169,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
     const t = Math.max(0, +$('fade').value || 0);
     let c = cues.find(x => x.num === num);
-    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.crowd = crowdMode; c.rave = raveMode; c.layout = snapLayout(); }
-    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, crowd: crowdMode, rave: raveMode, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
+    if (c) { c.state = state; c.fade = t; c.cyc = cycIn; c.curtain = curtainOpen; c.bars = snapBars(); c.fx = [...fxActive]; c.house = masters.house; c.crowd = crowdMode; c.rave = raveMode; c.fog = masters.fog; c.confetti = $('q-confetti').checked; c.layout = snapLayout(); }
+    else { c = { num, name: 'Cue ' + num, fade: t, state, cyc: cycIn, curtain: curtainOpen, bars: snapBars(), fx: [...fxActive], house: masters.house, crowd: crowdMode, rave: raveMode, fog: masters.fog, confetti: $('q-confetti').checked, layout: snapLayout() }; cues.push(c); cues.sort((a, b) => a.num - b.num); }
     curIdx = cues.indexOf(c); pb = clone(state); fade = null; lay = null; programmer = {};
     fb('Stored cue ' + num + ' (' + t + ' s fade) with the lights, set positions and cyc ' + (cycIn ? 'in' : 'out') + '. Programmer cleared');
     changed();
@@ -1153,6 +1188,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (k >= 1) barAnim = null;
     changed();
   }
+  function syncFader(k) { const inp = $('fd-' + k); if (!inp) return; inp.value = Math.round(masters[k]); inp.parentNode.querySelector('.v').textContent = Math.round(masters[k]); }
   function syncHouse() {
     const inp = $('fd-house'); if (!inp) return;
     inp.value = Math.round(masters.house); inp.parentNode.querySelector('.v').textContent = Math.round(masters.house);
@@ -1411,7 +1447,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   });
 
   // Faders
-  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['over', 'Elecs'], ['floor', 'Floor'], ['haze', 'Haze'], ['house', 'House']].forEach(([k, label]) => {
+  [['gm', 'Grand'], ['seq', 'Main'], ['foh', 'FOH'], ['over', 'Elecs'], ['floor', 'Floor'], ['haze', 'Haze'], ['fog', 'Fog'], ['house', 'House']].forEach(([k, label]) => {
     const w = document.createElement('div'); w.className = 'fader';
     w.innerHTML = '<span class="v"></span><input type="range" min="0" max="100" step="1"><label></label>';
     const inp = w.querySelector('input'), v = w.querySelector('.v'), l = w.querySelector('label');
@@ -1558,14 +1594,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     cyc.position.set(0, 5.25, CYCZ); scene.add(cyc);
 
     const prosMat = new THREE.MeshStandardMaterial({ color: 0x140b0c, roughness: 0.9 });
+    const theaterOnly = [];
     [[-9.0, 4.6, 1.8, 9.2], [9.0, 4.6, 1.8, 9.2]].forEach(([x, y, w, h]) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 4.6); scene.add(m);
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.6), prosMat); m.position.set(x, y, 4.6); scene.add(m); theaterOnly.push(m);
     });
     const masking = [];
-    const header = new THREE.Mesh(new THREE.BoxGeometry(19.8, 1.6, 0.6), prosMat); header.position.set(0, 8.4, 4.6); scene.add(header); masking.push(header);
+    const header = new THREE.Mesh(new THREE.BoxGeometry(19.8, 1.6, 0.6), prosMat); header.position.set(0, 8.4, 4.6); scene.add(header); masking.push(header); theaterOnly.push(header);
     const houseWall = new THREE.MeshStandardMaterial({ color: 0x0b0809, roughness: 1 });
-    const above = new THREE.Mesh(new THREE.BoxGeometry(44, 14, 0.5), houseWall); above.position.set(0, 16.2, 4.62); scene.add(above); masking.push(above);
-    [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(10, 22, 0.5), houseWall); w.position.set(sd * 14.9, 9, 4.62); scene.add(w); });
+    const above = new THREE.Mesh(new THREE.BoxGeometry(44, 14, 0.5), houseWall); above.position.set(0, 16.2, 4.62); scene.add(above); masking.push(above); theaterOnly.push(above);
+    [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(10, 22, 0.5), houseWall); w.position.set(sd * 14.9, 9, 4.62); scene.add(w); theaterOnly.push(w); });
 
     const velvet = new THREE.MeshStandardMaterial({ color: 0x5a0c14, roughness: 0.95, side: THREE.DoubleSide });
     function drape(w, h, folds, amp) {
@@ -1576,15 +1613,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     }
     [-1, 1].forEach(side => {
       const leg = new THREE.Mesh(drape(2.6, 8.2, 7, 0.12), velvet);
-      leg.position.set(side * 6.9, 4.1, 4.1); leg.receiveShadow = true; scene.add(leg);
+      leg.position.set(side * 6.9, 4.1, 4.1); leg.receiveShadow = true; scene.add(leg); theaterOnly.push(leg);
       const leg2 = new THREE.Mesh(drape(2.2, 8.2, 6, 0.1), new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 1, side: THREE.DoubleSide }));
-      leg2.position.set(side * 7.8, 4.1, -0.5); scene.add(leg2);
-      const leg3 = new THREE.Mesh(drape(2.2, 8.2, 6, 0.1), leg2.material); leg3.position.set(side * 7.8, 4.1, -4.2); scene.add(leg3);
+      leg2.position.set(side * 7.8, 4.1, -0.5); scene.add(leg2); theaterOnly.push(leg2);
+      const leg3 = new THREE.Mesh(drape(2.2, 8.2, 6, 0.1), leg2.material); leg3.position.set(side * 7.8, 4.1, -4.2); scene.add(leg3); theaterOnly.push(leg3);
     });
-    const border = new THREE.Mesh(drape(16, 1.2, 28, 0.08), velvet); border.position.set(0, 7.6, 4.1); scene.add(border); masking.push(border);
+    const border = new THREE.Mesh(drape(16, 1.2, 28, 0.08), velvet); border.position.set(0, 7.6, 4.1); scene.add(border); masking.push(border); theaterOnly.push(border);
     // Main curtain (a traveller): two halves that part to the sides
     const grandMat = new THREE.MeshStandardMaterial({ color: 0x6e0f1b, roughness: 0.92, side: THREE.DoubleSide });
-    const halves = [-1, 1].map(sd => { const m = new THREE.Mesh(drape(9.4, 8.2, 22, 0.1), grandMat); m.position.set(sd * 4.7, 4.1, 4.32); m.castShadow = m.receiveShadow = true; scene.add(m); return { m, sd }; });
+    const halves = [-1, 1].map(sd => { const m = new THREE.Mesh(drape(9.4, 8.2, 22, 0.1), grandMat); m.position.set(sd * 4.7, 4.1, 4.32); m.castShadow = m.receiveShadow = true; scene.add(m); theaterOnly.push(m); return { m, sd }; });
     let curtV = 1, curtT = 1, lastNow = 0;
     function placeCurtain() {
       const sx = 1 - 0.8 * curtV, w = 9.4 * sx, edge = 7.7 * curtV;
@@ -1596,7 +1633,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
     // ---- Set pieces and actors ----
     const setObj = {};
-    const SKIN = { lead: 0xc89a7c, dress: 0x8d5a3b, elder: 0xe0b597, suit: 0xb07a55, dancer: 0x5c3a24, child: 0xd8a882 };
+    const SKIN = { lead: 0xc89a7c, dress: 0x8d5a3b, elder: 0xe0b597, suit: 0xb07a55, dancer: 0x5c3a24, child: 0xd8a882, singer: 0x8d5a3b, guitar: 0xe0b597 };
     function buildPiece(kind) {
       const g = new THREE.Group(), mats = [];
       const M = (color, o) => { const m = new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.8 }, o || {})); m.userData.e0 = m.emissive.getHex(); m.userData.ei0 = m.emissiveIntensity; mats.push(m); return m; };
@@ -1628,6 +1665,47 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         case 'chair': { const m = M(0x5a3b22); put(B(0.45, 0.05, 0.45, m), 0, 0.45, 0); put(B(0.45, 0.5, 0.05, m), 0, 0.72, -0.2); [[-0.19, -0.19], [0.19, -0.19], [-0.19, 0.19], [0.19, 0.19]].forEach(([x, z]) => put(B(0.04, 0.45, 0.04, m), x, 0.225, z)); break; }
         case 'bench': { const m = M(0x4a3626); put(B(1.6, 0.08, 0.45, m), 0, 0.42, 0); put(B(0.08, 0.38, 0.4, m), -0.7, 0.19, 0); put(B(0.08, 0.38, 0.4, m), 0.7, 0.19, 0); break; }
         case 'crate': put(B(0.7, 0.7, 0.7, M(0x8a6a3e)), 0, 0.35, 0); break;
+        case 'drums': {
+          const riser = M(0x1b1c20), shell = M(0x7a1420, { roughness: 0.4 }), chrome = M(0xb8b8b8, { metalness: 0.8, roughness: 0.3 }), brass = M(0xc9a24a, { metalness: 0.7, roughness: 0.35 });
+          put(B(3.4, 0.5, 2.8, riser), 0, 0.25, 0);
+          const kickD = put(C(0.32, 0.32, 0.4, shell, 24), 0, 0.85, 0.35); kickD.rotation.x = Math.PI / 2;
+          [[-0.42, 1.05, 0.25, 0.18], [0.42, 1.05, 0.25, 0.18], [0.55, 0.85, -0.2, 0.22], [-0.5, 0.95, 0.5, 0.17]].forEach(([x, y, z, r]) => put(C(r, r, 0.22, shell, 18), x, y, z));
+          [[-0.85, 1.45, 0.45, 0.26], [0.8, 1.5, 0.3, 0.3], [-0.2, 1.6, 0.15, 0.22]].forEach(([x, y, z, r]) => { put(C(0.012, 0.012, y - 0.5, chrome, 6), x, 0.5 + (y - 0.5) / 2, z); put(C(r, r, 0.012, brass, 24), x, y, z); });
+          const shield = put(B(2.9, 1.5, 0.03, M(0xaac4d8, { transparent: true, opacity: 0.18, roughness: 0.1, depthWrite: false })), 0, 1.25, 1.25); shield.castShadow = false;
+          const cl = M(0x2b2f38), sk = M(0xb07a55);
+          put(C(0.18, 0.2, 0.55, cl, 12), 0, 1.05, -0.55); put(SP(0.11, sk, 14, 10), 0, 1.45, -0.55); put(C(0.17, 0.17, 0.08, M(0x111111), 12), 0, 0.72, -0.55);
+          break;
+        }
+        case 'keys': {
+          const stand = M(0x15161a), kb = M(0x222428), whiteK = M(0xeeeeee);
+          const l1 = put(B(0.04, 1.05, 0.04, stand), 0, 0.5, 0); l1.rotation.z = 0.5; const l2 = put(B(0.04, 1.05, 0.04, stand), 0, 0.5, 0); l2.rotation.z = -0.5;
+          put(B(1.3, 0.09, 0.38, kb), 0, 0.95, 0); put(B(1.2, 0.02, 0.15, whiteK), 0, 1.0, 0.09);
+          const cl = M(0x3a3a3e), sk = M(0xc89a7c);
+          put(C(0.18, 0.2, 0.6, cl, 12), 0, 1.1, -0.55); put(SP(0.11, sk, 14, 10), 0, 1.52, -0.55); put(C(0.07, 0.06, 0.85, M(0x1f1f24), 8), -0.1, 0.43, -0.55); put(C(0.07, 0.06, 0.85, M(0x1f1f24), 8), 0.1, 0.43, -0.55);
+          break;
+        }
+        case 'amp': { put(B(0.75, 0.62, 0.36, M(0x111214)), 0, 0.31, 0); put(B(0.66, 0.42, 0.01, M(0x2a2620, { roughness: 1 })), 0, 0.27, 0.181); put(B(0.75, 0.08, 0.36, M(0x1a1a1a)), 0, 0.66, 0); break; }
+        case 'mic': { const m = M(0x15161a, { metalness: 0.6, roughness: 0.4 }); put(C(0.16, 0.16, 0.02, m, 16), 0, 0.01, 0); put(C(0.012, 0.012, 1.45, m, 6), 0, 0.74, 0); const boom = put(C(0.01, 0.01, 0.4, m, 6), 0, 1.5, 0.12); boom.rotation.x = 1.0; put(SP(0.035, M(0x333333), 10, 8), 0, 1.58, 0.3); break; }
+        case 'choir': {
+          const step = M(0x1b1c20), robe = M(0x6b1b2a, { roughness: 0.9 }), stole = M(0xc9a24a);
+          [[0, 0.2, 0.4, 9.5], [0.4, 0.6, -0.6, 9], [0.8, 1.0, -1.6, 8.5]].forEach(([y0, y1, z, w]) => put(B(w, y1 - y0 + 0.001, 1.0, step), 0, (y0 + y1) / 2, z));
+          const skins = [0xc89a7c, 0x8d5a3b, 0xe0b597, 0x5c3a24, 0xb07a55];
+          [[0.4, 0.4, 5], [0.8, -0.6, 6], [1.2, -1.6, 5]].forEach(([fy, z, n], row) => {
+            for (let i = 0; i < n; i++) {
+              const x = (i - (n - 1) / 2) * 1.4 + (row % 2 ? 0.35 : 0);
+              put(new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.35, 12), robe), x, fy + 0.66, z);
+              put(B(0.06, 0.6, 0.02, stole), x - 0.08, fy + 1.0, z + 0.2); put(B(0.06, 0.6, 0.02, stole), x + 0.08, fy + 1.0, z + 0.2);
+              put(SP(0.11, M(skins[(i + row * 2) % skins.length], { roughness: 0.6 }), 14, 10), x, fy + 1.5, z);
+            }
+          });
+          break;
+        }
+        case 'cross': {
+          const lit = M(0xfff4dc, { emissive: 0xffe6b8, emissiveIntensity: 1.3 });
+          put(B(0.32, 4.0, 0.16, lit), 0, 6.2, 0); put(B(2.3, 0.32, 0.16, lit), 0, 7.1, 0);
+          const ln = M(0x222222); put(C(0.008, 0.008, 2.2, ln, 4), 0, 9.3, 0);
+          break;
+        }
         case 'city': case 'forest': {
           const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512; const x = cv.getContext('2d');
           let rs = kind === 'city' ? 7 : 3; const rnd = () => { rs = (rs * 16807) % 2147483647; return rs / 2147483647; };
@@ -1700,7 +1778,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             elder: { h: 1.72, top: 0x5b6a52, legs: 0x3a3430, hair: 0xd8d4cc },
             suit: { h: 1.86, top: 0x23272e, legs: 0x23272e, hair: 0x1a1410 },
             dancer: { h: 1.74, top: 0x2a3a6a, legs: 0x2a3a6a, hair: 0x0e0a08 },
-            child: { h: 1.18, top: 0xe0a43a, legs: 0x2f4b7a, hair: 0x6a3d1e }
+            child: { h: 1.18, top: 0xe0a43a, legs: 0x2f4b7a, hair: 0x6a3d1e },
+            singer: { h: 1.78, top: 0x2b2f38, legs: 0x1c1d22, hair: 0x120c08 },
+            guitar: { h: 1.8, top: 0x6a5a40, legs: 0x23272e, hair: 0x3a2716 }
           }[kind];
           const body = new THREE.Group(); body.scale.setScalar(S.h / 1.75); g.add(body);
           const skin = M(SKIN[kind], { roughness: 0.6 }), top = M(S.top, { roughness: 0.85 }), legs = M(S.legs, { roughness: 0.85 }), hair = M(S.hair, { roughness: 0.95 }), shoe = M(0x121212, { roughness: 0.6 });
@@ -1716,7 +1796,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           const arm = (side, rz, rx) => {
             const p = new THREE.Group(); p.position.set(side * 0.24, 1.42, 0); p.rotation.set(rx || 0, 0, side * rz); body.add(p);
             put(C(0.045, 0.04, 0.62, kind === 'dancer' ? skin : top), 0, -0.31, 0, p); put(SP(0.045, skin, 10, 8), 0, -0.64, 0, p);
+            return p;
           };
+          if (kind === 'singer') { const r = arm(1, 0.35, -1.6); put(C(0.025, 0.018, 0.2, M(0x111111), 8), 0, -0.72, 0, r); put(SP(0.04, M(0x333333), 10, 8), 0, -0.82, 0, r); arm(-1, 0.6, -0.5); }
+          if (kind === 'guitar') {
+            const wood = M(0x8a4a20, { roughness: 0.5 }), neck = M(0x2a1a10);
+            const gb = put(C(0.2, 0.2, 0.08, wood, 20), 0.04, 1.02, 0.2, body); gb.rotation.set(Math.PI / 2, 0, 0.5);
+            const nk = put(B(0.05, 0.75, 0.03, neck), -0.3, 1.26, 0.22, body); nk.rotation.z = 1.05;
+            put(B(0.02, 0.6, 0.02, M(0x111111)), 0.1, 1.25, -0.12, body).rotation.z = -0.6;
+            arm(-1, 0.9, -0.9); arm(1, 0.35, -0.7);
+          }
           if (kind === 'lead') { P(C(0.22, 0.31, 0.95, top), 0, 0.98, 0); P(B(0.3, 0.08, 0.06, top), 0, 1.47, 0.14); arm(-1, 0.14); arm(1, 0.14); }
           if (kind === 'dress') { P(C(0.16, 0.42, 0.98, legs), 0, 0.5, 0); P(C(0.1, 0.13, 0.42, hair), 0, 1.48, -0.08); arm(-1, 0.12); arm(1, 1.2, -0.5); }
           if (kind === 'elder') {
@@ -1747,11 +1836,25 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
     // ---- Audience: raked rows of seats with people, and house lights in the ceiling ----
     const seatSpots = [];
-    for (let row = 0; row < 12; row++) {
-      const z = 7 + row * 1.0, y = -1.1 + row * 0.24;
-      for (let x = -8.4; x <= 8.41; x += 0.6) {
-        if (Math.abs(x) < 0.5 || Math.abs(Math.abs(x) - 4.8) < 0.3) continue; // aisles
-        seatSpots.push([x, y, z]);
+    if (CHURCH) {
+      // Arena seating: curved rows facing the thrust
+      const cx = 0, cz = -1;
+      for (let row = 0; row < 12; row++) {
+        const R = 13.5 + row * 1.05, y = -1.1 + row * 0.22, n = Math.floor(R * 1.7 / 0.62);
+        for (let i = 0; i <= n; i++) {
+          const a = -0.85 + 1.7 * i / n;
+          if (Math.abs(a) < 0.04 || Math.abs(Math.abs(a) - 0.45) < 0.035) continue; // aisles
+          const x = cx + R * Math.sin(a), z = cz + R * Math.cos(a);
+          seatSpots.push([x, y, z, Math.atan2(x - cx, z - cz)]);
+        }
+      }
+    } else {
+      for (let row = 0; row < 12; row++) {
+        const z = 7 + row * 1.0, y = -1.1 + row * 0.24;
+        for (let x = -8.4; x <= 8.41; x += 0.6) {
+          if (Math.abs(x) < 0.5 || Math.abs(Math.abs(x) - 4.8) < 0.3) continue; // aisles
+          seatSpots.push([x, y, z, 0]);
+        }
       }
     }
     const nS = seatSpots.length;
@@ -1759,8 +1862,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const seatB = new THREE.InstancedMesh(new THREE.BoxGeometry(0.5, 0.42, 0.48), seatMat, nS);
     const seatK = new THREE.InstancedMesh(new THREE.BoxGeometry(0.5, 0.6, 0.08), seatMat, nS);
     const m4 = new THREE.Matrix4();
-    seatSpots.forEach(([x, y, z], i) => { m4.makeTranslation(x, y + 0.21, z); seatB.setMatrixAt(i, m4); m4.makeTranslation(x, y + 0.6, z + 0.24); seatK.setMatrixAt(i, m4); });
-    seatB.receiveShadow = seatK.receiveShadow = true; scene.add(seatB, seatK);
+    const dummy = new THREE.Object3D(); dummy.rotation.order = 'YXZ';
+    const riser = new THREE.InstancedMesh(new THREE.BoxGeometry(0.62, 1, 1.0), new THREE.MeshLambertMaterial({ color: 0x15121a }), nS);
+    seatSpots.forEach(([x, y, z, th], i) => {
+      dummy.rotation.set(0, th, 0); dummy.scale.set(1, 1, 1);
+      dummy.position.set(x, y + 0.21, z); dummy.updateMatrix(); seatB.setMatrixAt(i, dummy.matrix);
+      dummy.position.set(x + 0.24 * Math.sin(th), y + 0.6, z + 0.24 * Math.cos(th)); dummy.updateMatrix(); seatK.setMatrixAt(i, dummy.matrix);
+      const hh = Math.max(0.001, y + 1.1); dummy.scale.set(1, hh, 1); dummy.position.set(x + 0.1 * Math.sin(th), -1.1 + hh / 2, z + 0.1 * Math.cos(th)); dummy.updateMatrix(); riser.setMatrixAt(i, dummy.matrix);
+    });
+    dummy.scale.set(1, 1, 1);
+    seatB.receiveShadow = seatK.receiveShadow = riser.receiveShadow = true; scene.add(seatB, seatK, riser);
     const people = seatSpots.filter((_, i) => ((i * 2654435761) >>> 0) % 100 < 86);
     const bodyM = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.17, 0.22, 0.62, 10), new THREE.MeshLambertMaterial({ emissive: 0x3a2c1e, emissiveIntensity: 0 }), people.length);
     const headM = new THREE.InstancedMesh(new THREE.SphereGeometry(0.11, 12, 8), new THREE.MeshLambertMaterial({ emissive: 0x4a3626, emissiveIntensity: 0 }), people.length);
@@ -1769,7 +1880,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     people.forEach(([x, y, z], i) => {
       const h = 0.92 + ((i * 7919) % 13) / 100;
       m4.makeTranslation(x, y + 0.42 + 0.31 * h, z - 0.02); bodyM.setMatrixAt(i, m4);
-      m4.makeTranslation(x + (((i * 31) % 7) - 3) * 0.01, y + 0.42 + 0.62 * h + 0.13, z - 0.04); headM.setMatrixAt(i, m4);
+      m4.makeTranslation(x, y + 0.42 + 0.62 * h + 0.13, z - 0.04); headM.setMatrixAt(i, m4);
       bodyM.setColorAt(i, col.setHex(CLOTH[(i * 5) % CLOTH.length])); headM.setColorAt(i, col.setHex(SKINS[(i * 3) % SKINS.length]));
     });
     bodyM.receiveShadow = headM.receiveShadow = true; scene.add(bodyM, headM);
@@ -1778,7 +1889,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     people.forEach((p, i) => { const c = col.setHex(CLOTH[(i * 5) % CLOTH.length]); armM.setColorAt(i * 2, c); armM.setColorAt(i * 2 + 1, c); });
     armM.frustumCulled = bodyM.frustumCulled = headM.frustumCulled = false;
     scene.add(armM);
-    const dummy = new THREE.Object3D();
     let stand = 0, crowdT = 0, lastCrowd = -1, raveK = 0, raveT = 0;
     const hash2 = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
     const hsv3 = hh => { const i = Math.floor(hh * 6), fr = hh * 6 - i; return [[1, fr, 0], [1 - fr, 1, 0], [0, 1, fr], [0, 1 - fr, 1], [fr, 0, 1], [1, 0, 1 - fr]][((i % 6) + 6) % 6]; };
@@ -1791,35 +1901,123 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       const t = reduceMotion ? 0.4 : now / 1000, moving = crowdMode !== 'seated';
       if (!moving && stand === 0 && lastCrowd === 0) return;
       lastCrowd = moving || stand > 0 ? 1 : 0;
-      people.forEach(([x, y, z], i) => {
-        const h = 0.92 + ((i * 7919) % 13) / 100, ph = ((i * 2654435761) >>> 0) % 628 / 100;
+      people.forEach(([x, y, z, th], i) => {
+        const h = 0.92 + ((i * 7919) % 13) / 100, ph = ((i * 2654435761) >>> 0) % 628 / 100, cs = Math.cos(th), sn = Math.sin(th);
         const bounce = crowdMode === 'cheer' ? Math.abs(Math.sin(t * 5.2 + ph)) * 0.22 * stand : 0;
         const lift = 0.38 * stand + bounce;
         const by = y + 0.42 + 0.31 * h + lift;
         m4.makeTranslation(x, by, z - 0.02); bodyM.setMatrixAt(i, m4);
-        m4.makeTranslation(x + (((i * 31) % 7) - 3) * 0.01, y + 0.42 + 0.62 * h + 0.13 + lift, z - 0.04); headM.setMatrixAt(i, m4);
+        m4.makeTranslation(x, y + 0.42 + 0.62 * h + 0.13 + lift, z - 0.04); headM.setMatrixAt(i, m4);
         const sy = by + 0.31 * h - 0.06;
         [-1, 1].forEach((sd, k) => {
           let rz = 0, rx = 0, vis = stand;
           if (crowdMode === 'cheer') rz = sd * (2.5 + 0.35 * Math.sin(t * 6 + ph + k));
           else if (crowdMode === 'applause') { rx = 1.25; rz = sd * (-0.3 + 0.18 * Math.abs(Math.sin(t * 7 + ph))); }
           else { rx = 0.3; rz = sd * 0.15; }
-          dummy.position.set(x + sd * 0.2, sy, z - 0.02); dummy.rotation.set(rx, 0, rz); dummy.scale.setScalar(Math.max(0.0001, vis)); dummy.updateMatrix();
+          dummy.position.set(x + sd * 0.2 * cs, sy, z - sd * 0.2 * sn); dummy.rotation.set(rx, th, rz); dummy.scale.setScalar(Math.max(0.0001, vis)); dummy.updateMatrix();
           armM.setMatrixAt(i * 2 + k, dummy.matrix);
         });
       });
       bodyM.instanceMatrix.needsUpdate = headM.instanceMatrix.needsUpdate = armM.instanceMatrix.needsUpdate = true;
     }
     updateCrowd(performance.now());
-    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x0d0c0e, roughness: 1 }));
-    ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, 13.5, 15); scene.add(ceiling);
+    const CEIL = CHURCH ? { w: 48, d: 34, y: 16, z: 15, rows: 6, cols: 10, x0: -18, dx: 4, z0: 3, dz: 5 } : { w: 30, d: 20, y: 13.5, z: 15, rows: 4, cols: 6, x0: -8.75, dx: 3.5, z0: 7, dz: 4 };
+    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(CEIL.w, CEIL.d), new THREE.MeshStandardMaterial({ color: 0x0d0c0e, roughness: 1 }));
+    ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, CEIL.y, CEIL.z); scene.add(ceiling);
     const canMat = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0xffd9a8, emissiveIntensity: 0.05 });
-    const cans = new THREE.InstancedMesh(new THREE.CircleGeometry(0.22, 16), canMat, 24);
+    const cans = new THREE.InstancedMesh(new THREE.CircleGeometry(0.22, 16), canMat, CEIL.rows * CEIL.cols);
     let ci = 0; const rot = new THREE.Matrix4().makeRotationX(Math.PI / 2);
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) { m4.makeTranslation(-8.75 + c * 3.5, 13.45, 7 + r * 4).multiply(rot); cans.setMatrixAt(ci++, m4); }
+    for (let r = 0; r < CEIL.rows; r++) for (let c = 0; c < CEIL.cols; c++) { m4.makeTranslation(CEIL.x0 + c * CEIL.dx, CEIL.y - 0.05, CEIL.z0 + r * CEIL.dz).multiply(rot); cans.setMatrixAt(ci++, m4); }
     scene.add(cans);
     // House light is drawn as a warm glow on the audience and ceiling rather than extra real lights, which keeps the stage fast.
     const houseMats = [seatMat, bodyM.material, headM.material];
+
+    // ---- Fog: soft sprites that roll out of the two machines and drift across the stage ----
+    const fogCv = document.createElement('canvas'); fogCv.width = fogCv.height = 64; const fgx = fogCv.getContext('2d');
+    const fgr = fgx.createRadialGradient(32, 32, 0, 32, 32, 32); fgr.addColorStop(0, 'rgba(255,255,255,1)'); fgr.addColorStop(0.5, 'rgba(255,255,255,.35)'); fgr.addColorStop(1, 'rgba(255,255,255,0)');
+    fgx.fillStyle = fgr; fgx.fillRect(0, 0, 64, 64);
+    const FOG_SRC = [[-8.6, 4.2], [8.6, 4.2]];
+    const FOG_N = 460, fogPos = new Float32Array(FOG_N * 3), fogP = [];
+    const fogGeo = new THREE.BufferGeometry(); fogGeo.setAttribute('position', new THREE.BufferAttribute(fogPos, 3));
+    const fogMat = new THREE.PointsMaterial({ size: 3.6, map: new THREE.CanvasTexture(fogCv), transparent: true, depthWrite: false, opacity: 0, color: 0xc0c4cc, sizeAttenuation: true });
+    const fogPts = new THREE.Points(fogGeo, fogMat); fogPts.frustumCulled = false; fogPts.visible = false; scene.add(fogPts);
+    const zMax = CHURCH ? 10 : 4.8;
+    function fogSpawn(i, warm) {
+      const [sx, sz] = FOG_SRC[i % 2], side = sx < 0 ? 1 : -1;
+      const p = fogP[i] || (fogP[i] = {});
+      p.x = sx; p.z = sz; p.y = 0.15 + Math.random() * 0.25; p.vx = side * (0.5 + Math.random() * 1.1); p.vz = -0.5 + Math.random() * 0.9 - 0.15; p.vy = 0.02 + Math.random() * 0.05;
+      p.life = 0; p.max = 9 + Math.random() * 9;
+      if (warm) { const k = Math.random(); p.life = k * p.max; p.x += p.vx * p.life * 0.8; p.z += p.vz * p.life * 0.8; p.y += p.vy * p.life; }
+    }
+    for (let i = 0; i < FOG_N; i++) fogSpawn(i, true);
+    let fogLevel = 0, fogT = 0;
+    function fogBusy() { return fogLevel > 0.002 || masters.fog > 0; }
+    function updateFog(now, tint) {
+      const dt = Math.min(0.1, Math.max(0, (now - (fogT || now)) / 1000)); fogT = now;
+      const tgt = masters.fog / 100;
+      fogLevel = reduceMotion ? tgt : fogLevel + clamp(tgt - fogLevel, -dt / 6, dt / 4);
+      fogPts.visible = fogLevel > 0.002;
+      if (!fogPts.visible) return;
+      fogMat.opacity = 0.1 + 0.26 * fogLevel;
+      fogMat.color.setRGB(0.32 + 0.68 * tint[0], 0.32 + 0.68 * tint[1], 0.32 + 0.68 * tint[2]);
+      const active = Math.floor(FOG_N * Math.min(1, 0.15 + fogLevel));
+      for (let i = 0; i < FOG_N; i++) {
+        const p = fogP[i];
+        if (i >= active) { fogPos[i * 3 + 1] = -60; continue; }
+        if (!reduceMotion) {
+          p.life += dt; p.x += p.vx * dt; p.z += p.vz * dt; p.y = Math.min(1.6, p.y + p.vy * dt); p.vx *= 1 - 0.08 * dt; p.vz *= 1 - 0.05 * dt;
+          if (p.life > p.max || Math.abs(p.x) > 10.5 || p.z < -7 || p.z > zMax) fogSpawn(i);
+        }
+        fogPos[i * 3] = p.x; fogPos[i * 3 + 1] = p.y; fogPos[i * 3 + 2] = p.z;
+      }
+      fogGeo.attributes.position.needsUpdate = true;
+    }
+
+    // ---- Confetti: two cannons fire over the crowd; pieces flutter down and settle ----
+    const CN = 1500;
+    const confM = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.09, 0.055), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), CN);
+    const CCOL = [0xf2c94c, 0xd9d9e0, 0xff4fa3, 0x2fd3c4, 0xffffff, 0x8a6cff, 0xff8a3c];
+    for (let i = 0; i < CN; i++) confM.setColorAt(i, col.setHex(CCOL[i % CCOL.length]));
+    confM.frustumCulled = false; confM.visible = false; scene.add(confM);
+    const cf = Array.from({ length: CN }, () => ({}));
+    let confOn = false, confAge = 0, confT = 0;
+    function floorY(x, z) {
+      if (CHURCH) { if (z < 5 || Math.hypot(x, z - 5) < 6.5) return 0.01; const d = Math.hypot(x, z + 1); return d < 13.5 ? -1.09 : -1.09 + Math.min(11, (d - 13.5) / 1.05) * 0.22 + 0.42; }
+      if (z < 5) return 0.01; return z < 7 ? -1.09 : -1.09 + Math.min(11, z - 7) * 0.24 + 0.42;
+    }
+    function fireConfetti() {
+      const cx = CHURCH ? 5.5 : 7.6, cz = CHURCH ? 6.5 : 4.6;
+      cf.forEach((p, i) => {
+        const side = i % 2 ? 1 : -1;
+        p.x = side * cx; p.y = 0.7; p.z = cz; p.vx = -side * Math.random() * 3.5 + (Math.random() - 0.5) * 2.5; p.vy = 8 + Math.random() * 8; p.vz = 2 + Math.random() * 7.5;
+        p.rx = Math.random() * 6; p.ry = Math.random() * 6; p.wx = (Math.random() - 0.5) * 18; p.wy = (Math.random() - 0.5) * 14; p.ph = Math.random() * 6; p.down = false;
+        if (reduceMotion) { p.x = (Math.random() - 0.5) * 18; p.z = cz + Math.random() * 12; p.y = floorY(p.x, p.z); p.down = true; p.rx = Math.PI / 2; }
+      });
+      confOn = true; confAge = 0; confM.visible = true; dirty = true;
+    }
+    function confBusy() { return confOn; }
+    function updateConfetti(now) {
+      const dt = Math.min(0.05, Math.max(0, (now - (confT || now)) / 1000)); confT = now;
+      if (!confOn) return;
+      confAge += dt;
+      const fade = confAge > 22 ? Math.max(0, 1 - (confAge - 22) / 3) : 1;
+      cf.forEach((p, i) => {
+        if (!p.down) {
+          p.vy -= 9.8 * dt;
+          if (p.vy < -1.3) p.vy = -1.3;
+          p.vx *= 1 - 0.7 * dt; p.vz *= 1 - 0.7 * dt;
+          p.x += (p.vx + Math.sin(now / 160 + p.ph) * 0.5) * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+          p.rx += p.wx * dt; p.ry += p.wy * dt;
+          const fy = floorY(p.x, p.z);
+          if (p.vy < 0 && p.y <= fy) { p.y = fy; p.down = true; p.rx = Math.PI / 2; p.ry = p.ph; }
+        }
+        dummy.position.set(p.x, p.y, p.z); dummy.rotation.set(p.rx, p.ry, 0); dummy.scale.setScalar(Math.max(0.0001, fade)); dummy.updateMatrix();
+        confM.setMatrixAt(i, dummy.matrix);
+      });
+      dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1);
+      confM.instanceMatrix.needsUpdate = true;
+      if (fade <= 0) { confOn = false; confM.visible = false; }
+    }
     function applyHouse() {
       const h = masters.house / 100;
       houseMats.forEach(m => { m.emissiveIntensity = 0.9 * h; });
@@ -1868,8 +2066,45 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     backWall.position.set(0, 6, -8.3); backWall.receiveShadow = true; scene.add(backWall);
     let cycY = 5.25, cycTarget = 5.25;
     function flyCyc(isIn, now) { cycTarget = isIn ? 5.25 : 19; if (reduceMotion || now) cycY = cycTarget; dirty = true; }
-    function showMasking(on) { masking.forEach(m => { m.visible = on; }); dirty = true; }
+    function showMasking(on) { masking.forEach(m => { m.visible = on && !CHURCH; }); dirty = true; }
     showMasking(false);
+    if (CHURCH) {
+      theaterOnly.forEach(m => { m.visible = false; });
+      const dark = new THREE.MeshStandardMaterial({ color: 0x101114, roughness: 0.95 });
+      // Thrust: a half-round platform that pushes the stage out into the room
+      const thrust = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.5, 1.1, 48, 1, false, -Math.PI / 2, Math.PI), deck.material);
+      thrust.position.set(0, -0.55, 5); thrust.receiveShadow = true; scene.add(thrust);
+      const lip = new THREE.Mesh(new THREE.CylinderGeometry(6.52, 6.52, 0.05, 48, 1, true, -Math.PI / 2, Math.PI), new THREE.MeshBasicMaterial({ color: 0x3a6bd8 }));
+      lip.position.set(0, -0.06, 5); scene.add(lip);
+      // LED wall: the cyc becomes a pixel wall, coloured by the cyc light
+      const led = document.createElement('canvas'); led.width = 512; led.height = 256; const lc = led.getContext('2d');
+      const lg = lc.createLinearGradient(0, 0, 0, 256); lg.addColorStop(0, '#2a2a2a'); lg.addColorStop(0.6, '#9a9a9a'); lg.addColorStop(1, '#ffffff');
+      lc.fillStyle = lg; lc.fillRect(0, 0, 512, 256);
+      lc.fillStyle = 'rgba(0,0,0,.55)'; for (let x = 0; x < 512; x += 4) lc.fillRect(x, 0, 1, 256); for (let y = 0; y < 256; y += 4) lc.fillRect(0, y, 512, 1);
+      cycMat.emissiveMap = new THREE.CanvasTexture(led); cycMat.needsUpdate = true;
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(22.8, 11.2, 0.3), dark); frame.position.set(0, 5.25, CYCZ - 0.2); scene.add(frame);
+      backWall.material.map = null; backWall.material.color.setHex(0x121318); backWall.material.needsUpdate = true;
+      backWall.scale.set(2.4, 1.6, 1); backWall.position.y = 9;
+      // Side screens (IMAG) angled toward the seats
+      const sc = document.createElement('canvas'); sc.width = 1024; sc.height = 576; const sx2 = sc.getContext('2d');
+      const sg = sx2.createLinearGradient(0, 0, 1024, 576); sg.addColorStop(0, '#0d1b3a'); sg.addColorStop(1, '#3a1450');
+      sx2.fillStyle = sg; sx2.fillRect(0, 0, 1024, 576);
+      sx2.fillStyle = '#ffffff'; sx2.textAlign = 'center'; sx2.textBaseline = 'middle';
+      sx2.font = 'bold 120px Georgia, serif'; sx2.fillText('WELCOME HOME', 512, 250);
+      sx2.font = '44px Georgia, serif'; sx2.fillStyle = 'rgba(255,255,255,.8)'; sx2.fillText('We are glad you are here', 512, 370);
+      const screenTex = new THREE.CanvasTexture(sc); screenTex.encoding = THREE.sRGBEncoding;
+      [-1, 1].forEach(sd => {
+        const g = new THREE.Group(); g.position.set(sd * 14.2, 7.6, 2.2); g.rotation.y = -sd * 0.42; scene.add(g);
+        const scr = new THREE.Mesh(new THREE.PlaneGeometry(8, 4.5), new THREE.MeshBasicMaterial({ map: screenTex })); g.add(scr);
+        const fr = new THREE.Mesh(new THREE.BoxGeometry(8.4, 4.9, 0.2), dark); fr.position.z = -0.12; g.add(fr);
+      });
+      // Room: wide side walls and a bigger floor for arena seating
+      [-1, 1].forEach(sd => { const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 18, 46), dark); w.position.set(sd * 24, 8, 12); scene.add(w); });
+      house.geometry.dispose(); house.geometry = new THREE.PlaneGeometry(48, 44); house.position.z = 14;
+    }
+    // Fog machines at the downstage corners
+    const fogBoxMat = new THREE.MeshStandardMaterial({ color: 0x1d1f24, roughness: 0.5 });
+    FOG_SRC.forEach(([x, z]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.4, 0.5), fogBoxMat); b.position.set(x, 0.2, z); b.rotation.y = x < 0 ? 0.5 : -0.5; b.castShadow = true; scene.add(b); const n = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.2, 10), fogBoxMat); n.rotation.z = Math.PI / 2; n.position.set(x + (x < 0 ? 0.42 : -0.42), 0.25, z); scene.add(n); });
     const busy = () => Math.abs(cycY - cycTarget) > 0.005 || !!curtAnim;
 
     // A fixed pool of real lights is shared by the brightest fixtures, so the rig can grow without overloading the graphics card.
@@ -2008,7 +2243,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         lookAt.x = clamp(lookAt.x - Math.cos(az) * dx * k, -10, 10);
         lookAt.z = clamp(lookAt.z + Math.sin(az) * dx * k, -8, 6);
         panY = clamp(panY + dy * k, -4.5, 6);
-        lookAt.y = LOOKY - (1 - Math.min(zoomF, 1)) * 3.6 + panY;
+        lookAt.y = viewY - (zoomTilt ? (1 - Math.min(zoomF, 1)) * 3.6 : 0) + panY;
         pan = { x: e.clientX, y: e.clientY }; dirty = true; return;
       }
       if (dragSet) {
@@ -2018,8 +2253,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       }
       if (aiming) { aimHere(e); return; }
       if (!orbit) return;
-      az = clamp(az - (e.clientX - orbit.x) * 0.005, -1.5, 1.5);
-      el = clamp(el + (e.clientY - orbit.y) * 0.004, 0.02, 1.35);
+      az = clamp(az - (e.clientX - orbit.x) * 0.005, azC - 1.5, azC + 1.5);
+      el = clamp(el + (e.clientY - orbit.y) * 0.004, elMin, 1.35);
       orbit = { x: e.clientX, y: e.clientY }; dirty = true;
     });
     const end = () => { orbit = null; aiming = false; dragSet = null; pan = null; };
@@ -2029,17 +2264,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       zoomF = clamp(zoomF * Math.exp(step * 0.0008), 0.35, 1.6);
       dist = baseDist * zoomF;
       // Lower the look point as you zoom in, so close-ups frame the actors rather than the rig.
-      lookAt.y = LOOKY - (1 - Math.min(zoomF, 1)) * 3.6 + panY;
+      lookAt.y = viewY - (zoomTilt ? (1 - Math.min(zoomF, 1)) * 3.6 : 0) + panY;
       dirty = true;
     }, { passive: false });
-    const VIEWS = { Stage: [0.15, 0.16, 1, 0, LOOKY, -1.2], House: [0.0, 0.3, 1.4, 0, 3.0, 2.5], Top: [0.0, 1.3, 1.3, 0, 0, 3] };
+    const VIEWS = { Stage: [0.15, 0.16, 1, 0, LOOKY, -1.2], House: [0.0, 0.3, CHURCH ? 1.6 : 1.4, 0, 3.0, CHURCH ? 6 : 2.5], Top: [0.0, 1.3, CHURCH ? 1.6 : 1.3, 0, 0, CHURCH ? 6 : 3] };
+    let azC = 0, elMin = 0.02, viewY = LOOKY, zoomTilt = true;
     function setView(name) {
+      if (name === 'Performer') {
+        // Eye level of a performer at centre stage, looking out over the audience
+        const eye = new THREE.Vector3(0, 2.1, CHURCH ? 8.4 : 3.8), tgt = new THREE.Vector3(0, 1.6, CHURCH ? 26 : 17);
+        const dv = eye.clone().sub(tgt), dd = dv.length();
+        az = Math.atan2(dv.x, dv.z); el = Math.asin(dv.y / dd); zoomF = dd / baseDist; dist = dd; panY = 0; lookAt.copy(tgt);
+        azC = Math.PI; elMin = -0.35; viewY = tgt.y; zoomTilt = false; dirty = true; return;
+      }
       const v = VIEWS[name]; if (!v) return;
+      azC = 0; elMin = 0.02; viewY = v[4]; zoomTilt = name === 'Stage';
       [az, el, zoomF] = v; dist = baseDist * zoomF; panY = 0; lookAt.set(v[3], v[4], v[5]); dirty = true;
     }
     vp.addEventListener('dblclick', e => {
       if (e.target.closest('.vp-tools') || (toolMode !== 'move' && toolMode !== 'pan')) return;
-      zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, LOOKY, -1.2); az = 0.15; el = 0.16; dirty = true;
+      zoomF = 1; dist = baseDist; panY = 0; lookAt.set(0, LOOKY, -1.2); az = 0.15; el = 0.16; azC = 0; elMin = 0.02; viewY = LOOKY; zoomTilt = true; viewI = 0; $('tool-view').textContent = 'View: Stage'; dirty = true;
     });
     vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
 
@@ -2063,7 +2307,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (so.on !== on) { so.on = on; so.mats.forEach(m => { if (on) { m.emissive.setHex(0x6a3e0c); m.emissiveIntensity = 1; } else { m.emissive.setHex(m.userData.e0); m.emissiveIntensity = m.userData.ei0; } }); }
       });
       const lit = []; strobing = false;
-      applyHouse(); updateCrowd(now);
+      applyHouse(); updateCrowd(now); updateConfetti(now);
+      const hazeNow = Math.max(masters.haze, fogLevel * 65) / 100;
       { const dt = Math.min(0.1, Math.max(0, (now - (raveT || now)) / 1000)); raveT = now; const tg = raveMode ? 1 : 0; raveK = reduceMotion ? tg : raveK + clamp(tg - raveK, -dt / 1.5, dt / 1.5); }
       const fxOut = {}, tSec = reduceMotion ? 0.35 : now / 1000;
       fxLib.forEach(def => {
@@ -2121,14 +2366,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         const rr = Math.tan(rad(zoom / 2)) * o.len;
         o.cone.scale.set(rr, o.len, rr);
         o.cone.material.color.setRGB(r, g, b);
-        o.cone.material.opacity = masters.haze / 100 * d * ty.haze;
+        o.cone.material.opacity = hazeNow * d * ty.haze;
         o.cone.visible = !ty.laser && o.cone.material.opacity > 0.002;
         if (ty.laser) {
           const spread = rad(zoom), n = o.beams.length;
           o.beams.forEach((pv, i) => { pv.rotation.z = n > 1 ? -spread / 2 + spread * i / (n - 1) : 0; });
           o.fan.rotation.y = fx || raveK > 0.5 ? tSec * 1.4 + f.n : 0;
           o.fan.userData.mat.color.setRGB(r, g, b);
-          o.fan.userData.mat.opacity = d * (0.18 + 0.7 * masters.haze / 100);
+          o.fan.userData.mat.opacity = d * (0.18 + 0.7 * hazeNow);
           o.fan.visible = d > 0.002;
         }
         o.lens.material.color.setRGB(0.07 + r * d, 0.07 + g * d, 0.07 + b * d);
@@ -2136,6 +2381,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         if (d > 0.002 && ty.power > 0) lit.push({ f, o, d, r, g, b, zoom, pri: d * ty.power * (TRUSS[f.truss].floor ? 0.3 : 1) });
       });
       scene.updateMatrixWorld();
+      { let tr = 0, tg = 0, tb = 0, tw = 0.0001; lit.forEach(L => { tr += L.r * L.d; tg += L.g * L.d; tb += L.b * L.d; tw += L.d; }); const k = Math.min(1, tw / 6); updateFog(now, [tr / tw * k, tg / tw * k, tb / tw * k]); }
       lit.sort((a, b) => b.pri - a.pri);
       pool.forEach((s, i) => {
         const L = lit[i];
@@ -2174,7 +2420,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }
     resize();
-    return { render, setView, crowdBusy, raveBusy, moveTo, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
+    return { render, setView, crowdBusy, raveBusy, fogBusy, confBusy, fireConfetti, moveTo, isStrobing: () => strobing, addFixture, removeFixture, addBar, removeBar, flyCyc, moveCurtain, showMasking, busy, addSet, removeSet };
   }
 
   try { scene3d = build3D(); }
@@ -2291,6 +2537,20 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
   $('tool-fs').addEventListener('click', toggleFull);
   $('tool-rave').addEventListener('click', () => setRave(!raveMode));
+  $('tool-confetti').addEventListener('click', () => { if (scene3d) { scene3d.fireConfetti(); cannon(); fb('Confetti! Tick "Confetti on this cue" and Store to fire it with a cue'); } });
+  if (CHURCH) { $('tool-curtain').hidden = true; $('tool-mask').hidden = true; }
+  $('s-venue').value = VENUE;
+  let venueArm = null;
+  $('s-venue').addEventListener('change', () => { $('s-venue-go').hidden = $('s-venue').value === VENUE; });
+  $('s-venue-go').addEventListener('click', () => {
+    if (!venueArm) {
+      $('s-venue-go').textContent = 'Click again: loads the demo show';
+      fb('Switching venue loads the demo show built for that room and replaces your saved cues, rig and set. Click again to switch', true);
+      venueArm = setTimeout(() => { venueArm = null; $('s-venue-go').textContent = 'Switch venue'; }, 4000); return;
+    }
+    try { localStorage.setItem('kld-venue', $('s-venue').value); localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    saveDirty = false; location.reload();
+  });
   setRave(raveMode, true);
 
   // ---- Crowd sound: made live with Web Audio (no sound files); off until you switch it on ----
@@ -2333,6 +2593,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     src.buffer = snd.buf; hp.type = 'highpass'; hp.frequency.value = 7000;
     g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
     src.connect(hp); hp.connect(g); g.connect(snd.master); src.start(t, Math.random() * 1.8, 0.06);
+  }
+  function cannon() {
+    if (!snd || !soundOn) return;
+    const c = snd.ctx, t = c.currentTime + 0.01;
+    [0, 0.06].forEach(dt => {
+      const src = c.createBufferSource(), lp = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = snd.buf; lp.type = 'lowpass'; lp.frequency.value = 900;
+      g.gain.setValueAtTime(0.9, t + dt); g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.35);
+      src.connect(lp); lp.connect(g); g.connect(snd.master); src.start(t + dt, Math.random(), 0.4);
+    });
   }
   function clap(t) {
     const c = snd.ctx, src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
@@ -2377,7 +2647,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     fb(soundOn ? 'Crowd sound on. The crowd murmurs when seated, roars when cheering and claps for applause' : 'Crowd sound off');
   });
   document.addEventListener('visibilitychange', () => { if (!snd) return; if (document.hidden) snd.ctx.suspend(); else if (soundOn) snd.ctx.resume(); });
-  const VIEW_ORDER = ['Stage', 'House', 'Top']; let viewI = 0;
+  const VIEW_ORDER = ['Stage', 'House', 'Top', 'Performer'];
   $('tool-view').addEventListener('click', () => {
     viewI = (viewI + 1) % VIEW_ORDER.length;
     if (scene3d) scene3d.setView(VIEW_ORDER[viewI]);
@@ -2413,7 +2683,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       syncHouse(); changed();
     }
     if (saveDirty && now - lastSave > 1500) { lastSave = now; saveDirty = false; saveShow(); }
-    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.crowdBusy() || scene3d.raveBusy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
+    if (scene3d && (dirty || fx || scene3d.busy() || scene3d.crowdBusy() || scene3d.raveBusy() || scene3d.fogBusy() || scene3d.confBusy() || scene3d.isStrobing() || (fxActive.size && !reduceMotion))) { scene3d.render(now); dirty = false; }
     if (uiDirty) { renderUI(); uiDirty = false; }
     requestAnimationFrame(loop);
   }
