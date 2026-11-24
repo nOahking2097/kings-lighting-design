@@ -325,6 +325,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <button type="submit" class="cbtn" id="a-in">Admin sign in</button>
           </span>
           <button type="button" class="cbtn" id="a-out" hidden>Lock console</button>
+          <a class="cbtn" id="a-visitors" href="https://kingslighting.goatcounter.com" target="_blank" rel="noopener" hidden style="text-decoration:none">Visitors</a>
           <span class="msg" id="a-msg" role="status">Visitors can watch and run cues. Sign in to edit the rig, cues and set.</span>
         </form>
         <div class="c-top">
@@ -581,9 +582,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <div class="pip-stage" id="pip-stage"></div>
 </aside>
 <footer>
-  <div class="wrap"><span>Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span></div>
+  <div class="wrap"><span>Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span><span style="flex-basis:100%">This site counts anonymous visits and the controls visitors use, without cookies, to improve it.</span></div>
 </footer>
 
+<script>
+/* GoatCounter visitor counting (no cookies). Runs only on the live site; the admin's own visits are not counted. */
+(function () {
+  if (!/\.github\.io$/.test(location.hostname)) return;
+  var admin = false; try { admin = !!localStorage.getItem('kld-admin-v1'); } catch (e) {}
+  window.goatcounter = { no_onload: admin };
+  var s = document.createElement('script'); s.async = true; s.src = 'https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter', 'https://kingslighting.goatcounter.com/count');
+  document.head.appendChild(s);
+})();
+function kldTrack(name) {
+  try {
+    if (localStorage.getItem('kld-admin-v1')) return;
+    if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'event/' + name, title: name, event: true });
+  } catch (e) {}
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="fx.js"></script>
 <script>
@@ -970,6 +988,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const b = $('tool-rave'); if (b) { b.setAttribute('aria-pressed', raveMode); b.textContent = raveMode ? 'Rave mode on' : 'Rave mode'; }
     if (!quiet) {
       if (raveMode && crowdMode === 'seated') setCrowd('cheer', true);
+      if (raveMode) kldTrack('rave-mode');
       // Rave mode fills the room with fog; turning it off puts the fog back where it was.
       if (raveMode) { fogBeforeRave = masters.fog; masters.fog = 100; } else if (fogBeforeRave != null) { masters.fog = fogBeforeRave; fogBeforeRave = null; }
       syncFader('fog');
@@ -1155,6 +1174,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function gotoIdx(i, instant) {
     if (i < 0 || i >= cues.length) return;
     const c = cues[i]; curIdx = i;
+    kldTrack('cue/' + c.num + ' ' + c.name);
     if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
     if (c.cyc != null) setCyc(c.cyc, true);
@@ -2509,7 +2529,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     document.querySelectorAll('.console .edit button, .console .edit input, .console .edit select, .console .edit-tool').forEach(el => { el.disabled = locked; });
     document.querySelectorAll('.console .edit [tabindex]').forEach(el => { el.tabIndex = locked ? -1 : 0; });
     $('auth-fields').hidden = !locked; $('auth-fields').style.display = locked ? 'contents' : 'none';
-    $('a-out').hidden = locked;
+    $('a-out').hidden = locked; $('a-visitors').hidden = locked;
     $('auth-h').textContent = locked ? 'Viewing only' : 'Admin';
     if (locked && (toolMode === 'aim' || toolMode === 'set')) setTool('move');
   }
@@ -2549,11 +2569,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       if (!vp.requestFullscreen) throw new Error('no fullscreen');
       await vp.requestFullscreen();
     } catch (e) { vp.classList.add('vp-max'); document.body.style.overflow = 'hidden'; }
+    kldTrack('full-screen');
     fsLabel();
   }
   $('tool-fs').addEventListener('click', toggleFull);
   $('tool-rave').addEventListener('click', () => setRave(!raveMode));
-  $('tool-confetti').addEventListener('click', () => { if (scene3d) { scene3d.fireConfetti(); cannon(); fb('Confetti! Tick "Confetti on this cue" and Store to fire it with a cue'); } });
+  $('tool-confetti').addEventListener('click', () => { kldTrack('confetti'); if (scene3d) { scene3d.fireConfetti(); cannon(); fb('Confetti! Tick "Confetti on this cue" and Store to fire it with a cue'); } });
   if (CHURCH) { $('tool-curtain').hidden = true; $('tool-mask').hidden = true; }
   $('s-venue').value = VENUE;
   let venueArm = null;
@@ -2657,7 +2678,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!snd) { fb('This browser cannot play sound', true); return; }
     soundOn = !soundOn;
     const t = snd.ctx.currentTime;
-    if (soundOn) { snd.ctx.resume(); snd.master.gain.setTargetAtTime(0.8, t, 0.3); }
+    if (soundOn) { kldTrack('crowd-sound'); snd.ctx.resume(); snd.master.gain.setTargetAtTime(0.8, t, 0.3); }
     else snd.master.gain.setTargetAtTime(0, t, 0.15);
     $('tool-sound').setAttribute('aria-pressed', soundOn); $('tool-sound').textContent = soundOn ? 'Crowd sound on' : 'Crowd sound off';
     fb(soundOn ? 'Crowd sound on. The crowd murmurs when seated, roars when cheering and claps for applause' : 'Crowd sound off');
@@ -2668,6 +2689,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     viewI = (viewI + 1) % VIEW_ORDER.length;
     if (scene3d) scene3d.setView(VIEW_ORDER[viewI]);
     $('tool-view').textContent = 'View: ' + VIEW_ORDER[viewI];
+    kldTrack('view/' + VIEW_ORDER[viewI]);
   });
   document.addEventListener('fullscreenchange', fsLabel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && vp.classList.contains('vp-max')) { vp.classList.remove('vp-max'); document.body.style.overflow = ''; fsLabel(); } });
@@ -2773,6 +2795,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   // ---------- Enquiry builder ----------
   $('brief-form').addEventListener('submit', e => {
+    kldTrack('enquiry/prepared');
     e.preventDefault();
     const txt = [
       'New production enquiry',
@@ -2798,6 +2821,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       $('copy-msg').textContent = 'Text selected. Press Ctrl+C or ⌘C to copy.';
     };
     try {
+      kldTrack('enquiry/copied');
       navigator.clipboard.writeText(text).then(() => { $('copy-msg').textContent = 'Copied to clipboard.'; }, fallback);
     } catch (_) { fallback(); }
   });

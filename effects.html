@@ -150,6 +150,7 @@ footer { padding-block: 28px; color: var(--muted); font-size: 13px; }
             <button type="submit" class="btn ghost">Admin sign in</button>
           </span>
           <button type="button" class="btn ghost" id="a-out" hidden>Lock</button>
+          <a class="btn ghost" id="a-visitors" href="https://kingslighting.goatcounter.com" target="_blank" rel="noopener" hidden style="text-decoration:none">Visitors</a>
           <span class="msg" id="a-msg" role="status">Anyone can try effects in the preview. Sign in to save them to the library.</span>
         </form>
         <form class="designer" id="designer" novalidate>
@@ -204,8 +205,25 @@ footer { padding-block: 28px; color: var(--muted); font-size: 13px; }
     </div>
   </section>
 </main>
-<footer><div class="wrap">Kings Lighting Design · Egg Harbor Township, New Jersey</div></footer>
+<footer><div class="wrap">Kings Lighting Design · Egg Harbor Township, New Jersey<br>This site counts anonymous visits and the controls visitors use, without cookies, to improve it.</div></footer>
 
+<script>
+/* GoatCounter visitor counting (no cookies). Runs only on the live site; the admin's own visits are not counted. */
+(function () {
+  if (!/\.github\.io$/.test(location.hostname)) return;
+  var admin = false; try { admin = !!localStorage.getItem('kld-admin-v1'); } catch (e) {}
+  window.goatcounter = { no_onload: admin };
+  var s = document.createElement('script'); s.async = true; s.src = 'https://gc.zgo.at/count.js';
+  s.setAttribute('data-goatcounter', 'https://kingslighting.goatcounter.com/count');
+  document.head.appendChild(s);
+})();
+function kldTrack(name) {
+  try {
+    if (localStorage.getItem('kld-admin-v1')) return;
+    if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'event/' + name, title: name, event: true });
+  } catch (e) {}
+}
+</script>
 <script src="fx.js"></script>
 <script>
 (function () {
@@ -297,7 +315,7 @@ footer { padding-block: 28px; color: var(--muted); font-size: 13px; }
     $('designer-wrap').classList.toggle('locked', !isAdmin);
     document.querySelectorAll('.lock-me').forEach(b => { b.disabled = !isAdmin; });
     $('auth-fields').style.display = isAdmin ? 'none' : 'contents';
-    $('a-out').hidden = !isAdmin; $('auth-h').textContent = isAdmin ? 'Admin' : 'Viewing only';
+    $('a-out').hidden = !isAdmin; $('a-visitors').hidden = !isAdmin; $('auth-h').textContent = isAdmin ? 'Admin' : 'Viewing only';
   }
   $('auth').addEventListener('submit', async e => {
     e.preventDefault();
@@ -324,7 +342,7 @@ footer { padding-block: 28px; color: var(--muted); font-size: 13px; }
       txt.firstChild.textContent = def.name; txt.lastChild.textContent = FX.formLabel(def) + ' · ' + FX.targetLabel(def.target);
       const m = document.createElement('span'); m.className = 'mono'; m.textContent = (+def.speed).toFixed(2) + '/s · ' + def.spread + '°';
       b.append(cv, txt, m);
-      b.addEventListener('click', () => { cur = clone(def); toForm(); renderLib(); status(''); kick(); });
+      b.addEventListener('click', () => { cur = clone(def); toForm(); renderLib(); status(''); kick(); kldTrack('effects/preview ' + def.name); });
       box.appendChild(b); minis.push({ cv, def: def.id === cur.id ? cur : def });
     });
   }
