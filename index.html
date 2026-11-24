@@ -173,7 +173,16 @@ a { color: inherit; }
 .cbtn.go:hover { filter: brightness(1.12); }
 #b-blind { width: 100%; padding: 10px 8px; }
 #b-blind[aria-pressed="true"] { background: #F3D9A8; color: #17110A; border-color: #F3D9A8; }
-.cuelist { max-height: 260px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
+.cuelist tr.song td { font: 500 10.5px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--sel); background: #0B0D12; padding-top: 10px; cursor: default; }
+.cuelist td:nth-child(2) { white-space: normal; }
+.cuelist td small { display: block; color: var(--stage-muted); font-size: 10.5px; line-height: 1.35; }
+#b-go { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ce-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; }
+.ce-grid label { display: grid; gap: 3px; font: 10.5px var(--f-mono); color: var(--stage-muted); text-transform: uppercase; letter-spacing: .06em; min-width: 0; }
+.ce-grid .full { grid-column: 1 / -1; }
+.console .ce-grid input { font: 12px var(--f-mono); color: var(--stage-fg); background: #07080B; border: 1px solid var(--c-edge); border-radius: 3px; padding: 5px 6px; min-width: 0; color-scheme: dark; text-transform: none; letter-spacing: 0; }
+[data-edit].editing { outline: 1px dashed var(--accent); outline-offset: 4px; cursor: text; }
+.cuelist { max-height: 340px; overflow: auto; border: 1px solid var(--c-edge); border-radius: 3px; }
 .cuelist tr.cur td { color: var(--sel); }
 .cuelist tr.cur td:first-child::before { content: "▶ "; }
 .cuelist tr.next td:first-child::before { content: "› "; color: var(--stage-muted); }
@@ -322,8 +331,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <div class="stage">
     <div class="wrap">
       <div class="hero-copy">
-        <h1>Write the cues <em>before</em> you get into the theater.</h1>
-        <p>We model your stage, set and lighting rig in 3D and program the show offline. You arrive at tech with a cue stack that already works, and your stage time goes into refining it.</p>
+        <h1 data-edit="hero-title">Write the cues <em>before</em> you get into the theater.</h1>
+        <p data-edit="hero-text">We model your stage, set and lighting rig in 3D and program the show offline. You arrive at tech with a cue stack that already works, and your stage time goes into refining it.</p>
       </div>
 
       <div class="console locked" id="console">
@@ -359,6 +368,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <label><input type="checkbox" id="ap-sound"> can turn on crowd sound</label>
             <label><input type="checkbox" id="ap-auto"> auto-play the show, one cue every</label><input type="number" id="ap-sec" min="4" max="120" step="1"><span>s</span>
             <label for="ap-start">Start visitors at cue</label><select id="ap-start"></select>
+            <label><input type="checkbox" id="ap-tags"> see light numbers on the stage</label>
+          </div>
+          <div class="ap-sec">
+            <b class="patch-h">Website</b>
+            <button type="button" class="cbtn" id="ap-edit" aria-pressed="false">Edit page text</button>
+            <button type="button" class="cbtn warn" id="ap-text-reset">Reset page text</button>
+            <span>Show sections:</span>
+            <label><input type="checkbox" data-sec="services"> Services</label>
+            <label><input type="checkbox" data-sec="work"> Productions</label>
+            <label><input type="checkbox" data-sec="process"> Process</label>
+            <label><input type="checkbox" data-sec="deliverables"> Paperwork</label>
+            <label><input type="checkbox" data-sec="brief"> Booking form</label>
+          </div>
+          <div class="ap-sec">
+            <b class="patch-h">Cues</b>
+            <button type="button" class="cbtn" id="ap-sheet">Copy cue sheet</button>
+            <span class="ap-note" style="flex-basis:auto">A plain-text list of every cue with its time, follow and note, to print or text to your volunteers.</span>
           </div>
         </div>
         <div class="c-top">
@@ -445,7 +471,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div class="c-sec">
             <div class="c-h">Main cue list <span id="pb-state"></span></div>
             <div class="cuelist">
-              <table class="ctable"><thead><tr><th>Cue</th><th>Name</th><th>Fade</th><th>Cyc</th><th>Curtain</th></tr></thead><tbody id="cue-body"></tbody></table>
+              <table class="ctable"><thead><tr><th>Cue</th><th>Label</th><th>Time</th><th>Follow</th></tr></thead><tbody id="cue-body"></tbody></table>
+            </div>
+            <div class="cue-edit edit" id="cue-edit" hidden>
+              <div class="c-h">Edit cue <span id="ce-num"></span></div>
+              <div class="ce-grid">
+                <label>Label<input type="text" id="ce-label" maxlength="40"></label>
+                <label>Song / section<input type="text" id="ce-song" maxlength="30"></label>
+                <label>Time (s)<input type="number" id="ce-time" min="0" max="60" step="0.5"></label>
+                <label>Follow (s)<input type="number" id="ce-follow" min="0" max="600" step="0.5" placeholder="Off"></label>
+                <label class="full">Note for the operator<input type="text" id="ce-note" maxlength="90"></label>
+              </div>
+              <div class="btn-row" style="margin-top:6px"><button type="button" class="cbtn" id="ce-insert">Insert cue after this</button><button type="button" class="cbtn warn" id="ce-del">Delete this cue</button></div>
             </div>
             <div class="fade-row edit"><label for="fade">Fade for next Store</label><input id="fade" type="number" min="0" max="30" step="0.5" value="3"><span>s</span><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="q-confetti"> Confetti on this cue</label><button type="button" class="cbtn warn" id="b-reset" style="margin-left:auto">Reset show</button></div>
             <div class="fade-row"><span id="save-state">Your cues, rig and set save in this browser</span></div>
@@ -462,7 +499,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The <b>Venue</b> menu switches between the mega church (thrust stage, LED wall, side screens, worship band and choir, arena seating) and the theater. The <b>Fog</b> fader runs two fog machines whose fog takes the colour of the lights and makes beams show; <b>Confetti</b> fires the cannons, and a cue can fire them too. <b>View: Performer</b> puts you on stage looking out at the crowd. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Admins can undo with <b>Ctrl+Z</b> (redo with Ctrl+Shift+Z or Ctrl+Y), and the <b>admin tools</b> above the stage publish the show to the website, set a banner, and choose what visitors can do. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. The lit cross is light <b>Cross</b> in the fixture sheet (and the Cross group): give it any colour or level from the colour presets, encoders or command line, and each cue keeps it. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The <b>Venue</b> menu switches between the mega church (thrust stage, LED wall, side screens, worship band and choir, arena seating) and the theater. The <b>Fog</b> fader runs two fog machines whose fog takes the colour of the lights and makes beams show; <b>Confetti</b> fires the cannons, and a cue can fire them too. <b>View: Performer</b> puts you on stage looking out at the crowd. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). In the church venue the cue list runs like a Sunday service (walk-in, songs by section, prayer, message, response, benediction, walk-out); each cue has a label, time, auto-follow and an operator note, and admins can change them in <b>Edit cue</b> or insert point cues like 4.5. Admins can undo with <b>Ctrl+Z</b> (redo with Ctrl+Shift+Z or Ctrl+Y), and the <b>admin tools</b> above the stage publish the show to the website, set a banner, and choose what visitors can do. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. The lit cross is light <b>Cross</b> in the fixture sheet (and the Cross group): give it any colour or level from the colour presets, encoders or command line, and each cue keeps it. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -470,39 +507,39 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="band" id="services">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Lighting design for the stage, built in previs</h2>
-        <p>We design for plays, musicals, opera and dance. The 3D model holds the venue, the set and every fixture on the plot, so the design, the paperwork and the show file all come from one source.</p>
+        <h2 data-edit="x-lighting-design-for-the-stage-built-in-pre">Lighting design for the stage, built in previs</h2>
+        <p data-edit="x-we-design-for-plays-musicals-opera-and-dan">We design for plays, musicals, opera and dance. The 3D model holds the venue, the set and every fixture on the plot, so the design, the paperwork and the show file all come from one source.</p>
       </div>
       <div class="services">
         <article class="svc">
           <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 12h44"/><path d="M14 12v4M28 12v4M42 12v4"/><path d="M14 16l-6 30M14 16l6 30M28 16l-5 30M28 16l5 30M42 16l-6 30M42 16l6 30" opacity=".45"/><path d="M4 46h48"/></svg>
           <div>
-            <h3>Stage previsualization</h3>
-            <p>A live 3D model of the venue and set where we focus every unit, build looks and play back cues for the director before load-in.</p>
+            <h3 data-edit="x-stage-previsualization">Stage previsualization</h3>
+            <p data-edit="x-a-live-3d-model-of-the-venue-and-set-where">A live 3D model of the venue and set where we focus every unit, build looks and play back cues for the director before load-in.</p>
             <div class="tags"><span>Capture</span><span>Vectorworks Spotlight</span><span>WYSIWYG</span></div>
           </div>
         </article>
         <article class="svc">
           <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="8" y="10" width="40" height="36" rx="2"/><path d="M8 20h40M8 30h40" opacity=".5"/><circle cx="16" cy="15" r="2"/><circle cx="26" cy="15" r="2"/><circle cx="36" cy="15" r="2"/><circle cx="20" cy="25" r="2"/><circle cx="32" cy="25" r="2"/><path d="M18 38h20"/></svg>
           <div>
-            <h3>Light plot &amp; paperwork</h3>
-            <p>Plot, section, channel hookup, instrument schedule and magic sheets, ready for the production electrician and the rental shop.</p>
+            <h3 data-edit="x-light-plot-amp-paperwork">Light plot &amp; paperwork</h3>
+            <p data-edit="x-plot-section-channel-hookup-instrument-sch">Plot, section, channel hookup, instrument schedule and magic sheets, ready for the production electrician and the rental shop.</p>
             <div class="tags"><span>Lightwright</span><span>DMX patch</span><span>Circuit map</span></div>
           </div>
         </article>
         <article class="svc">
           <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="6" y="14" width="44" height="28" rx="2"/><path d="M12 34v-8M18 34v-12M24 34v-6M30 34v-10" /><path d="M36 22h8M36 28h8M36 34h8" opacity=".5"/></svg>
           <div>
-            <h3>Offline cue programming</h3>
-            <p>Groups, palettes, effects and a first cue stack written against the previs model, so the board op starts tech on page one.</p>
+            <h3 data-edit="x-offline-cue-programming">Offline cue programming</h3>
+            <p data-edit="x-groups-palettes-effects-and-a-first-cue-st">Groups, palettes, effects and a first cue stack written against the previs model, so the board op starts tech on page one.</p>
             <div class="tags"><span>ETC Eos</span><span>grandMA3</span><span>Timecode</span></div>
           </div>
         </article>
         <article class="svc">
           <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="6" y="18" width="20" height="22" rx="1"/><rect x="30" y="14" width="20" height="26" rx="1"/><path d="M26 29h4" /><path d="M10 46h36" opacity=".5"/></svg>
           <div>
-            <h3>Tours &amp; transfers</h3>
-            <p>We adapt an existing design to each new venue's rig and trim heights, and the re-light is planned in the model before the truck arrives.</p>
+            <h3 data-edit="x-tours-amp-transfers">Tours &amp; transfers</h3>
+            <p data-edit="x-we-adapt-an-existing-design-to-each-new-ve">We adapt an existing design to each new venue's rig and trim heights, and the re-light is planned in the model before the truck arrives.</p>
             <div class="tags"><span>Venue rig files</span><span>Re-focus charts</span><span>Show file merges</span></div>
           </div>
         </article>
@@ -513,30 +550,30 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="band" id="work">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Recent productions</h2>
-        <p>Three shows from the last season. Each image is a frame from the previs model that the director signed off before tech.</p>
+        <h2 data-edit="x-recent-productions">Recent productions</h2>
+        <p data-edit="x-three-shows-from-the-last-season-each-imag">Three shows from the last season. Each image is a frame from the previs model that the director signed off before tech.</p>
       </div>
       <div class="projects">
         <article class="proj">
           <div class="proj-img"><canvas data-scene="play" width="480" height="360" aria-label="Previs frame: a lone figure in a warm pool of light in front of a deep blue cyclorama"></canvas><span class="tag">PLAY</span></div>
-          <h3>The Salt Marsh</h3>
+          <h3 data-edit="x-the-salt-marsh">The Salt Marsh</h3>
           <span class="venue">420-seat proscenium · 6-week run</span>
-          <p>A single estuary horizon that shifts from dawn to storm over two hours. The cyc carries the weather and tight specials carry the actors.</p>
-          <dl class="spec"><div><dt>Cues</dt><dd>148</dd></div><div><dt>Fixtures</dt><dd>112</dd></div><div><dt>Console</dt><dd>Eos</dd></div></dl>
+          <p data-edit="x-a-single-estuary-horizon-that-shifts-from-">A single estuary horizon that shifts from dawn to storm over two hours. The cyc carries the weather and tight specials carry the actors.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd data-edit="x-148">148</dd></div><div><dt>Fixtures</dt><dd data-edit="x-112">112</dd></div><div><dt>Console</dt><dd data-edit="x-eos">Eos</dd></div></dl>
         </article>
         <article class="proj">
           <div class="proj-img"><canvas data-scene="opera" width="480" height="360" aria-label="Previs frame: red back light shafts through haze onto a staircase"></canvas><span class="tag">OPERA</span></div>
-          <h3>Orpheus Below</h3>
+          <h3 data-edit="x-orpheus-below">Orpheus Below</h3>
           <span class="venue">1,100-seat opera house · Rep</span>
-          <p>Heavy haze and saturated back light for the underworld, with the return to earth played in open white. The show had to re-light in two hours on every rep changeover.</p>
-          <dl class="spec"><div><dt>Cues</dt><dd>214</dd></div><div><dt>Fixtures</dt><dd>286</dd></div><div><dt>Console</dt><dd>MA3</dd></div></dl>
+          <p data-edit="x-heavy-haze-and-saturated-back-light-for-th">Heavy haze and saturated back light for the underworld, with the return to earth played in open white. The show had to re-light in two hours on every rep changeover.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd data-edit="x-214">214</dd></div><div><dt>Fixtures</dt><dd data-edit="x-286">286</dd></div><div><dt>Console</dt><dd data-edit="x-ma3">MA3</dd></div></dl>
         </article>
         <article class="proj">
           <div class="proj-img"><canvas data-scene="dance" width="480" height="360" aria-label="Previs frame: dancers lit by low side light from booms"></canvas><span class="tag">DANCE</span></div>
-          <h3>Glasswork</h3>
+          <h3 data-edit="x-glasswork">Glasswork</h3>
           <span class="venue">Touring · 14 venues</span>
-          <p>Shin-busters and head-highs on booms sculpt the dancers with side light. We rebuilt the plot in the model for each venue on the tour.</p>
-          <dl class="spec"><div><dt>Cues</dt><dd>96</dd></div><div><dt>Fixtures</dt><dd>64</dd></div><div><dt>Console</dt><dd>Ion Xe</dd></div></dl>
+          <p data-edit="x-shin-busters-and-head-highs-on-booms-sculp">Shin-busters and head-highs on booms sculpt the dancers with side light. We rebuilt the plot in the model for each venue on the tour.</p>
+          <dl class="spec"><div><dt>Cues</dt><dd data-edit="x-96">96</dd></div><div><dt>Fixtures</dt><dd data-edit="x-64">64</dd></div><div><dt>Console</dt><dd data-edit="x-ion-xe">Ion Xe</dd></div></dl>
         </article>
       </div>
     </div>
@@ -545,16 +582,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="band" id="process">
     <div class="wrap">
       <div class="sec-head">
-        <h2>From first read-through to opening night</h2>
-        <p>A typical mid-scale play runs ten to twelve weeks from first meeting to opening night. We join as early as the set designer's first model box.</p>
+        <h2 data-edit="x-from-first-read-through-to-opening-night">From first read-through to opening night</h2>
+        <p data-edit="x-a-typical-mid-scale-play-runs-ten-to-twelv">A typical mid-scale play runs ten to twelve weeks from first meeting to opening night. We join as early as the set designer's first model box.</p>
       </div>
       <ol class="process">
-        <li><span class="n">01</span><h3>Read &amp; concept</h3><p>Script breakdown, references and a lighting storyboard agreed with the director and set designer.</p><span class="wk">Weeks 1–2</span></li>
-        <li><span class="n">02</span><h3>Previs model</h3><p>We build the venue, set and masking from the CAD files, using the house's rep plot as the starting rig.</p><span class="wk">Weeks 2–4</span></li>
-        <li><span class="n">03</span><h3>Plot &amp; paperwork</h3><p>The light plot and hookup go to the production electrician and rental shop for pricing.</p><span class="wk">Weeks 4–6</span></li>
-        <li><span class="n">04</span><h3>Offline programming</h3><p>We write the cue stack against the model and show it to the director in a previs session.</p><span class="wk">Weeks 6–9</span></li>
-        <li><span class="n">05</span><h3>Load-in &amp; focus</h3><p>Hang, focus with our focus charts and check the patch against the model.</p><span class="wk">Week 10</span></li>
-        <li><span class="n">06</span><h3>Tech &amp; previews</h3><p>We refine cues in the room, give notes each preview and freeze the show at opening.</p><span class="wk">Weeks 11–12</span></li>
+        <li><span class="n">01</span><h3 data-edit="x-read-amp-concept">Read &amp; concept</h3><p data-edit="x-script-breakdown-references-and-a-lighting">Script breakdown, references and a lighting storyboard agreed with the director and set designer.</p><span class="wk">Weeks 1–2</span></li>
+        <li><span class="n">02</span><h3 data-edit="x-previs-model">Previs model</h3><p data-edit="x-we-build-the-venue-set-and-masking-from-th">We build the venue, set and masking from the CAD files, using the house's rep plot as the starting rig.</p><span class="wk">Weeks 2–4</span></li>
+        <li><span class="n">03</span><h3 data-edit="x-plot-amp-paperwork">Plot &amp; paperwork</h3><p data-edit="x-the-light-plot-and-hookup-go-to-the-produc">The light plot and hookup go to the production electrician and rental shop for pricing.</p><span class="wk">Weeks 4–6</span></li>
+        <li><span class="n">04</span><h3 data-edit="x-offline-programming">Offline programming</h3><p data-edit="x-we-write-the-cue-stack-against-the-model-a">We write the cue stack against the model and show it to the director in a previs session.</p><span class="wk">Weeks 6–9</span></li>
+        <li><span class="n">05</span><h3 data-edit="x-load-in-amp-focus">Load-in &amp; focus</h3><p data-edit="x-hang-focus-with-our-focus-charts-and-check">Hang, focus with our focus charts and check the patch against the model.</p><span class="wk">Week 10</span></li>
+        <li><span class="n">06</span><h3 data-edit="x-tech-amp-previews">Tech &amp; previews</h3><p data-edit="x-we-refine-cues-in-the-room-give-notes-each">We refine cues in the room, give notes each preview and freeze the show at opening.</p><span class="wk">Weeks 11–12</span></li>
       </ol>
     </div>
   </section>
@@ -562,8 +599,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="band" id="deliverables">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Show paperwork</h2>
-        <p>Everything the electrics team needs to hang, focus and run the show, in the formats they already use.</p>
+        <h2 data-edit="x-show-paperwork">Show paperwork</h2>
+        <p data-edit="x-everything-the-electrics-team-needs-to-han">Everything the electrics team needs to hang, focus and run the show, in the formats they already use.</p>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -584,12 +621,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="band" id="brief">
     <div class="wrap brief">
       <div class="brief-copy">
-        <h2>Book us for your production</h2>
-        <p>Tell us about the show and the venue. We reply within two working days with our availability, a fee proposal and first thoughts on the design.</p>
+        <h2 data-edit="x-book-us-for-your-production">Book us for your production</h2>
+        <p data-edit="x-tell-us-about-the-show-and-the-venue-we-re">Tell us about the show and the venue. We reply within two working days with our availability, a fee proposal and first thoughts on the design.</p>
         <dl class="contact">
-          <div><dt>Email</dt><dd>noahking110@gmail.com</dd></div>
-          <div><dt>Phone</dt><dd>(609) 703-2604</dd></div>
-          <div><dt>Address</dt><dd>24 High School Drive, Egg Harbor Township, NJ 08234</dd></div>
+          <div><dt>Email</dt><dd data-edit="x-noahking110-gmail-com">noahking110@gmail.com</dd></div>
+          <div><dt>Phone</dt><dd data-edit="x-609-703-2604">(609) 703-2604</dd></div>
+          <div><dt>Address</dt><dd data-edit="x-24-high-school-drive-egg-harbor-township-n">24 High School Drive, Egg Harbor Township, NJ 08234</dd></div>
         </dl>
       </div>
       <form id="brief-form" novalidate>
@@ -617,7 +654,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <div class="pip-stage" id="pip-stage"></div>
 </aside>
 <footer>
-  <div class="wrap"><span>Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span><span style="flex-basis:100%">This site counts anonymous visits and the controls visitors use, without cookies, to improve it.</span></div>
+  <div class="wrap"><span data-edit="footer-line">Kings Lighting Design · Lighting design and previsualization for theater, opera and dance</span><span class="mono">Egg Harbor Township, New Jersey</span><span style="flex-basis:100%">This site counts anonymous visits and the controls visitors use, without cookies, to improve it.</span></div>
 </footer>
 
 <script>
@@ -968,13 +1005,41 @@ function kldTrack(name) {
   const lastQ = cues[cues.length - 1];
   const bo = clone(lastQ.state); Object.values(bo).forEach(v => { v.dim = 0; });
   cues.push({ num: cues.length + 1, name: 'Blackout', fade: 2, state: bo, cyc: true, curtain: false, bars: snapBars(), fx: [], house: 100, crowd: 'seated', rave: false, fog: 0, confetti: false, layout: clone(lastQ.layout) });
+  cues.forEach(c => { c.song = c.song || ''; c.note = c.note || ''; c.follow = c.follow || 0; });
+  if (CHURCH) {
+    // A Sunday service, laid out the way a church lighting console runs it: one cue per moment, grouped by song or section.
+    const L = Object.fromEntries(cues.map(c => [c.name, c]));
+    const PLAN = [
+      ['Walk-in', 'Pre-service', 'Preset', 0, 0, 'House full, walk-in music. Doors open', { house: 100 }],
+      ['Countdown', 'Pre-service', 'Dusk', 3, 0, 'GO when the 5-minute countdown starts', { house: 60, crowd: 'seated' }],
+      ['Welcome', 'Opening', 'Morning', 3, 0, 'GO as the host walks on', { house: 25 }],
+      ['Intro', 'Song 1', 'Dawn', 4, 8, 'Auto-follows into the verse after 8 s', { house: 0 }],
+      ['Verse', 'Song 1', 'Sunset', 4, 0, '', { house: 0 }],
+      ['Chorus', 'Song 1', 'Midday', 2, 0, 'GO on the downbeat of the chorus', { house: 0 }],
+      ['Bridge', 'Song 1', 'Dream', 5, 0, 'Fog builds. Slow and soft', { house: 0 }],
+      ['Celebration', 'Song 2', 'Rave', 1, 0, 'Rave mode and confetti on the last chorus', { house: 0 }],
+      ['Prayer', 'Prayer', 'Moonlight', 4, 0, 'GO on "Let us pray"', { house: 10, crowd: 'seated' }],
+      ['Announcements', 'Announcements', 'Morning', 3, 0, 'Host centre stage, screens on slides', { house: 35 }],
+      ['Offering', 'Offering', 'Fireside', 4, 0, '', { house: 25 }],
+      ['Message', 'Message', 'Solo', 3, 0, 'Pastor special centre. House at 20% so people can read', { house: 20 }],
+      ['Response', 'Response', 'Dusk', 6, 0, 'Altar call: slow fade, no sudden changes', { house: 10 }],
+      ['Closing song', 'Closing', 'Sunset', 3, 0, '', { house: 0 }],
+      ['Benediction', 'Closing', 'Curtain call', 3, 0, 'Audience blinders at 55%', { house: 40, confetti: false, crowd: 'applause' }],
+      ['Walk-out', 'Post-service', 'Preset', 4, 0, 'House to full, outro music', { house: 100, crowd: 'seated' }]
+    ];
+    cues = PLAN.map(([name, song, look, t, follow, note, o], i) => Object.assign(clone(L[look] || L.Preset), { num: i + 1, name, song, fade: t, follow, note }, o));
+  }
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
   // Only the admin's browser keeps a saved show; visitors always get the published show (show.json) or the demo.
   const ADMIN_LOCAL = (() => { try { return !!window.KLD_FX && localStorage.getItem('kld-admin-v1') === window.KLD_FX.ADMIN_HASH; } catch (e) { return false; } })();
-  const DEFAULT_SETTINGS = { banner: '', visitorCues: true, visitorConfetti: true, visitorSound: true, autoplay: false, autoplaySec: 12, startCue: 1 };
+  const DEFAULT_SETTINGS = { banner: '', visitorCues: true, visitorConfetti: true, visitorSound: true, autoplay: false, autoplaySec: 12, startCue: 1, visitorTags: true, text: {}, hidden: [] };
   let SETTINGS = clone(DEFAULT_SETTINGS);
+  const SECTIONS = ['services', 'work', 'process', 'deliverables', 'brief'];
+  const ORIG_TEXT = {};
+  document.querySelectorAll('[data-edit]').forEach(el => { ORIG_TEXT[el.dataset.edit] = el.innerHTML; });
+  let editingText = false, ceIdx = -1;
   function loadShow() {
     if (!ADMIN_LOCAL) return null;
     try {
@@ -1297,9 +1362,12 @@ function kldTrack(name) {
   }
 
   // ================= Playback =================
+  let followTimer = null;
   function gotoIdx(i, instant, silent) {
     if (i < 0 || i >= cues.length) return;
     const c = cues[i]; curIdx = i;
+    clearTimeout(followTimer); followTimer = null;
+    if (c.follow > 0) followTimer = setTimeout(() => { followTimer = null; if (curIdx === i && i + 1 < cues.length) gotoIdx(i + 1, false, true); uiDirty = true; }, c.follow * 1000);
     if (!silent) kldTrack('cue/' + c.num + ' ' + c.name);
     if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
@@ -1715,13 +1783,18 @@ function kldTrack(name) {
     groupTiles.forEach((b, i) => b.classList.toggle('on', key !== '' && GROUPS[i] && key === [...GROUPS[i].ids].sort().join()));
     const body = $('cue-body'); body.innerHTML = '';
     cues.forEach((c, i) => {
+      if (c.song && (i === 0 || c.song !== cues[i - 1].song)) { const h = document.createElement('tr'); h.className = 'song'; h.innerHTML = '<td colspan="4"></td>'; h.firstChild.textContent = c.song; body.appendChild(h); }
       const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
-      tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td>';
-      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.cyc === false ? 'Out' : 'In'; tr.cells[4].textContent = c.curtain === false ? 'Shut' : 'Open';
+      tr.innerHTML = '<td></td><td></td><td></td><td></td>';
+      tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name;
+      if (c.note) { const sm = document.createElement('small'); sm.textContent = c.note; tr.cells[1].appendChild(sm); }
+      tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.follow ? c.follow + ' s' : '';
       tr.addEventListener('click', () => { if (canRun()) gotoIdx(i); else fb('Cue controls are turned off for visitors', true); });
       body.appendChild(tr);
     });
-    $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
+    const nx = cues[curIdx + 1]; $('b-go').textContent = nx ? 'Go ▸ ' + nx.num + ' ' + nx.name : 'Go';
+    if (curIdx !== ceIdx) fillCueEdit();
+    $('pb-state').textContent = followTimer ? 'Auto-follow running…' : fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
     const c = cues[curIdx];
     if ($('pip-cue')) $('pip-cue').textContent = c ? 'Q ' + c.num + ' · ' + c.name : '';
     $('vp-cue').textContent = (c ? 'Q ' + c.num + ' · ' + c.name : 'No cue') + (raveMode ? ' · rave mode' : '') + (Object.keys(programmer).length ? ' + programmer' : '');
@@ -2668,7 +2741,8 @@ function kldTrack(name) {
     document.querySelectorAll('.console .edit button, .console .edit input, .console .edit select, .console .edit-tool').forEach(el => { el.disabled = locked; });
     document.querySelectorAll('.console .edit [tabindex]').forEach(el => { el.tabIndex = locked ? -1 : 0; });
     $('auth-fields').hidden = !locked; $('auth-fields').style.display = locked ? 'contents' : 'none';
-    $('a-out').hidden = locked; $('a-visitors').hidden = locked; $('admin-panel').hidden = locked;
+    $('a-out').hidden = locked; $('a-visitors').hidden = locked; $('admin-panel').hidden = locked; $('cue-edit').hidden = locked;
+    if (locked && editingText) setEditText(false);
     $('save-state').textContent = locked ? 'Sign in as admin to change and save the show' : 'Your cues, rig and set save in this browser';
     applySettings(); updUndo();
     $('auth-h').textContent = locked ? 'Viewing only' : 'Admin';
@@ -2703,17 +2777,89 @@ function kldTrack(name) {
   // ---- Admin tools: publish the show, banner, and what visitors may do ----
   function applySettings() {
     const ban = $('site-banner'); ban.textContent = SETTINGS.banner || ''; ban.hidden = !SETTINGS.banner;
+    document.querySelectorAll('[data-edit]').forEach(el => {
+      const k = el.dataset.edit; if (el === document.activeElement) return;
+      const t = (SETTINGS.text || {})[k];
+      if (t != null) { if (el.textContent !== t) el.textContent = t; } else if (el.innerHTML !== ORIG_TEXT[k]) el.innerHTML = ORIG_TEXT[k];
+    });
+    SECTIONS.forEach(id => {
+      const hide = (SETTINGS.hidden || []).includes(id);
+      const sec = $(id); if (sec) sec.hidden = hide;
+      document.querySelectorAll('.nav a[href="#' + id + '"]').forEach(a => { a.hidden = hide; });
+    });
+    $('labels').hidden = !isAdmin && SETTINGS.visitorTags === false;
     $('tool-confetti').hidden = !isAdmin && !SETTINGS.visitorConfetti;
     $('tool-sound').hidden = !isAdmin && !SETTINGS.visitorSound;
     ['b-go', 'b-back', 'fs-go', 'fs-back', 'pip-go', 'pip-back'].forEach(id => { const b = $(id); if (b) b.disabled = !canRun(); });
     if (!isAdmin) return;
     if (document.activeElement !== $('ap-banner')) $('ap-banner').value = SETTINGS.banner || '';
     $('ap-cues').checked = !!SETTINGS.visitorCues; $('ap-confetti').checked = !!SETTINGS.visitorConfetti; $('ap-sound').checked = !!SETTINGS.visitorSound;
-    $('ap-auto').checked = !!SETTINGS.autoplay; $('ap-sec').value = SETTINGS.autoplaySec;
+    $('ap-auto').checked = !!SETTINGS.autoplay; $('ap-sec').value = SETTINGS.autoplaySec; $('ap-tags').checked = SETTINGS.visitorTags !== false;
+    document.querySelectorAll('[data-sec]').forEach(cb => { cb.checked = !(SETTINGS.hidden || []).includes(cb.dataset.sec); });
     const st = $('ap-start'); st.innerHTML = '';
     cues.forEach(c => st.add(new Option(c.num + ' · ' + c.name, c.num)));
     st.value = String(cues.some(c => c.num === SETTINGS.startCue) ? SETTINGS.startCue : (cues[0] ? cues[0].num : 1));
   }
+  // ---- Edit the website's own text in place ----
+  function setEditText(on) {
+    editingText = on;
+    document.querySelectorAll('[data-edit]').forEach(el => { if (on) el.setAttribute('contenteditable', 'true'); else el.removeAttribute('contenteditable'); el.classList.toggle('editing', on); });
+    $('ap-edit').setAttribute('aria-pressed', on); $('ap-edit').textContent = on ? 'Done editing' : 'Edit page text';
+    if (on) fb('Click any heading, paragraph or contact line on the page and type. Download the show file to publish the changes');
+  }
+  document.querySelectorAll('[data-edit]').forEach(el => {
+    el.addEventListener('blur', () => {
+      if (!editingText || !isAdmin) return;
+      const k = el.dataset.edit, t = el.textContent.replace(/\s+/g, ' ').trim();
+      const cur = (SETTINGS.text || {})[k], orig = (() => { const d = document.createElement('div'); d.innerHTML = ORIG_TEXT[k]; return d.textContent.replace(/\s+/g, ' ').trim(); })();
+      if ((cur != null ? cur : orig) === t) return;
+      remember('text');
+      const text = Object.assign({}, SETTINGS.text || {}); if (t === orig || !t) delete text[k]; else text[k] = t;
+      SETTINGS = Object.assign({}, SETTINGS, { text }); applySettings(); changed();
+    });
+    el.addEventListener('keydown', e => { if (editingText && e.key === 'Enter' && !/^P$/.test(el.tagName)) { e.preventDefault(); el.blur(); } });
+  });
+  $('ap-edit').addEventListener('click', () => setEditText(!editingText));
+  $('ap-text-reset').addEventListener('click', () => { if (!Object.keys(SETTINGS.text || {}).length) { fb('The page text is already the original'); return; } remember('text'); SETTINGS = Object.assign({}, SETTINGS, { text: {} }); applySettings(); changed(); fb('Page text back to the original. Ctrl+Z undoes it'); });
+  document.querySelectorAll('[data-sec]').forEach(cb => cb.addEventListener('change', () => {
+    const hidden = new Set(SETTINGS.hidden || []); if (cb.checked) hidden.delete(cb.dataset.sec); else hidden.add(cb.dataset.sec);
+    setSetting('hidden', [...hidden], (cb.checked ? 'Showing' : 'Hiding') + ' the ' + cb.parentNode.textContent.trim() + ' section');
+  }));
+  $('ap-tags').addEventListener('change', e => setSetting('visitorTags', e.target.checked, e.target.checked ? 'Visitors see the light numbers' : 'Light numbers are hidden from visitors'));
+  $('ap-sheet').addEventListener('click', () => {
+    const lines = ['Kings Lighting Design · Cue sheet · ' + (CHURCH ? 'Mega church' : 'Theater')];
+    let song = null;
+    cues.forEach(c => {
+      if ((c.song || '') !== song) { song = c.song || ''; if (song) lines.push('', song.toUpperCase()); }
+      lines.push('  Q' + c.num + '   ' + c.name + '   ' + c.fade + ' s' + (c.follow ? '   follow ' + c.follow + ' s' : ''));
+      if (c.note) lines.push('        ' + c.note);
+    });
+    const txt = lines.join('\n');
+    try { navigator.clipboard.writeText(txt).then(() => fb('Cue sheet copied (' + cues.length + ' cues). Paste it into a document or message'), () => fb('Copying was blocked here', true)); }
+    catch (e) { fb('Copying was blocked here', true); }
+  });
+
+  // ---- Cue editor: label, song or section, time, follow and note for the current cue ----
+  function fillCueEdit() {
+    ceIdx = curIdx; const c = cues[curIdx]; if (!c) return;
+    $('ce-num').textContent = c.num;
+    [['ce-label', c.name], ['ce-song', c.song || ''], ['ce-time', c.fade], ['ce-follow', c.follow || ''], ['ce-note', c.note || '']].forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v; });
+  }
+  [['ce-label', (c, v) => { c.name = v.trim() || 'Cue ' + c.num; }], ['ce-song', (c, v) => { c.song = v.trim(); }], ['ce-time', (c, v) => { c.fade = clamp(+v || 0, 0, 60); }],
+   ['ce-follow', (c, v) => { c.follow = clamp(+v || 0, 0, 600); }], ['ce-note', (c, v) => { c.note = v.trim(); }]].forEach(([id, fn]) => {
+    $(id).addEventListener('change', () => { if (!isAdmin || !cues[curIdx]) return; remember('cue-edit-' + id); fn(cues[curIdx], $(id).value); ceIdx = -1; changed(); fb('Cue ' + cues[curIdx].num + ' updated'); });
+  });
+  $('ce-insert').addEventListener('click', () => {
+    const c = cues[curIdx], nx = cues[curIdx + 1];
+    let num = c ? (nx ? Math.round(((c.num + nx.num) / 2) * 100) / 100 : Math.floor(c.num) + 1) : 1;
+    if (cues.some(x => x.num === num)) { fb('There is no room for a cue between ' + c.num + ' and ' + nx.num, true); return; }
+    const song = c ? c.song : '';
+    store(num);
+    const n = cues.find(x => x.num === num); if (n) { n.song = song; n.note = ''; n.follow = 0; }
+    ceIdx = -1; changed();
+  });
+  $('ce-del').addEventListener('click', () => { const c = cues[curIdx]; if (c) { deleteCue(c.num); ceIdx = -1; fb('Deleted cue ' + c.num + '. Ctrl+Z brings it back'); } });
+
   function setSetting(k, v, msg) { remember('set-' + k); SETTINGS = Object.assign({}, SETTINGS, { [k]: v }); applySettings(); changed(); if (msg) fb(msg); }
   $('ap-banner-set').addEventListener('click', () => { const t = $('ap-banner').value.trim(); if (!t) { fb('Type the banner text first', true); return; } setSetting('banner', t, 'Banner shown. Download the show file to publish it'); });
   $('ap-banner-clear').addEventListener('click', () => { $('ap-banner').value = ''; setSetting('banner', '', 'Banner removed'); });
