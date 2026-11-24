@@ -93,6 +93,15 @@ a { color: inherit; }
 .sheet { border-left: 1px solid var(--stage-line); overflow: auto; max-height: clamp(560px, 80vh, 960px); }
 .viewport:fullscreen { min-height: 0; width: 100%; height: 100%; }
 .viewport.vp-max { position: fixed; inset: 0; z-index: 60; min-height: 0; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.site-banner { background: var(--accent); color: var(--accent-ink); text-align: center; font-weight: 600; font-size: 15px; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.admin-panel { display: grid; gap: 10px; padding: 12px; border-bottom: 1px solid var(--stage-line); background: #090B10; }
+.ap-sec { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; font: 12px var(--f-mono); color: var(--stage-fg); }
+.ap-sec label { display: inline-flex; gap: 6px; align-items: center; }
+.ap-sec input[type="text"] { flex: 1 1 240px; min-width: 0; font: 13px var(--f-mono); color: var(--stage-fg); background: var(--c-panel); border: 1px solid var(--c-edge); border-radius: 3px; padding: 6px 8px; color-scheme: dark; }
+.ap-sec input[type="number"], .ap-sec select { width: auto; font: 12px var(--f-mono); color: var(--stage-fg); background: var(--c-panel); border: 1px solid var(--c-edge); border-radius: 3px; padding: 5px 6px; color-scheme: dark; }
+.ap-sec input[type="number"] { width: 64px; }
+.ap-note { flex-basis: 100%; color: var(--stage-muted); font: 12.5px/1.5 var(--f-body); }
+.ap-note code { font-family: var(--f-mono); color: var(--stage-fg); }
 .pip { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: min(440px, calc(100vw - 24px)); z-index: 40; background: #050608; border: 1px solid #2E3340; border-radius: 6px; overflow: hidden; box-shadow: 0 12px 32px rgba(0, 0, 0, .45); }
 .pip-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 8px; background: #0D1016; border-bottom: 1px solid #242833; }
 .pip-cue { font: 12px var(--f-mono); color: #E9EBEF; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
@@ -294,6 +303,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 <body>
 
 
+<div class="site-banner" id="site-banner" role="status" hidden></div>
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kings Lighting Design</a>
@@ -328,6 +338,29 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <a class="cbtn" id="a-visitors" href="https://kingslighting.goatcounter.com" target="_blank" rel="noopener" hidden style="text-decoration:none">Visitors</a>
           <span class="msg" id="a-msg" role="status">Visitors can watch and run cues. Sign in to edit the rig, cues and set.</span>
         </form>
+        <div class="admin-panel" id="admin-panel" hidden>
+          <div class="ap-sec">
+            <b class="patch-h">Publish</b>
+            <button type="button" class="cbtn" id="ap-download">Download show file</button>
+            <label class="cbtn" for="ap-file" style="cursor:pointer">Load show file…</label><input type="file" id="ap-file" accept=".json,application/json" hidden>
+            <button type="button" class="cbtn" id="ap-copy">Copy show file</button>
+            <span class="ap-note">To put your show on the website, download the show file and upload it to your GitHub repository as <code>show.json</code> (Add file → Upload files → Commit). Every visitor then sees your cues, rig, set, effects and settings instead of the demo.</span>
+          </div>
+          <div class="ap-sec">
+            <b class="patch-h">Banner</b>
+            <label class="sr-only" for="ap-banner">Banner text</label><input type="text" id="ap-banner" maxlength="140" placeholder="e.g. Now booking spring productions">
+            <button type="button" class="cbtn" id="ap-banner-set">Show banner</button>
+            <button type="button" class="cbtn warn" id="ap-banner-clear">Remove</button>
+          </div>
+          <div class="ap-sec">
+            <b class="patch-h">Visitors</b>
+            <label><input type="checkbox" id="ap-cues"> can run cues</label>
+            <label><input type="checkbox" id="ap-confetti"> can fire confetti</label>
+            <label><input type="checkbox" id="ap-sound"> can turn on crowd sound</label>
+            <label><input type="checkbox" id="ap-auto"> auto-play the show, one cue every</label><input type="number" id="ap-sec" min="4" max="120" step="1"><span>s</span>
+            <label for="ap-start">Start visitors at cue</label><select id="ap-start"></select>
+          </div>
+        </div>
         <div class="c-top">
           <div class="viewport" id="viewport" aria-label="3D proscenium stage with moving lights on a front-of-house truss and an overhead electric">
             <div class="vp-tools" role="group" aria-label="Viewport tool">
@@ -405,6 +438,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <button type="button" class="cbtn" id="b-locate">Locate</button>
               <button type="button" class="cbtn" id="b-store">Store</button>
               <button type="button" class="cbtn warn" id="b-clear">Clear</button>
+              <button type="button" class="cbtn" id="b-undo" title="Undo (Ctrl+Z)">Undo</button>
+              <button type="button" class="cbtn" id="b-redo" title="Redo (Ctrl+Shift+Z or Ctrl+Y)">Redo</button>
             </div>
           </div>
           <div class="c-sec">
@@ -427,7 +462,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <div class="keypad" id="keypad"></div>
           </div>
         </div>
-        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The <b>Venue</b> menu switches between the mega church (thrust stage, LED wall, side screens, worship band and choir, arena seating) and the theater. The <b>Fog</b> fader runs two fog machines whose fog takes the colour of the lights and makes beams show; <b>Confetti</b> fires the cannons, and a cue can fire them too. <b>View: Performer</b> puts you on stage looking out at the crowd. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. The lit cross is light <b>Cross</b> in the fixture sheet (and the Cross group): give it any colour or level from the colour presets, encoders or command line, and each cue keeps it. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
+        <p class="c-help"><b>Full screen</b> fills your screen with the stage (Esc to leave), with Go and Back in the corner. Editing is locked for visitors; sign in as admin to change the rig, cues and set. <b>Rave mode</b> moves every light over the crowd in time to a 128 BPM beat, pulsing on each beat and changing colour every bar (with Crowd sound on you hear the beat too) (the Rave cue turns it on), and <b>Crowd sound</b> plays a live crowd: murmuring when seated, roaring when cheering and clapping for applause. Aim and the Crowd position preset can now point lights into the audience. When you scroll away from the stage, it follows you in a small floating window with Go and Back. The <b>Audience</b> menu in the Set bar makes the crowd sit, cheer or applaud, and cues remember it. The <b>Venue</b> menu switches between the mega church (thrust stage, LED wall, side screens, worship band and choir, arena seating) and the theater. The <b>Fog</b> fader runs two fog machines whose fog takes the colour of the lights and makes beams show; <b>Confetti</b> fires the cannons, and a cue can fire them too. <b>View: Performer</b> puts you on stage looking out at the crowd. The audience sits in raked rows in front of the stage; the <b>House</b> fader sets the house lights, and each cue stores its house level (full for the Preset, out when the show starts). Admins can undo with <b>Ctrl+Z</b> (redo with Ctrl+Shift+Z or Ctrl+Y), and the <b>admin tools</b> above the stage publish the show to the website, set a banner, and choose what visitors can do. Your cues, rig and set save in this browser automatically; <b>Reset show</b> brings back the demo. The lit cross is light <b>Cross</b> in the fixture sheet (and the Cross group): give it any colour or level from the colour presets, encoders or command line, and each cue keeps it. New light types in the Patch list: <b>Blinder</b> (a warm 4-lite audience light; hold <b>Blinder hit</b> to flash every blinder to full), <b>LED strobe</b> and <b>Laser</b> (a fan of beams; Zoom sets the fan width and Ballyhoo spins it). The <b>Shutter</b> encoder page sets a strobe rate on any light; for safety the preview flashes no more than 3 times a second, and not at all if your device is set to reduce motion. <b>Masking off</b> hides the border and the wall above the stage so you can see the bars, and <b>Fly bar in / out</b> flies the electric picked in Position, lights and all. The Set list also has flying scenery: painted drops, a scrim, a border, a chandelier, a moon and a show sign. Move the view with <b>Orbit</b>, <b>Pan</b> (or right-drag / Shift-drag) and the mouse wheel; double-click resets it. Build a set with the <b>Set</b> bar: add scenery, furniture and actors, use the <b>Set</b> tool to drag them around, <b>Rotate 45°</b> to turn them and <b>Fly in / out</b> to fly scenery above the stage. <b>Curtain</b> opens and closes the main curtain. Each stored cue remembers where the set and actors stand, which pieces are flown, the cyc and the curtain, so the stage changes between scenes. Use <b>Add bar</b> and <b>Remove bar</b> to hang or strike electrics, and <b>Cyc in / out</b> to fly the cyclorama. Use <b>Patch</b> to add lights from the type list (moving spots, washes and beams, profiles, Fresnels and LED PARs) to any truss, change the type of selected lights, or remove them. Select lights by clicking their tags on the stage, rows in the fixture sheet, or a group. Turn the encoders (drag up and down, scroll, or use arrow keys) to set dimmer, pan, tilt, zoom and color. Use <b>Aim</b> and click the stage to point the selected lights at that spot. Press <b>Store</b> to save the look as a new cue, then <b>Go</b> and <b>Back</b> to play the cue list. The command line accepts console syntax such as <kbd>Group 2 At 80</kbd>, <kbd>1 Thru 3 @ Full</kbd>, <kbd>Store Cue 6</kbd> and <kbd>Cue 3</kbd>.</p>
       </div>
     </div>
   </div>
@@ -936,12 +971,17 @@ function kldTrack(name) {
   Object.entries(cues[0].layout).forEach(([id, p]) => { const o = SET.find(x => x.id === id); if (o) Object.assign(o, p); });
   // Saved show: the rig, cues and set are kept in this browser between visits.
   const SAVE_KEY = 'kld-previs-show-v2';
+  // Only the admin's browser keeps a saved show; visitors always get the published show (show.json) or the demo.
+  const ADMIN_LOCAL = (() => { try { return !!window.KLD_FX && localStorage.getItem('kld-admin-v1') === window.KLD_FX.ADMIN_HASH; } catch (e) { return false; } })();
+  const DEFAULT_SETTINGS = { banner: '', visitorCues: true, visitorConfetti: true, visitorSound: true, autoplay: false, autoplaySec: 12, startCue: 1 };
+  let SETTINGS = clone(DEFAULT_SETTINGS);
   function loadShow() {
+    if (!ADMIN_LOCAL) return null;
     try {
       const d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
       if (!d || (d.v !== 2 && d.v !== 3) || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) return null;
       Object.keys(TRUSS).forEach(k => delete TRUSS[k]); Object.assign(TRUSS, d.truss);
-      FIX = d.fix.filter(x => FLAT(x.type) || (TYPES[x.type] && TRUSS[x.truss])).map(x => mk(x.id, x.type, x.truss, x.x0));
+      FIX = d.fix.filter(x => FLAT(x.type) || (TYPES[x.type] && TRUSS[x.truss])).map(x => mk(x.id, x.type, x.truss, x.x0, x.rave));
       if (d.v === 2) {
         // Older saves numbered lights 101, 201 … : renumber them from 1 and update every cue to match.
         const map = renumber(FIX);
@@ -950,6 +990,7 @@ function kldTrack(name) {
       if (!FIX.some(x => x.type === 'cross')) FIX.push(mk(FIX.reduce((m, x) => Math.max(m, x.id), 0) + 1, 'cross', null, 0));
       reindex();
       cues = d.cues; SET = d.set; setSeq = d.seq || 50;
+      SETTINGS = Object.assign(clone(DEFAULT_SETTINGS), d.settings || {});
       return d;
     } catch (e) { return null; }
   }
@@ -961,12 +1002,88 @@ function kldTrack(name) {
   FIX.forEach(f => { pb[f.id] = Object.assign(defaults(f), pb[f.id] || {}); cues.forEach(c => { c.state[f.id] = Object.assign(defaults(f), c.state[f.id] || {}); }); });
   let saveDirty = false, lastSave = 0;
   function saveShow() {
+    if (!isAdmin) return;
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 3, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0 })), truss: TRUSS, cues, set: SET, seq: setSeq, cur: curIdx, cyc: cycIn, curtain: curtainOpen }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 3, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0, rave: f.rave })), truss: TRUSS, cues, set: SET, seq: setSeq, cur: curIdx, cyc: cycIn, curtain: curtainOpen, settings: SETTINGS }));
       $('save-state').textContent = 'Saved in this browser';
     } catch (e) { $('save-state').textContent = 'Could not save in this browser'; }
   }
   window.addEventListener('pagehide', () => { if (saveDirty) saveShow(); });
+
+  // ---- Undo / redo (Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y): a snapshot of the show is kept before each edit ----
+  const undoStack = [], redoStack = [];
+  let undoT = 0, undoTag = '', restoring = false;
+  function showSnap() {
+    return { truss: TRUSS, fix: FIX.map(f => ({ id: f.id, type: f.type, truss: f.truss, x0: f.x0, rave: f.rave })), cues, cur: curIdx, set: SET, seq: setSeq,
+      masters: { gm: masters.gm, seq: masters.seq, foh: masters.foh, over: masters.over, floor: masters.floor, haze: masters.haze, fog: masters.fog, house: masters.house },
+      fx: [...fxActive], cyc: cycIn, curtain: curtainOpen, crowd: crowdMode, rave: raveMode, settings: SETTINGS };
+  }
+  const fullSnap = () => JSON.stringify(Object.assign(showSnap(), { prog: programmer, sel: selection }));
+  function remember(tag) {
+    if (restoring || !isAdmin) return;
+    const now = performance.now();
+    // Steps that happen together (one click) or a continuous drag of the same control become one undo step.
+    if (now - undoT < 60 || (tag && tag === undoTag && now - undoT < 900)) { undoT = now; return; }
+    undoT = now; undoTag = tag || '';
+    undoStack.push(fullSnap()); if (undoStack.length > 40) undoStack.shift();
+    redoStack.length = 0; updUndo();
+  }
+  function updUndo() {
+    const u = $('b-undo'), r = $('b-redo');
+    if (u) { u.disabled = !isAdmin || !undoStack.length; u.textContent = 'Undo' + (undoStack.length ? ' (' + undoStack.length + ')' : ''); }
+    if (r) r.disabled = !isAdmin || !redoStack.length;
+  }
+  function undo() {
+    if (!isAdmin) return;
+    if (!undoStack.length) { fb('Nothing to undo', true); return; }
+    redoStack.push(fullSnap()); applyShow(JSON.parse(undoStack.pop())); undoT = 0; undoTag = '';
+    fb('Undone' + (undoStack.length ? '. ' + undoStack.length + ' more step' + (undoStack.length === 1 ? '' : 's') + ' can be undone' : '')); updUndo();
+  }
+  function redo() {
+    if (!isAdmin) return;
+    if (!redoStack.length) { fb('Nothing to redo', true); return; }
+    undoStack.push(fullSnap()); applyShow(JSON.parse(redoStack.pop())); undoT = 0; undoTag = '';
+    fb('Redone'); updUndo();
+  }
+  document.addEventListener('keydown', e => {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    const k = (e.key || '').toLowerCase(); if (k !== 'z' && k !== 'y') return;
+    const t = e.target;
+    if (t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && /^(text|email|password|number|search)$/.test(t.type)))) return;
+    if (!isAdmin) return;
+    e.preventDefault();
+    if (k === 'y' || e.shiftKey) redo(); else undo();
+  });
+  // Puts the whole show (rig, cues, set, faders, toggles) back to a saved state: used by undo, redo, loading a show file and the published show.
+  function applyShow(d) {
+    restoring = true;
+    try {
+      Object.keys(TRUSS).forEach(k => { if (!d.truss[k]) { delete TRUSS[k]; if (scene3d) scene3d.removeBar(k); } });
+      Object.entries(d.truss).forEach(([k, T]) => { const had = !!TRUSS[k]; TRUSS[k] = clone(T); if (!had && scene3d) scene3d.addBar(k); });
+      const want = new Map(d.fix.map(x => [x.id, x]));
+      FIX.slice().forEach(f => { const w = want.get(f.id); if (!w || w.type !== f.type || w.truss !== f.truss) { if (scene3d) scene3d.removeFixture(f.id); FIX = FIX.filter(x => x !== f); } });
+      d.fix.forEach(x => { if (!FIX.some(f => f.id === x.id) && (FLAT(x.type) || (TYPES[x.type] && TRUSS[x.truss]))) { const f = mk(x.id, x.type, x.truss, x.x0, x.rave); FIX.push(f); if (scene3d) scene3d.addFixture(f); } });
+      reindex();
+      cues = clone(d.cues); curIdx = clamp(d.cur | 0, 0, cues.length - 1); fade = null;
+      FIX.forEach(f => { cues.forEach(c => { c.state[f.id] = Object.assign(defaults(f), c.state[f.id] || {}); }); if (!pb[f.id]) pb[f.id] = clone(cues[curIdx].state[f.id]); });
+      Object.keys(pb).forEach(k => { if (!byId[k]) delete pb[k]; });
+      programmer = d.prog ? clone(d.prog) : {}; Object.keys(programmer).forEach(k => { if (!byId[k]) delete programmer[k]; });
+      selection = (d.sel || []).filter(id => byId[id]);
+      const wantS = new Map(d.set.map(o => [o.id, o]));
+      SET.slice().forEach(o => { const w = wantS.get(o.id); if (!w || w.kind !== o.kind) { if (scene3d) scene3d.removeSet(o.id); SET = SET.filter(x => x !== o); } });
+      d.set.forEach(o => { const cur = SET.find(x => x.id === o.id); if (cur) Object.assign(cur, clone(o)); else if (PIECES[o.kind]) { const n = clone(o); SET.push(n); if (scene3d) scene3d.addSet(n); } });
+      lay = null; selSet = null; setSeq = Math.max(setSeq, d.seq || 0);
+      if (d.masters) { Object.assign(masters, d.masters); houseAnim = null; Object.keys(d.masters).forEach(syncFader); }
+      if (Array.isArray(d.fxlib) && d.fxlib.length) fxLib = d.fxlib;
+      fxActive = new Set((d.fx || []).filter(id => fxLib.some(x => x.id === id)));
+      if (d.cyc != null) setCyc(d.cyc, true);
+      if (d.curtain != null) setCurtain(d.curtain, true);
+      if (d.crowd) setCrowd(d.crowd, true);
+      if (d.rave != null) setRave(d.rave, true);
+      if (d.settings) SETTINGS = Object.assign(clone(DEFAULT_SETTINGS), d.settings);
+      rebuildPatch(); buildFxPool(); applySettings(); changed();
+    } finally { restoring = false; }
+  }
   let programmer = {};
   let selection = [];
   let fade = null;
@@ -983,6 +1100,7 @@ function kldTrack(name) {
   let snd = null, soundOn = false;
   const BPM = 128, BEAT_MS = 60000 / BPM;
   function setRave(v, quiet) {
+    if (!quiet) remember('rave');
     if (v && !raveMode) { raveBeat0 = performance.now(); if (snd) snd.lastBeat = -1; }
     raveMode = !!v;
     const b = $('tool-rave'); if (b) { b.setAttribute('aria-pressed', raveMode); b.textContent = raveMode ? 'Rave mode on' : 'Rave mode'; }
@@ -998,6 +1116,7 @@ function kldTrack(name) {
   }
   function setCrowd(m, quiet) {
     if (!CROWD[m]) return;
+    if (!quiet) remember('crowd');
     crowdMode = m; const sel = $('s-crowd'); if (sel) sel.value = m;
     if (!quiet) fb('The audience is now ' + CROWD[m] + '. Store to keep it in a cue');
     changed();
@@ -1033,6 +1152,7 @@ function kldTrack(name) {
   }
   function setAttr(ids, a, v) {
     if (!isAdmin) return;
+    remember('prog');
     ids.forEach(id => {
       const f = byId[id]; if (!f || !f.attrs.includes(a)) return;
       let lo = ATTR[a].min, hi = ATTR[a].max;
@@ -1072,6 +1192,7 @@ function kldTrack(name) {
     fb('Located ' + fmtIds(selection));
   }
   function clearKey() {
+    remember('clear');
     if (selection.length) { selection = []; fb('Selection cleared. Press Clear again to empty the programmer'); }
     else if (Object.keys(programmer).length) { programmer = {}; fb('Programmer cleared'); }
     else fb('Nothing to clear');
@@ -1090,6 +1211,7 @@ function kldTrack(name) {
     return Math.round(best * 100) / 100;
   }
   function addLights(type, truss, qty) {
+    remember('patch');
     let full = '';
     const T = TRUSS[truss], added = [];
     for (let k = 0; k < qty; k++) {
@@ -1112,6 +1234,7 @@ function kldTrack(name) {
     fb('Added ' + added.length + ' × ' + TYPES[type].label + ' on the ' + T.name + ': ' + fmtIds(added) + (full ? '. ' + full : '') + '. Store to keep them in a cue', !!full);
   }
   function changeType(type) {
+    remember('type');
     if (!needSel()) return;
     const ids = selection.filter(id => !FLAT(byId[id].type));
     if (!ids.length) { fb('The cyc light cannot change type', true); return; }
@@ -1128,6 +1251,7 @@ function kldTrack(name) {
   }
   const ORD = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
   function addBar() {
+    remember('bar');
     const elecs = Object.values(TRUSS).filter(T => T.elec);
     if (elecs.length >= 8) { fb('The grid holds up to 8 electrics', true); return; }
     const zs = [4.1, ...elecs.map(T => T.z).sort((a, b) => b - a), -6.6];
@@ -1143,6 +1267,7 @@ function kldTrack(name) {
     fb('Added the ' + TRUSS[key].name + ' (' + (best >= 0 ? best.toFixed(1) + ' m downstage' : (-best).toFixed(1) + ' m upstage') + ' of centre). Add lights to it with Add lights');
   }
   function removeBar(key) {
+    remember('unbar');
     const T = TRUSS[key];
     if (!T || !T.elec) { fb('Only electrics can be removed. Pick one in Position first', true); return; }
     const n = FIX.filter(f => f.truss === key).length;
@@ -1154,6 +1279,7 @@ function kldTrack(name) {
   }
 
   function removeLights() {
+    remember('unpatch');
     if (!needSel()) return;
     const ids = selection.filter(id => !FLAT(byId[id].type));
     if (!ids.length) { fb('The cyc light cannot be removed', true); return; }
@@ -1171,10 +1297,10 @@ function kldTrack(name) {
   }
 
   // ================= Playback =================
-  function gotoIdx(i, instant) {
+  function gotoIdx(i, instant, silent) {
     if (i < 0 || i >= cues.length) return;
     const c = cues[i]; curIdx = i;
-    kldTrack('cue/' + c.num + ' ' + c.name);
+    if (!silent) kldTrack('cue/' + c.num + ' ' + c.name);
     if (instant || c.fade <= 0) { pb = clone(c.state); fade = null; }
     else fade = { from: clone(pb), to: clone(c.state), t0: performance.now(), dur: c.fade * 1000 };
     if (c.cyc != null) setCyc(c.cyc, true);
@@ -1191,11 +1317,15 @@ function kldTrack(name) {
     fb('Cue ' + c.num + ' · ' + c.name + (instant || c.fade <= 0 ? '' : ' (' + c.fade + ' s)'));
     changed();
   }
-  function go() { if (curIdx + 1 >= cues.length) { fb('End of cue list. Click a cue or type Cue 1 to start again', true); return; } gotoIdx(curIdx + 1); }
-  function back() { if (curIdx <= 0) { fb('Already at the first cue', true); return; } gotoIdx(curIdx - 1); }
+  const canRun = () => isAdmin || SETTINGS.visitorCues;
+  function go() {
+    if (!canRun()) { fb('Cue controls are turned off for visitors', true); return; } if (curIdx + 1 >= cues.length) { fb('End of cue list. Click a cue or type Cue 1 to start again', true); return; } gotoIdx(curIdx + 1); }
+  function back() {
+    if (!canRun()) { fb('Cue controls are turned off for visitors', true); return; } if (curIdx <= 0) { fb('Already at the first cue', true); return; } gotoIdx(curIdx - 1); }
   function gotoNum(n) { const i = cues.findIndex(c => c.num === n); if (i < 0) { fb('There is no cue ' + n, true); return; } gotoIdx(i); }
   function store(num) {
     if (!isAdmin) { fb('Sign in as admin to store cues', true); return; }
+    remember('store');
     const state = {};
     FIX.forEach(f => { const o = {}; f.attrs.forEach(a => { o[a] = val(f.id, a); }); state[f.id] = o; });
     if (num == null) num = cues.length ? Math.floor(Math.max(...cues.map(c => c.num))) + 1 : 1;
@@ -1227,6 +1357,7 @@ function kldTrack(name) {
   }
   function deleteCue(n) {
     if (!isAdmin) return;
+    remember('delcue');
     const i = cues.findIndex(c => c.num === n);
     if (i < 0) { fb('There is no cue ' + n, true); return; }
     cues.splice(i, 1); if (curIdx >= cues.length) curIdx = cues.length - 1; else if (i < curIdx) curIdx--;
@@ -1348,6 +1479,7 @@ function kldTrack(name) {
       b.classList.toggle('fx-on', fxActive.has(def.id)); b.setAttribute('aria-pressed', fxActive.has(def.id));
       b.addEventListener('click', () => {
         if (!isAdmin) { fb('Sign in as admin to run effects', true); return; }
+        remember('fx');
         if (fxActive.has(def.id)) { fxActive.delete(def.id); fb(def.name + ' stopped'); }
         else { fxActive.add(def.id); fb(def.name + ' running on ' + FX.targetLabel(def.target).toLowerCase() + '. Store to keep it in a cue'); }
         buildFxPool(); changed();
@@ -1394,6 +1526,7 @@ function kldTrack(name) {
   pPos.addEventListener('change', () => { dirty = true; });
   $('p-bar-add').addEventListener('click', addBar);
   $('p-bar-fly').addEventListener('click', () => {
+    remember('barfly');
     const T = TRUSS[pPos.value];
     if (!T || !T.elec) { fb('Only electrics can fly. Pick one in Position first', true); return; }
     const out = (T.fly || 0) < 0.5, tg = {}; tg[pPos.value] = out ? 1 : 0;
@@ -1407,6 +1540,7 @@ function kldTrack(name) {
   });
   sKind.value = 'stairs';
   function addPiece(kind) {
+    remember('piece');
     if (SET.length >= 40) { fb('The stage holds up to 40 pieces', true); return; }
     let best = [0, 1], bs = -Infinity;
     for (let x = -7; x <= 7; x += 1) for (let z = -5; z <= 3.5; z += 0.5) {
@@ -1425,12 +1559,14 @@ function kldTrack(name) {
   $('s-crowd').value = crowdMode;
   $('s-crowd').addEventListener('change', () => setCrowd($('s-crowd').value));
   $('s-rot').addEventListener('click', () => {
+    remember('rot');
     const o = SET.find(x => x.id === selSet);
     if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
     lay = null; o.rot = Math.round((o.rot + 45) / 45) * 45 % 360; changed();
     fb(PIECES[o.kind].label + ' turned to ' + o.rot + '°');
   });
   $('s-fly').addEventListener('click', () => {
+    remember('fly');
     const o = SET.find(x => x.id === selSet);
     if (!o) { fb('Pick the Set tool and click a piece first', true); return; }
     if (PIECES[o.kind].actor) { fb('Actors cannot fly. Drag them offstage instead', true); return; }
@@ -1440,6 +1576,7 @@ function kldTrack(name) {
     fb((out ? 'Flying out ' : 'Flying in ') + PIECES[o.kind].label + '. Store to save it in a cue');
   });
   $('s-del').addEventListener('click', () => {
+    remember('pdel');
     const o = SET.find(x => x.id === selSet);
     if (!o) { fb('Pick the Set tool and click a piece or actor first', true); return; }
     SET = SET.filter(x => x !== o); if (scene3d) scene3d.removeSet(o.id); selSet = null; changed();
@@ -1484,7 +1621,7 @@ function kldTrack(name) {
     w.innerHTML = '<span class="v"></span><input type="range" min="0" max="100" step="1"><label></label>';
     const inp = w.querySelector('input'), v = w.querySelector('.v'), l = w.querySelector('label');
     inp.id = 'fd-' + k; l.htmlFor = inp.id; l.textContent = label; inp.value = masters[k]; v.textContent = masters[k];
-    inp.addEventListener('input', () => { if (k === 'house') houseAnim = null; masters[k] = +inp.value; v.textContent = inp.value; changed(); });
+    inp.addEventListener('input', () => { remember('fader-' + k); if (k === 'house') houseAnim = null; masters[k] = +inp.value; v.textContent = inp.value; changed(); });
     $('faders').appendChild(w);
   });
 
@@ -1581,7 +1718,7 @@ function kldTrack(name) {
       const tr = document.createElement('tr'); if (i === curIdx) tr.className = 'cur'; else if (i === curIdx + 1) tr.className = 'next';
       tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td>';
       tr.cells[0].textContent = c.num; tr.cells[1].textContent = c.name; tr.cells[2].textContent = c.fade + ' s'; tr.cells[3].textContent = c.cyc === false ? 'Out' : 'In'; tr.cells[4].textContent = c.curtain === false ? 'Shut' : 'Open';
-      tr.addEventListener('click', () => gotoIdx(i));
+      tr.addEventListener('click', () => { if (canRun()) gotoIdx(i); else fb('Cue controls are turned off for visitors', true); });
       body.appendChild(tr);
     });
     $('pb-state').textContent = fade ? 'Fading…' : (Object.keys(programmer).length ? 'Programmer active' : cues.length + ' cues');
@@ -2265,7 +2402,7 @@ function kldTrack(name) {
         if (id) {
           const o = SET.find(x => x.id === id), P = hit(e, deckPlane);
           dragSet = { o, dx: P ? o.x - P.x : 0, dz: P ? o.z - P.z : 0 };
-          lay = null; selSet = id; changed(); return;
+          remember('drag'); lay = null; selSet = id; changed(); return;
         }
         if (selSet) { selSet = null; changed(); }
       }
@@ -2484,6 +2621,7 @@ function kldTrack(name) {
   let curtainOpen = true;
   function setCurtain(v, quiet, now) {
     if (v === curtainOpen) return;
+    if (!quiet) remember('curtain');
     curtainOpen = v;
     $('tool-curtain').setAttribute('aria-pressed', curtainOpen); $('tool-curtain').textContent = curtainOpen ? 'Curtain open' : 'Curtain shut';
     if (scene3d) scene3d.moveCurtain(curtainOpen, now);
@@ -2495,6 +2633,7 @@ function kldTrack(name) {
   let cycIn = true;
   function setCyc(v, quiet, now) {
     if (v === cycIn) return;
+    if (!quiet) remember('cyc');
     cycIn = v;
     $('tool-cyc').setAttribute('aria-pressed', cycIn); $('tool-cyc').textContent = cycIn ? 'Cyc in' : 'Cyc out';
     if (scene3d) scene3d.flyCyc(cycIn, now);
@@ -2529,7 +2668,9 @@ function kldTrack(name) {
     document.querySelectorAll('.console .edit button, .console .edit input, .console .edit select, .console .edit-tool').forEach(el => { el.disabled = locked; });
     document.querySelectorAll('.console .edit [tabindex]').forEach(el => { el.tabIndex = locked ? -1 : 0; });
     $('auth-fields').hidden = !locked; $('auth-fields').style.display = locked ? 'contents' : 'none';
-    $('a-out').hidden = locked; $('a-visitors').hidden = locked;
+    $('a-out').hidden = locked; $('a-visitors').hidden = locked; $('admin-panel').hidden = locked;
+    $('save-state').textContent = locked ? 'Sign in as admin to change and save the show' : 'Your cues, rig and set save in this browser';
+    applySettings(); updUndo();
     $('auth-h').textContent = locked ? 'Viewing only' : 'Admin';
     if (locked && (toolMode === 'aim' || toolMode === 'set')) setTool('move');
   }
@@ -2556,6 +2697,81 @@ function kldTrack(name) {
   try { if (localStorage.getItem(ADMIN_KEY) === ADMIN_HASH) { isAdmin = true; $('a-msg').textContent = 'Signed in on this device.'; } } catch (err) {}
   applyLock();
   fxReady = true; buildFxPool();
+  $('b-undo').addEventListener('click', undo);
+  $('b-redo').addEventListener('click', redo);
+
+  // ---- Admin tools: publish the show, banner, and what visitors may do ----
+  function applySettings() {
+    const ban = $('site-banner'); ban.textContent = SETTINGS.banner || ''; ban.hidden = !SETTINGS.banner;
+    $('tool-confetti').hidden = !isAdmin && !SETTINGS.visitorConfetti;
+    $('tool-sound').hidden = !isAdmin && !SETTINGS.visitorSound;
+    ['b-go', 'b-back', 'fs-go', 'fs-back', 'pip-go', 'pip-back'].forEach(id => { const b = $(id); if (b) b.disabled = !canRun(); });
+    if (!isAdmin) return;
+    if (document.activeElement !== $('ap-banner')) $('ap-banner').value = SETTINGS.banner || '';
+    $('ap-cues').checked = !!SETTINGS.visitorCues; $('ap-confetti').checked = !!SETTINGS.visitorConfetti; $('ap-sound').checked = !!SETTINGS.visitorSound;
+    $('ap-auto').checked = !!SETTINGS.autoplay; $('ap-sec').value = SETTINGS.autoplaySec;
+    const st = $('ap-start'); st.innerHTML = '';
+    cues.forEach(c => st.add(new Option(c.num + ' · ' + c.name, c.num)));
+    st.value = String(cues.some(c => c.num === SETTINGS.startCue) ? SETTINGS.startCue : (cues[0] ? cues[0].num : 1));
+  }
+  function setSetting(k, v, msg) { remember('set-' + k); SETTINGS = Object.assign({}, SETTINGS, { [k]: v }); applySettings(); changed(); if (msg) fb(msg); }
+  $('ap-banner-set').addEventListener('click', () => { const t = $('ap-banner').value.trim(); if (!t) { fb('Type the banner text first', true); return; } setSetting('banner', t, 'Banner shown. Download the show file to publish it'); });
+  $('ap-banner-clear').addEventListener('click', () => { $('ap-banner').value = ''; setSetting('banner', '', 'Banner removed'); });
+  $('ap-cues').addEventListener('change', e => setSetting('visitorCues', e.target.checked, e.target.checked ? 'Visitors can run cues' : 'Visitors can watch but not run cues'));
+  $('ap-confetti').addEventListener('change', e => setSetting('visitorConfetti', e.target.checked, e.target.checked ? 'Visitors can fire confetti' : 'Confetti is admin only'));
+  $('ap-sound').addEventListener('change', e => setSetting('visitorSound', e.target.checked, e.target.checked ? 'Visitors can turn on crowd sound' : 'Crowd sound is admin only'));
+  $('ap-auto').addEventListener('change', e => setSetting('autoplay', e.target.checked, e.target.checked ? 'Visitors will see the show play itself, one cue every ' + SETTINGS.autoplaySec + ' s. Lock the console to watch it' : 'Auto-play off'));
+  $('ap-sec').addEventListener('change', e => setSetting('autoplaySec', clamp(Math.round(+e.target.value || 12), 4, 120)));
+  $('ap-start').addEventListener('change', e => setSetting('startCue', +e.target.value, 'Visitors will start at cue ' + e.target.value));
+  function showFile() {
+    return JSON.stringify(Object.assign({ v: 3, kind: 'kld-show', venue: VENUE, saved: new Date().toISOString(), fxlib: fxLib }, showSnap(), { prog: {} }));
+  }
+  $('ap-download').addEventListener('click', () => {
+    try {
+      const url = URL.createObjectURL(new Blob([showFile()], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'show.json'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      fb('Downloading show.json. If nothing downloads here, use Copy show file instead');
+    } catch (e) { fb('This page could not start a download. Use Copy show file instead', true); }
+  });
+  $('ap-copy').addEventListener('click', () => {
+    const txt = showFile();
+    try { navigator.clipboard.writeText(txt).then(() => fb('Show file copied. Paste it into a new file called show.json in your GitHub repository'), () => fb('Copying was blocked here. Use Download show file instead', true)); }
+    catch (e) { fb('Copying was blocked here. Use Download show file instead', true); }
+  });
+  $('ap-file').addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      let d; try { d = JSON.parse(rd.result); } catch (err) { fb('That file is not a show file (it is not valid JSON)', true); return; }
+      if (!d || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) { fb('That file is not a Kings Lighting show file', true); return; }
+      remember('import'); applyShow(d);
+      fb('Loaded ' + file.name + ': ' + cues.length + ' cues, ' + FIX.length + ' lights' + (d.venue && d.venue !== VENUE ? '. It was made for the ' + (d.venue === 'church' ? 'mega church' : 'theater') + ' venue' : '') + '. Ctrl+Z undoes it');
+    };
+    rd.readAsText(file);
+  });
+
+  // Auto-play for visitors: steps through the cue list and loops back to the start.
+  let autoT = performance.now();
+  setInterval(() => {
+    if (isAdmin || !SETTINGS.autoplay || document.hidden || !cues.length) { autoT = performance.now(); return; }
+    if (performance.now() - autoT >= Math.max(4, SETTINGS.autoplaySec) * 1000) { autoT = performance.now(); gotoIdx(curIdx + 1 < cues.length ? curIdx + 1 : 0, false, true); }
+  }, 500);
+
+  // Without a saved show on this device, load the published show if the site has one.
+  if (!saved) {
+    fetch('show.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).then(d => {
+      if (!d || !Array.isArray(d.fix) || !Array.isArray(d.cues) || !d.cues.length || !Array.isArray(d.set) || !d.truss) return;
+      if (d.venue && d.venue !== VENUE) {
+        try { if (!sessionStorage.getItem('kld-venue-hop')) { sessionStorage.setItem('kld-venue-hop', '1'); localStorage.setItem('kld-venue', d.venue); location.reload(); return; } } catch (e) {}
+      }
+      applyShow(d);
+      const si = cues.findIndex(c => c.num === (SETTINGS.startCue || 1));
+      gotoIdx(si >= 0 ? si : 0, true, true);
+      fb(isAdmin ? 'Loaded the published show from show.json' : 'Ready');
+    }).catch(() => {});
+  }
 
   // ---- Full screen (falls back to filling the browser window where full screen is not allowed) ----
   function isFull() { return document.fullscreenElement === vp || vp.classList.contains('vp-max'); }
@@ -2574,7 +2790,7 @@ function kldTrack(name) {
   }
   $('tool-fs').addEventListener('click', toggleFull);
   $('tool-rave').addEventListener('click', () => setRave(!raveMode));
-  $('tool-confetti').addEventListener('click', () => { kldTrack('confetti'); if (scene3d) { scene3d.fireConfetti(); cannon(); fb('Confetti! Tick "Confetti on this cue" and Store to fire it with a cue'); } });
+  $('tool-confetti').addEventListener('click', () => { if (!isAdmin && !SETTINGS.visitorConfetti) return; kldTrack('confetti'); if (scene3d) { scene3d.fireConfetti(); cannon(); fb('Confetti! Tick "Confetti on this cue" and Store to fire it with a cue'); } });
   if (CHURCH) { $('tool-curtain').hidden = true; $('tool-mask').hidden = true; }
   $('s-venue').value = VENUE;
   let venueArm = null;
@@ -2676,6 +2892,7 @@ function kldTrack(name) {
   $('tool-sound').addEventListener('click', () => {
     if (!snd) snd = makeSound();
     if (!snd) { fb('This browser cannot play sound', true); return; }
+    if (!soundOn && !isAdmin && !SETTINGS.visitorSound) return;
     soundOn = !soundOn;
     const t = snd.ctx.currentTime;
     if (soundOn) { kldTrack('crowd-sound'); snd.ctx.resume(); snd.master.gain.setTargetAtTime(0.8, t, 0.3); }
